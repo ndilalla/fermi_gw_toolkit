@@ -8,6 +8,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 import healpy as hp
 import numpy as np
+from matplotlib import rc
+rc('text', usetex=True)
 
 if __name__=="__main__":
 
@@ -22,6 +24,10 @@ if __name__=="__main__":
                         required=True, type=str)
     parser.add_argument('--max_percentile', help='Percentile to use as maximum for color bar',
                         required=True, type=str)
+    parser.add_argument('--zscale', help='scale for the color bar',
+                        required=False, type=str, default='linear')
+    parser.add_argument('--cmap', help='cccolor map for the color bar',
+                        required=False, type=str, default='jet')
 
     args = parser.parse_args()
 
@@ -46,24 +52,28 @@ if __name__=="__main__":
 
     idx = hpx_ul <= 0
     hpx_ul[idx] = np.nan
-
-    cmap = matplotlib.cm.afmhot_r
-    cmap.set_bad('#f0f0f0')
-
+    if args.cmap=='jet':
+        cmap = matplotlib.cm.jet
+        cmap.set_under("w") # sets background to white
+    elif args.cmap=='afmhot_r':
+        cmap = matplotlib.cm.afmhot_r
+        cmap.set_bad('#f0f0f0')
+        pass
+    
     fig = plt.figure(figsize=(15, 8))
 
     # Get order of magnitude of the median (to scale the values)
 
     magnitude = 10 ** np.floor(np.log10(np.median(hpx_ul[np.isfinite(hpx_ul)])))
-
+    
     projected_map = hp.mollview(hpx_ul / magnitude, rot=(0, 0),
                                 min=mmin / magnitude,
                                 max=mmax / magnitude,
-                                norm='linear',
+                                norm=args.zscale,
                                 return_projected_map=True, xsize=1000, coord='C',
                                 title='',
                                 cmap=cmap,
-                                fig=1, cbar=None)
+                                fig=1, cbar=None,notext=True)
 
     ax = plt.gca()
     image = ax.get_images()[0]
@@ -73,11 +83,27 @@ if __name__=="__main__":
                         format='%.2g')
 
     hp.graticule()
+    lat=0
+    for lon in range(-150,180,60):
+        hp.projtext(lon,lat,'%d' %(lon),lonlat=True,size=15,va='bottom')
+        pass
 
-    for ra in range(-150, 180, 60):
-        hp.visufunc.projtext(ra + 7.5, -10, '%.0f' % ra, lonlat=True)
+    lon=179.9
+    for lat in range(-60,90,30):
+        if lat==0:
+            va='center'
+            continue
+        elif lat>0:va='bottom'
+        else: va='top'
+        hp.projtext(lon,lat,'%d' %(lat),lonlat=True,size=15,horizontalalignment='right',va=va)
+        pass
+    plt.text(-2.2,0,'Dec',rotation=90,size=20)
+    plt.text(0,-1.1,'RA',size=20,ha='center')
+    
+    #for ra in range(-150, 180, 60):
+    #    hp.visufunc.projtext(ra + 7.5, -10, '%.0f' % ra, lonlat=True)
 
-    for dec in range(-60, 90, 30):
-        hp.visufunc.projtext(7.5, dec - 10, '%.0f' % dec, lonlat=True)
+    #for dec in range(-60, 90, 30):
+    #    hp.visufunc.projtext(7.5, dec - 10, '%.0f' % dec, lonlat=True)
 
     fig.savefig(args.out_plot)
