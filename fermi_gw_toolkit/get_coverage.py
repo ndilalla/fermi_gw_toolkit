@@ -62,6 +62,8 @@ def get_coverage(ft2file, ligo_map_file, met_t1, met_t2, theta_cut, zenith_cut):
 
     start, ra_scz, dec_scz, ra_zenith, dec_zenith = _gtmktime(ft2data, met_t1, met_t2, cadence=30)
 
+    print("\nCoverage will be computed from %.1f to %.1f\n" % (start.min(), start.max()))
+
     coverage = np.zeros_like(start)
 
     for i, (t, rz, dz, rz2, dz2) in enumerate(zip(start, ra_scz, dec_scz, ra_zenith, dec_zenith)):
@@ -179,10 +181,13 @@ if __name__ == "__main__":
 
     fig = plt.figure(figsize=(16*3, 8.0*3), dpi=150)
 
-    plt.plot((t - args.start_time) / 1000.0, c * 100.0, '-', linewidth=4)
+    dt = (t - args.start_time) / 1000.0
+
+    plt.plot(dt, c * 100.0, '-', linewidth=4)
     plt.xlabel("Time since trigger (ks)")
     plt.ylabel("Coverage of LIGO map (%)")
     plt.ylim([0, 110])
+    plt.xlim([dt.min(), dt.max()])
     _ = plt.yticks(np.arange(0, 120, 20))
     plt.axhline(100, linestyle=':', color='green')
 
@@ -208,23 +213,24 @@ if __name__ == "__main__":
 
     sky_coverage = np.cumsum(c)
 
-    dt = (t - args.start_time)
+    dt = (t - args.start_time) / 1000.0
 
     fig = plt.figure(figsize=(16*3, 8.0*3), dpi=150)
 
-    plt.plot(dt / 1000.0, sky_coverage, lw=4)
+    plt.plot(dt, sky_coverage, lw=4)
 
     plt.xlabel("Time since trigger (ks)")
     plt.ylabel("Cumulative\nprobability coverage")
 
     plt.ylim([0,1.1])
+    plt.xlim([dt.min(),dt.max()])
     plt.axhline(1, linestyle=':', color='green')
 
     if args.vert_lines:
 
         for p in args.vert_lines:
             plt.axvline(p / 1000.0, linestyle=':', color='black', lw=2)
-            plt.text(p / 1000.0, 1.107, '%.1f ks' % (p / 1000.0), horizontalalignment='center')
+            plt.text(p / 1000.0, 1.11, '%.1f ks' % (p / 1000.0), horizontalalignment='center')
 
     fig.tight_layout()
 
