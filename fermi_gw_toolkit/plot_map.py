@@ -44,10 +44,23 @@ if __name__=="__main__":
 
     idx = (hpx_ul > 0) & np.isfinite(hpx_ul)
 
-    # Use the 5 and 95 percentile
+    # Use the provided percentiles
 
-    mmin = np.percentile(hpx_ul[idx],args.min_percentile)
-    mmax = np.percentile(hpx_ul[idx],args.max_percentile)
+    if args.min_percentile != 0:
+
+        mmin = np.percentile(hpx_ul[idx],args.min_percentile)
+
+    else:
+
+        mmin = hpx_ul.min()
+
+    if args.max_percentile != 100:
+
+        mmax = np.percentile(hpx_ul[idx],args.max_percentile)
+
+    else:
+
+        mmax = hpx_ul.max()
 
     # Now set to nan all negative or zero pixels
 
