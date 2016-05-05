@@ -26,11 +26,12 @@ if __name__=="__main__":
                         required=True, type=str)
     parser.add_argument('--zscale', help='scale for the color bar',
                         required=False, type=str, default='linear')
-    parser.add_argument('--cmap', help='cccolor map for the color bar',
+    parser.add_argument('--cmap', help='color map for the color bar',
                         required=False, type=str, default='jet')
+    parser.add_argument('--rot', help='rotation to center the map',
+                        required=False, type=str, default='180,0')
 
     args = parser.parse_args()
-
     # Read map
 
     hpx_ul = hp.read_map(args.map)
@@ -59,14 +60,16 @@ if __name__=="__main__":
         cmap = matplotlib.cm.afmhot_r
         cmap.set_bad('#f0f0f0')
         pass
-    
+    # Rotation for the mollview map:
+    rot=args.rot.split(',')
+
     fig = plt.figure(figsize=(15, 8))
 
     # Get order of magnitude of the median (to scale the values)
 
     magnitude = 10 ** np.floor(np.log10(np.median(hpx_ul[np.isfinite(hpx_ul)])))
     
-    projected_map = hp.mollview(hpx_ul / magnitude, rot=(0, 0),
+    projected_map = hp.mollview(hpx_ul / magnitude, rot=rot,
                                 min=mmin / magnitude,
                                 max=mmax / magnitude,
                                 norm=args.zscale,
@@ -84,7 +87,7 @@ if __name__=="__main__":
 
     hp.graticule()
     lat=0
-    for lon in range(-150,180,60):
+    for lon in range(60,360,60):
         hp.projtext(lon,lat,'%d' %(lon),lonlat=True,size=15,va='bottom')
         pass
 
