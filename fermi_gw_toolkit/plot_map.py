@@ -69,6 +69,7 @@ if __name__=="__main__":
     if args.cmap=='jet':
         cmap = matplotlib.cm.jet
         cmap.set_under("w") # sets background to white
+        cmap.set_bad('ivory')
     elif args.cmap=='afmhot_r':
         cmap = matplotlib.cm.afmhot_r
         cmap.set_bad('#f0f0f0')
@@ -101,17 +102,18 @@ if __name__=="__main__":
     hp.graticule()
     lat=0
     for lon in range(60,360,60):
-        hp.projtext(lon,lat,'%d' %(lon),lonlat=True,size=15,va='bottom')
+        hp.visufunc.projtext(lon,lat,'--%d$' %(lon),lonlat=True,size=15,va='bottom')
         pass
 
-    lon=179.9
+    lon=179.9-float(rot[0])
     for lat in range(-60,90,30):
         if lat==0:
             va='center'
             continue
         elif lat>0:va='bottom'
-        else: va='top'
-        hp.projtext(lon,lat,'%d' %(lat),lonlat=True,size=15,horizontalalignment='right',va=va)
+        else:
+            va='top'
+        hp.visufunc.projtext(lon,lat, r'%d$^{\circ}$ ' %(lat),lonlat=True,size=15,horizontalalignment='right',va=va)
         pass
     plt.text(-2.2,0,'Dec',rotation=90,size=20)
     plt.text(0,-1.1,'RA',size=20,ha='center')
