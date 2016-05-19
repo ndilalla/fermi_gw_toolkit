@@ -67,9 +67,13 @@ if __name__=="__main__":
     idx = hpx_ul <= 0
     hpx_ul[idx] = np.nan
     if args.cmap=='jet':
+        background='w'
+        background='ivory'
+        background='antiquewhite'
         cmap = matplotlib.cm.jet
-        cmap.set_under("w") # sets background to white
-        cmap.set_bad('ivory')
+        cmap.set_under("w",alpha=0) # sets background to white
+        cmap.set_bad(background)
+        
     elif args.cmap=='afmhot_r':
         cmap = matplotlib.cm.afmhot_r
         cmap.set_bad('#f0f0f0')
