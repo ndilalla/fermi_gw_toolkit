@@ -5,6 +5,7 @@ __author__ = 'giacomov'
 import argparse
 import numpy as np
 import healpy as hp
+import warnings
 
 from check_file_exists import check_file_exists
 
@@ -41,7 +42,7 @@ if __name__=="__main__":
 
     if len(non_uls) > 0:
 
-        raise RuntimeError("Not all the fluxes are upper limits!")
+        warnings.warn("\n\n*** Not all the fluxes are upper limits!\n\n")
 
     # Convert to float
 
