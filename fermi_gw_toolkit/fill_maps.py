@@ -9,14 +9,8 @@ import warnings
 
 from check_file_exists import check_file_exists
 
+from sky_to_healpix_id import sky_to_healpix_id
 
-def sky_to_healpix_id(this_ra, this_dec):
-
-    theta = 0.5 * np.pi - np.deg2rad(this_dec)
-    phi = np.deg2rad(this_ra)
-    ipix = hp.ang2pix(nside, theta, phi)
-
-    return ipix
 
 if __name__=="__main__":
 
@@ -65,7 +59,7 @@ if __name__=="__main__":
 
     for this_ra, this_dec, this_upper_limit in zip(ra,dec,upper_limits):
 
-        id = sky_to_healpix_id(this_ra, this_dec)
+        id = sky_to_healpix_id(nside, this_ra, this_dec)
 
         upper_limits_map[id] = this_upper_limit
 
@@ -83,7 +77,7 @@ if __name__=="__main__":
 
     for this_ra, this_dec, this_ts in zip(ra,dec,tss):
 
-        id = sky_to_healpix_id(this_ra, this_dec)
+        id = sky_to_healpix_id(nside, this_ra, this_dec)
 
         ts_map[id] = this_ts
 

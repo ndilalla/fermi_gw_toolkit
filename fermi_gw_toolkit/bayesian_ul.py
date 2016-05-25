@@ -52,7 +52,7 @@ if __name__=="__main__":
     parser.add_argument('--min_index', help='Minimum photon index to consider', type=float,
                         required=False, default=-10)
     parser.add_argument('--max_index', help='Maximum photon index to consider', type=float,
-                        required=False, default=10)
+                        required=False, default=0.1)
     parser.add_argument('--gal_sys_err', help='Systematic error on the Galactic template (Default: 0.15, '
                                               'i.e., 15 percent)',
                         type=float, required=False, default=0.15)
@@ -73,6 +73,7 @@ if __name__=="__main__":
     parser.add_argument('--emax', help='Maximum energy for flux computation (you should use the same you '
                                        'used to select data)',
                         type=float, required=False, default=100000.0)
+
 
     args = parser.parse_args()
 
@@ -95,20 +96,35 @@ if __name__=="__main__":
     print("Semi-bayesian upper limit computation with ST...")
 
     # Sync and fit
-    pylike_instance[args.src].src.spectrum().parameter('Index').setBounds(args.min_index, args.max_index)
     pylike_instance.syncSrcParams()
-    pylike_instance.fit(0)
+    pylike_instance.fit()
 
     # Compute ST upper limit
 
     ul = UpperLimits.UpperLimit(pylike_instance, args.src)
 
-    st_bayes_ul, parameter_value = ul.bayesianUL(0.95, emin=args.emin, emax=args.emax)
+    try:
 
-    # Convert to energy flux
-    best_fit_photon_index = pylike_instance[args.src].src.spectrum().parameter('Index').getValue()
+        st_bayes_ul, parameter_value = ul.bayesianUL(0.95, emin=args.emin, emax=args.emax)
 
-    st_bayes_ul_ene = st_bayes_ul * get_conversion_factor(best_fit_photon_index)
+    except:
+
+        # This fails sometimes with RuntimeError: Attempt to set parameter value outside bounds.
+
+        print("\n\nWARNING: upper limit computation with ST has failed! \n\n")
+
+        st_bayes_ul = -1
+        st_bayes_ul_ene = -1
+
+        # Get back to a good state
+        pylike_instance = UnbinnedAnalysis.UnbinnedAnalysis(unbinned_observation, args.xml, args.engine)
+        pylike_instance.fit()
+
+    else:
+        # Convert to energy flux
+        best_fit_photon_index = pylike_instance[args.src].src.spectrum().parameter('Index').getValue()
+
+        st_bayes_ul_ene = st_bayes_ul * get_conversion_factor(best_fit_photon_index)
 
     print("done")
 
@@ -122,9 +138,9 @@ if __name__=="__main__":
     for p in pylike_instance.model.params:
 
         if p.isFree():
-
             source_name = p.srcName
             parameter_name = p.parameter.getName()
+            p.parameter.setScale(1.0)
 
             free_parameters[(source_name, parameter_name)] = MyParameter(p)
 
@@ -136,7 +152,15 @@ if __name__=="__main__":
 
     if (args.iso, 'Normalization') in free_parameters:
 
-        free_parameters[(args.iso, 'Normalization')].bounds = (0, 100)
+        try:
+
+            free_parameters[(args.iso, 'Normalization')].bounds = (0, 100)
+
+        except:
+
+            # This happens if the best fit value is outside those boundaries
+            free_parameters[(args.iso, 'Normalization')].value = 1.0
+            free_parameters[(args.iso, 'Normalization')].bounds = (0, 100)
 
     else:
 
@@ -146,7 +170,16 @@ if __name__=="__main__":
 
     if (args.gal, 'Value') in free_parameters:
 
-        free_parameters[(args.gal, 'Value')].prior = TruncatedGaussianPrior(1.0, args.gal_sys_err)
+        try:
+
+            free_parameters[(args.gal, 'Value')].bounds = (0.1, 10.0)
+
+            free_parameters[(args.gal, 'Value')].prior = TruncatedGaussianPrior(1.0, args.gal_sys_err)
+
+        except:
+            # This happens if the best fit value is outside those boundaries
+            free_parameters[(args.gal, 'Value')].value = 1.0
+            free_parameters[(args.gal, 'Value')].bounds = (0.1, 10.0)
 
     else:
 
@@ -156,7 +189,14 @@ if __name__=="__main__":
 
     if (args.src, 'Integral') in free_parameters:
 
-        free_parameters[(args.src, 'Integral')].bounds = (0, 10)
+        try:
+
+            free_parameters[(args.src, 'Integral')].bounds = (0, 10)
+
+        except:
+
+            free_parameters[(args.src, 'Integral')].value = 1e-7
+            free_parameters[(args.src, 'Integral')].bounds = (0, 10)
 
     else:
 
@@ -166,20 +206,28 @@ if __name__=="__main__":
 
     if (args.src, 'Index') in free_parameters:
 
-        free_parameters[(args.src, 'Index')].bounds = (args.min_index, args.max_index)
+        try:
 
+            free_parameters[(args.src, 'Index')].bounds = (args.min_index, args.max_index)
+
+        except:
+
+            raise RuntimeError("It looks like the best fit photon index is outside the boundaries "
+                               "provided in the command line")
 
     else:
 
         raise RuntimeError("The Index parameter must be a free parameter of source %s" % args.src)
+
+    # Execute a fit to get to a good state with the new boundaries
+    pylike_instance.fit()
 
     # Print the configuration
     print("\nFree parameters:")
     print("----------------\n")
 
     for k, v in free_parameters.iteritems():
-
-        print("* %s of %s (%s)" % (k[1],k[0], v.prior.name))
+        print("* %s of %s (%s)" % (k[1], k[0], v.prior.name))
 
     print("")
 
@@ -228,7 +276,10 @@ if __name__=="__main__":
 
     print("Producing corner plot...")
 
-    fig = corner.corner(samples, show_titles=True, quantiles=[0.5, 0.50, 0.95], title_fmt=u'.2g', labels=labels)
+    fig = corner.corner(samples, show_titles=True, quantiles=[0.5, 0.50, 0.95],
+                        title_fmt=u'.2g', labels=labels, plot_contours=True, plot_density=False)
+
+    fig.tight_layout()
 
     fig.savefig(args.corner_plot)
 
@@ -260,6 +311,8 @@ if __name__=="__main__":
 
         free_parameters[(args.src, 'Index')].scaled_value = current_photon_index
 
+        pylike_instance.syncSrcParams()
+
         # Get photon flux for this sample
 
         photon_flux = pylike_instance[args.src].flux(args.emin, args.emax)
@@ -283,7 +336,9 @@ if __name__=="__main__":
 
     # Save the samples
 
-    np.savez(args.output_file, photon_fluxes=photon_fluxes, energy_fluxes=energy_fluxes, samples=samples,
+    np.savez(args.output_file + "_samples", samples=samples)
+
+    np.savez(args.output_file, photon_fluxes=photon_fluxes, energy_fluxes=energy_fluxes,
              photon_flux_p95=photon_flux_p95, energy_flux_p95=energy_flux_p95, st_bayes_ul=st_bayes_ul,
              st_bayes_ul_ene=st_bayes_ul_ene)
 

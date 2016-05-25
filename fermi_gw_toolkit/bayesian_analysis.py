@@ -209,6 +209,10 @@ class MyParameter(object):
 
         std = abs(variance * current_value)
 
+        if std==0:
+
+            std = 0.1
+
         a = (min_value - current_value) / std
 
         b = (max_value - current_value) / std
