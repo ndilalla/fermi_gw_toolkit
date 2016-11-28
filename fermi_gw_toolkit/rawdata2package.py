@@ -9,11 +9,8 @@ import os, shutil
 import argparse
 
 try:
-    
     from astropy.io.fits import pyfits
-
 except:
-    
     import pyfits
 
 """Command-line switches.
