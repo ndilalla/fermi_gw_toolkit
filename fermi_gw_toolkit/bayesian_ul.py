@@ -4,90 +4,88 @@ __author__ = 'giacomov'
 
 import matplotlib as mpl
 mpl.use('Agg')
+import corner
+import emcee
 
 import argparse
 import UnbinnedAnalysis
 import collections
 import UpperLimits
 
-import corner
-import emcee
 from bayesian_analysis import *
-
 
 from check_file_exists import check_file_exists
 
+__description__ = '''Compute a fully-Bayesian upper limit by sampling the posterior probability'''
 
-def get_conversion_factor(photon_index):
+formatter = argparse.ArgumentDefaultsHelpFormatter
+parser = argparse.ArgumentParser(description=__description__,
+                                 formatter_class=formatter)
+
+parser.add_argument('--ft1',help='Input FT1 file (already filtered)', type=check_file_exists, required=True)
+parser.add_argument('--ft2',help='Input FT2 file', type=check_file_exists, required=True)
+parser.add_argument('--expomap',help='Exposure map for UNBINNED analysis',type=check_file_exists, required=True)
+parser.add_argument('--ltcube',help='Livetime cube for UNBINNED analysis',type=check_file_exists, required=True)
+parser.add_argument('--xml', help='XML model for the ROI', type=check_file_exists, required=True)
+parser.add_argument('--engine', help='Fitting engine (default: MINUIT)', type=str, required=False, default='MINUIT')
+parser.add_argument('--src', help='Name of the source in the XML', type=str, required=True)
+parser.add_argument('--iso', help='Name of the Isotropic Template source in the XML model', type=str,
+                    required=False, default='IsotropicTemplate')
+parser.add_argument('--gal', help='Name of the Galactic Template source in the XML model', type=str,
+                    required=False, default='GalacticTemplate')
+parser.add_argument('--min_index', help='Minimum photon index to consider', type=float,
+                    required=False, default=-10)
+parser.add_argument('--max_index', help='Maximum photon index to consider', type=float,
+                    required=False, default=0.1)
+parser.add_argument('--gal_sys_err', help='Systematic error on the Galactic template (Default: 0.15, '
+                                          'i.e., 15 percent)',
+                    type=float, required=False, default=0.15)
+parser.add_argument('--n_walkers', help='Number of walkers for Emcee',
+                    type=int, required=False, default=100)
+parser.add_argument('--burn_in', help='Samples for walker to throw away as burn-in',
+                    type=int, required=False, default=100)
+parser.add_argument('--n_samples', help='Samples for walker to get while sampling posterior',
+                    type=int, required=False, default=1000)
+parser.add_argument('--corner_plot', help='Output name for the corner plot',
+                    type=str, required=False, default='bayesian_ul_corner.png')
+parser.add_argument('--output_file', help='Output file name root for the samples',
+                    type=str, required=False, default='bayesian_ul_samples')
+parser.add_argument('--emin', help='Minimum energy for flux computation (you should use the same you '
+                                   'used to select data)',
+                    type=float, required=False, default=100.0)
+
+parser.add_argument('--emax', help='Maximum energy for flux computation (you should use the same you '
+                                   'used to select data)',
+                    type=float, required=False, default=100000.0)
+
+def get_conversion_factor(photon_index, kwargs):
 
     if photon_index != -2:
 
         conv = (1. + photon_index) / (2.0 + photon_index) * \
-               (pow(args.emax, photon_index + 2.0) - pow(args.emin, photon_index + 2.0)) / \
-               (pow(args.emax, photon_index + 1.0) - pow(args.emin, photon_index + 1.0))
+               (pow(kwargs['emax'], photon_index + 2.0) - pow(kwargs['emin'], photon_index + 2.0)) / \
+               (pow(kwargs['emax'], photon_index + 1.0) - pow(kwargs['emin'], photon_index + 1.0))
 
     else:
 
-        conv = (args.emin) * (args.emax) / (args.emax - args.emin) * np.log(args.emax / args.emin)
+        conv = (kwargs['emin']) * (kwargs['emax']) / (kwargs['emax'] - kwargs['emin']) * np.log(kwargs['emax'] / kwargs['emin'])
 
     return conv
-
-if __name__=="__main__":
-
-    desc = '''Compute a fully-Bayesian upper limit by sampling the posterior probability'''
-
-    parser = argparse.ArgumentParser(description=desc)
-
-    parser.add_argument('--ft1',help='Input FT1 file (already filtered)', type=check_file_exists, required=True)
-    parser.add_argument('--ft2',help='Input FT2 file', type=check_file_exists, required=True)
-    parser.add_argument('--expomap',help='Exposure map for UNBINNED analysis',type=check_file_exists, required=True)
-    parser.add_argument('--ltcube',help='Livetime cube for UNBINNED analysis',type=check_file_exists, required=True)
-    parser.add_argument('--xml', help='XML model for the ROI', type=check_file_exists, required=True)
-    parser.add_argument('--engine', help='Fitting engine (default: MINUIT)', type=str, required=False, default='MINUIT')
-    parser.add_argument('--src', help='Name of the source in the XML', type=str, required=True)
-    parser.add_argument('--iso', help='Name of the Isotropic Template source in the XML model', type=str,
-                        required=False, default='IsotropicTemplate')
-    parser.add_argument('--gal', help='Name of the Galactic Template source in the XML model', type=str,
-                        required=False, default='GalacticTemplate')
-    parser.add_argument('--min_index', help='Minimum photon index to consider', type=float,
-                        required=False, default=-10)
-    parser.add_argument('--max_index', help='Maximum photon index to consider', type=float,
-                        required=False, default=0.1)
-    parser.add_argument('--gal_sys_err', help='Systematic error on the Galactic template (Default: 0.15, '
-                                              'i.e., 15 percent)',
-                        type=float, required=False, default=0.15)
-    parser.add_argument('--n_walkers', help='Number of walkers for Emcee',
-                        type=int, required=False, default=100)
-    parser.add_argument('--burn_in', help='Samples for walker to throw away as burn-in',
-                        type=int, required=False, default=100)
-    parser.add_argument('--n_samples', help='Samples for walker to get while sampling posterior',
-                        type=int, required=False, default=1000)
-    parser.add_argument('--corner_plot', help='Output name for the corner plot',
-                        type=str, required=False, default='bayesian_ul_corner.png')
-    parser.add_argument('--output_file', help='Output file name root for the samples',
-                        type=str, required=False, default='bayesian_ul_samples')
-    parser.add_argument('--emin', help='Minimum energy for flux computation (you should use the same you '
-                                       'used to select data)',
-                        type=float, required=False, default=100.0)
-
-    parser.add_argument('--emax', help='Maximum energy for flux computation (you should use the same you '
-                                       'used to select data)',
-                        type=float, required=False, default=100000.0)
-
-
-    args = parser.parse_args()
+    
+    
+def bayesian_ul(**kwargs):
 
     # Instance the unbinned analysis
 
     print("Instancing pyLikelihood...")
 
-    unbinned_observation = UnbinnedAnalysis.UnbinnedObs(args.ft1,
-                                                        args.ft2,
-                                                        args.expomap,
-                                                        args.ltcube,
+    unbinned_observation = UnbinnedAnalysis.UnbinnedObs(kwargs['ft1'],
+                                                        kwargs['ft2'],
+                                                        kwargs['expomap'],
+                                                        kwargs['ltcube'],
                                                         'CALDB')
 
-    pylike_instance = UnbinnedAnalysis.UnbinnedAnalysis(unbinned_observation, args.xml, args.engine)
+    pylike_instance = UnbinnedAnalysis.UnbinnedAnalysis(unbinned_observation, kwargs['xml'], kwargs['engine'])
 
     print("done")
 
@@ -101,11 +99,11 @@ if __name__=="__main__":
 
     # Compute ST upper limit
 
-    ul = UpperLimits.UpperLimit(pylike_instance, args.src)
+    ul = UpperLimits.UpperLimit(pylike_instance, kwargs['src'])
 
     try:
 
-        st_bayes_ul, parameter_value = ul.bayesianUL(0.95, emin=args.emin, emax=args.emax)
+        st_bayes_ul, parameter_value = ul.bayesianUL(0.95, emin=kwargs['emin'], emax=kwargs['emax'])
 
     except:
 
@@ -117,14 +115,14 @@ if __name__=="__main__":
         st_bayes_ul_ene = -1
 
         # Get back to a good state
-        pylike_instance = UnbinnedAnalysis.UnbinnedAnalysis(unbinned_observation, args.xml, args.engine)
+        pylike_instance = UnbinnedAnalysis.UnbinnedAnalysis(unbinned_observation, kwargs['xml'], kwargs['engine'])
         pylike_instance.fit()
 
     else:
         # Convert to energy flux
-        best_fit_photon_index = pylike_instance[args.src].src.spectrum().parameter('Index').getValue()
+        best_fit_photon_index = pylike_instance[kwargs['src']].src.spectrum().parameter('Index').getValue()
 
-        st_bayes_ul_ene = st_bayes_ul * get_conversion_factor(best_fit_photon_index)
+        st_bayes_ul_ene = st_bayes_ul * get_conversion_factor(best_fit_photon_index, kwargs)
 
     print("done")
 
@@ -150,17 +148,17 @@ if __name__=="__main__":
 
     # Isotropic template
 
-    if (args.iso, 'Normalization') in free_parameters:
+    if (kwargs['iso'], 'Normalization') in free_parameters:
 
         try:
 
-            free_parameters[(args.iso, 'Normalization')].bounds = (0, 100)
+            free_parameters[(kwargs['iso'], 'Normalization')].bounds = (0, 100)
 
         except:
 
             # This happens if the best fit value is outside those boundaries
-            free_parameters[(args.iso, 'Normalization')].value = 1.0
-            free_parameters[(args.iso, 'Normalization')].bounds = (0, 100)
+            free_parameters[(kwargs['iso'], 'Normalization')].value = 1.0
+            free_parameters[(kwargs['iso'], 'Normalization')].bounds = (0, 100)
 
     else:
 
@@ -168,18 +166,18 @@ if __name__=="__main__":
 
     # Galactic template (Truncated Gaussian with systematic error)
 
-    if (args.gal, 'Value') in free_parameters:
+    if (kwargs['gal'], 'Value') in free_parameters:
 
         try:
 
-            free_parameters[(args.gal, 'Value')].bounds = (0.1, 10.0)
+            free_parameters[(kwargs['gal'], 'Value')].bounds = (0.1, 10.0)
 
-            free_parameters[(args.gal, 'Value')].prior = TruncatedGaussianPrior(1.0, args.gal_sys_err)
+            free_parameters[(kwargs['gal'], 'Value')].prior = TruncatedGaussianPrior(1.0, kwargs['gal_sys_err'])
 
         except:
             # This happens if the best fit value is outside those boundaries
-            free_parameters[(args.gal, 'Value')].value = 1.0
-            free_parameters[(args.gal, 'Value')].bounds = (0.1, 10.0)
+            free_parameters[(kwargs['gal'], 'Value')].value = 1.0
+            free_parameters[(kwargs['gal'], 'Value')].bounds = (0.1, 10.0)
 
     else:
 
@@ -187,28 +185,28 @@ if __name__=="__main__":
 
     # Photon flux (uniform prior)
 
-    if (args.src, 'Integral') in free_parameters:
+    if (kwargs['src'], 'Integral') in free_parameters:
 
         try:
 
-            free_parameters[(args.src, 'Integral')].bounds = (0, 10)
+            free_parameters[(kwargs['src'], 'Integral')].bounds = (0, 10)
 
         except:
 
-            free_parameters[(args.src, 'Integral')].value = 1e-7
-            free_parameters[(args.src, 'Integral')].bounds = (0, 10)
+            free_parameters[(kwargs['src'], 'Integral')].value = 1e-7
+            free_parameters[(kwargs['src'], 'Integral')].bounds = (0, 10)
 
     else:
 
-        raise RuntimeError("The Integral parameter must be a free parameter of source %s" % args.src)
+        raise RuntimeError("The Integral parameter must be a free parameter of source %s" % kwargs['src'])
 
     # Photon index
 
-    if (args.src, 'Index') in free_parameters:
+    if (kwargs['src'], 'Index') in free_parameters:
 
         try:
 
-            free_parameters[(args.src, 'Index')].bounds = (args.min_index, args.max_index)
+            free_parameters[(kwargs['src'], 'Index')].bounds = (kwargs['min_index'], kwargs['max_index'])
 
         except:
 
@@ -217,7 +215,7 @@ if __name__=="__main__":
 
     else:
 
-        raise RuntimeError("The Index parameter must be a free parameter of source %s" % args.src)
+        raise RuntimeError("The Index parameter must be a free parameter of source %s" % kwargs['src'])
 
     # Execute a fit to get to a good state with the new boundaries
     pylike_instance.fit()
@@ -233,7 +231,7 @@ if __name__=="__main__":
 
     # Generate the randomized starting points for the Emcee sampler
 
-    ndim, nwalkers = len(free_parameters), args.n_walkers
+    ndim, nwalkers = len(free_parameters), kwargs['n_walkers']
 
     p0 = [map(lambda p: p.get_random_init(0.1), free_parameters.values()) for i in range(nwalkers)]
 
@@ -254,7 +252,7 @@ if __name__=="__main__":
 
     print("Burn in...")
 
-    pos, prob, state = sampler.run_mcmc(p0, args.burn_in)
+    pos, prob, state = sampler.run_mcmc(p0, kwargs['burn_in'])
 
     print("done")
 
@@ -262,7 +260,7 @@ if __name__=="__main__":
 
     print("Sampling...")
 
-    samples = sampler.run_mcmc(pos, args.n_samples)
+    samples = sampler.run_mcmc(pos, kwargs['n_samples'])
 
     print("done")
 
@@ -281,7 +279,7 @@ if __name__=="__main__":
 
     fig.tight_layout()
 
-    fig.savefig(args.corner_plot)
+    fig.savefig(kwargs['corner_plot'])
 
     print("done")
 
@@ -289,10 +287,10 @@ if __name__=="__main__":
 
     # Find index of normalization
 
-    norm_index = free_parameters.keys().index( (args.src, 'Integral') )
+    norm_index = free_parameters.keys().index( (kwargs['src'], 'Integral') )
 
     # Find index of photon index
-    ph_index_index = free_parameters.keys().index((args.src, 'Index'))
+    ph_index_index = free_parameters.keys().index((kwargs['src'], 'Index'))
 
     photon_fluxes = np.zeros(samples.shape[0])
     energy_fluxes = np.zeros(samples.shape[0])
@@ -303,23 +301,23 @@ if __name__=="__main__":
 
         # Set the Integral parameter to the current value
 
-        free_parameters[(args.src, 'Integral')].scaled_value = current_sample[norm_index]
+        free_parameters[(kwargs['src'], 'Integral')].scaled_value = current_sample[norm_index]
 
         # Set the photon index to the current value
 
         current_photon_index = current_sample[ph_index_index]
 
-        free_parameters[(args.src, 'Index')].scaled_value = current_photon_index
+        free_parameters[(kwargs['src'], 'Index')].scaled_value = current_photon_index
 
         pylike_instance.syncSrcParams()
 
         # Get photon flux for this sample
 
-        photon_flux = pylike_instance[args.src].flux(args.emin, args.emax)
+        photon_flux = pylike_instance[kwargs['src']].flux(kwargs['emin'], kwargs['emax'])
 
         # Get energy flux for this value
 
-        conv = get_conversion_factor(current_photon_index)
+        conv = get_conversion_factor(current_photon_index, kwargs)
 
         energy_flux = photon_flux * conv
 
@@ -336,9 +334,9 @@ if __name__=="__main__":
 
     # Save the samples
 
-    np.savez(args.output_file + "_samples", samples=samples)
+    np.savez(kwargs['output_file'] + "_samples", samples=samples)
 
-    np.savez(args.output_file, photon_fluxes=photon_fluxes, energy_fluxes=energy_fluxes,
+    np.savez(kwargs['output_file'], photon_fluxes=photon_fluxes, energy_fluxes=energy_fluxes,
              photon_flux_p95=photon_flux_p95, energy_flux_p95=energy_flux_p95, st_bayes_ul=st_bayes_ul,
              st_bayes_ul_ene=st_bayes_ul_ene)
 
@@ -354,3 +352,9 @@ if __name__=="__main__":
     print("  * Semi-bayes from ST   : %g" % st_bayes_ul_ene)
     print("  * Bayesian             : %g" % energy_flux_p95)
 
+
+if __name__=="__main__":
+    args = parser.parse_args()
+    bayesian_ul(**args.__dict__)
+
+    
