@@ -158,9 +158,7 @@ if __name__ == "__main__":
 
         import seaborn as sns
 
-        sns.set(color_codes=True)
-        sns.set(font_scale=3)
-        sns.set_style("whitegrid")
+        sns.set(font_scale=6)
         sns.set_style("ticks")
 
     except:
@@ -179,11 +177,11 @@ if __name__ == "__main__":
 
     #with sns.plotting_context("paper", font_scale=3):
 
-    fig = plt.figure(figsize=(16*3, 8.0*3), dpi=150)
+    fig = plt.figure(figsize=(16*3, 16*3 / 1.333), dpi=150)
 
     dt = (t - args.start_time) / 1000.0
 
-    plt.plot(dt, c * 100.0, '-', linewidth=4)
+    plt.plot(dt, c * 100.0, 'o', linewidth=4)
     plt.xlabel("Time since trigger (ks)")
     plt.ylabel("Coverage of LIGO map (%)")
     plt.ylim([0, 110])
@@ -215,15 +213,15 @@ if __name__ == "__main__":
 
     dt = (t - args.start_time) / 1000.0
 
-    fig = plt.figure(figsize=(16*3, 8.0*3), dpi=150)
+    fig = plt.figure(figsize=(16*3, 16*3 / 1.333), dpi=150)
 
-    plt.plot(dt, sky_coverage, lw=4)
+    plt.plot(dt, sky_coverage, '-', lw=4)
 
     plt.xlabel("Time since trigger (ks)")
     plt.ylabel("Cumulative\nprobability coverage")
 
     plt.ylim([0,1.1])
-    plt.xlim([dt.min(),dt.max()])
+    plt.xlim([min(0, dt.min()),dt.max()])
     plt.axhline(1, linestyle=':', color='green')
 
     if args.vert_lines:
