@@ -15,6 +15,8 @@ parser.add_argument("configfile", help="Configuration file for the trigger",
                     type=str)
 parser.add_argument('--line_number', help='Line number of the roi to analyze',
                     type=int, default=1)
+parser.add_argument('--adaptive', help='Perform the adaptive time analysis',
+                    type=int, required=False, default=0, choices=[0,1])
 args = parser.parse_args()
 
 module_name = os.path.basename(args.configfile).replace('.py', '')
@@ -30,8 +32,6 @@ except:
     message = 'ft2 file not available in: %s' %DATA_PATH
     sys.exit(message)
 
-TSTART = float(config.TSTART)
-TSTOP = float(config.TSTOP)
 EMIN = config.EMIN
 EMAX = config.EMAX
 TSMIN = config.TSMIN
@@ -47,7 +47,16 @@ SRC = config.SRC
 N_SAMPLES = config.N_SAMPLES
 BURN_IN = config.BURN_IN
 
-OUTLIST = config.OUTLIST
+if args.adaptive:
+    LIST = config.OUTTIME
+    KEYWORD = 'adroi'
+    print 'Performing the adaptive time analysis...'
+else:
+    LIST = config.OUTLIST
+    TSTART = float(config.TSTART)
+    TSTOP = float(config.TSTOP)
+    KEYWORD = 'roi'
+    print 'Performing the fixed time analysis...'
 
 """Main pipeline object.
 """
@@ -55,22 +64,27 @@ OUTLIST = config.OUTLIST
 PIPELINE = gwPipeline()
 
 def do_the_analysis():
-    with open(OUTLIST, 'r') as roi_list:
+    with open(LIST, 'r') as roi_list:
         roi = roi_list.readlines()
         line_number = args.line_number
-        ra, dec = roi[line_number].split()
+        if args.adaptive:
+            ra, dec, tstart, tstop, deltat = roi[line_number].split()
+        else:
+            ra, dec = roi[line_number].split()
+            tstart, tstop = TSTART, TSTOP
         print 'Selected ROI: %s, %s (line number: %d)' %(ra, dec, line_number)
-        outfile = os.path.join(OUTPUT_FILE_PATH, '%s_roi_%s_%s.txt' %\
-                                                        (TRIGGERNAME, ra, dec))
-
+        outfile = os.path.join(OUTPUT_FILE_PATH, '%s_%s_%s_%s.txt' %\
+                                                (TRIGGERNAME, KEYWORD, ra, dec))
+        print 'Running doTimeResolvedLike in the time interval: %s-%s' %\
+                                                                (tstart, tstop)
         PIPELINE.doTimeResolvedLike(TRIGGERNAME, ra=ra, dec=dec, roi=ROI,
-                            tstarts=TSTART, tstops=TSTOP, irf=IRF,
+                            tstarts=tstart, tstops=tstop, irf=IRF,
                             galactic_model=GAL_MODEL, particle_model=PART_MODEL,
                             tsmin=TSMIN, emin=EMIN, emax=EMAX, zmax=ZMAX,
                             strategy=STRATEGY, datarepository=FERMI_GW_DATA,
                             ulphindex=UL_INDEX, outfile=outfile)
         
-        subfolder_dir = os.path.abspath("interval%s-%s" %(TSTART, TSTOP))
+        subfolder_dir = os.path.abspath("interval%s-%s" %(tstart, tstop))
         try:
             xml = glob.glob(subfolder_dir + '/*filt_likeRes.xml')[0]
             expomap = glob.glob(subfolder_dir + '/*filt_expomap.fit')[0]
