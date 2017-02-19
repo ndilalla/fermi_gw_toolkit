@@ -39,6 +39,8 @@ OUTCOV = os.path.join(OUTPUT_FILE_PATH, TRIGGERNAME)
 OUTULMAP = os.path.join(OUTPUT_FILE_PATH, 'ul_map.fits')
 OUTTSMAP = os.path.join(OUTPUT_FILE_PATH, 'ts_map.fits')
 
+KEYWORD = 'roi'
+
 """Main pipeline object.
 """
 
@@ -59,8 +61,8 @@ def run():
     roi_list.readline()
     for i in range(0,2):
         ra, dec = roi_list.readline().split()
-        outfile = os.path.join(OUTPUT_FILE_PATH, '%s_roi_%s_%s.txt' %\
-                                                        (TRIGGERNAME, ra, dec))
+        outfile = os.path.join(OUTPUT_FILE_PATH, '%s_%s_%s_%s.txt' %\
+                                                (TRIGGERNAME, KEYWORD, ra, dec))
 
         PIPELINE.doTimeResolvedLike(TRIGGERNAME, ra=ra, dec=dec, roi=ROI,
                             tstarts=TSTART, tstops=TSTOP, irf=IRF,
@@ -83,9 +85,10 @@ def run():
                             emax=EMAX, output_file=outul, corner_plot=outplot,
                             n_samples=N_SAMPLES, src=SRC, burn_in=BURN_IN)
     roi_list.close()
-    txt_all = PIPELINE.merge_results(TRIGGERNAME, txtdir=OUTPUT_FILE_PATH)
+    txt_all = PIPELINE.merge_results(TRIGGERNAME, txtdir=OUTPUT_FILE_PATH,
+                                     keyword=KEYWORD)
     PIPELINE.fill_maps(in_map=OUTMAP, text_file=txt_all,
-                            out_uls_map=OUTULMAP, out_ts_map=OUTTSMAP)
+                       out_uls_map=OUTULMAP, out_ts_map=OUTTSMAP)
 
 if __name__ == '__main__':
     run()
