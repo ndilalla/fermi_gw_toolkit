@@ -30,6 +30,7 @@ SRC = 'GRB'
 N_SAMPLES = 500
 BURN_IN = 200
 
+OUTTIME = os.path.join(OUTPUT_FILE_PATH, 'time_list.txt')
 OUTLIST = os.path.join(OUTPUT_FILE_PATH, 'roi_list.txt')
 OUTMAP = os.path.join(OUTPUT_FILE_PATH, 'new_map.fits')
 OUTCOV = os.path.join(OUTPUT_FILE_PATH, TRIGGERNAME)
