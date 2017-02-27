@@ -12,21 +12,26 @@ parser = argparse.ArgumentParser(description=__description__,
                                  formatter_class=formatter)
 
 parser.add_argument("triggername", help="Trigger name", type=str)
-parser.add_argument("--txtdir", help="Directory of txt files", type=str,
+parser.add_argument("--txtdir", help="Directory of text files", type=str,
                     required=True)
-parser.add_argument("--outdir", help="Output directory for the merged file",
+parser.add_argument("--outfile", help="Name and directory for the merged file",
                     type=str, default=None)
+parser.add_argument("--keyword", help="keyword contained in txt files to merge",
+                    type=str, default='roi')
 
 def merge_results(**kwargs):
     triggername = kwargs['triggername']
-    if kwargs['outdir'] is None:
+    keyword = kwargs['keyword']
+    if kwargs['outfile'] is None:
         outdir = kwargs['txtdir']
-    txtdir = '%s/%s_roi_*.txt' % (kwargs['txtdir'], triggername)
+        out_txt_name = '%s_all_%s.txt' %(triggername, keyword)
+        out_txt = os.path.join(outdir, out_txt_name)
+    else:
+        out_txt = kwargs['outfile']
+    txtdir = '%s/%s_%s_*.txt' % (kwargs['txtdir'], triggername, keyword)
     txt_list = glob.glob(txtdir)
     #print "Txt-files to merge:\n%s" %txt_list
-    print "Preparing to merge %d txt-files..." %len(txt_list)
-    out_txt_name = '%s_all.txt' % triggername
-    out_txt = os.path.join(outdir, out_txt_name)
+    print "Preparing to merge %d text files..." %len(txt_list)
     
     print "Merging..."
     first_txt = True

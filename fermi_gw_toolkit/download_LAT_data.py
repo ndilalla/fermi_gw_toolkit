@@ -45,8 +45,8 @@ def download_LAT_data(**kwargs):
     triggername = kwargs['triggername']
     myIRF = IRFS.IRFS[kwargs['irf'].upper()]
     irfs= myIRF.name
-    evclass=myIRF.evclass
-    outdir = os.path.join(kwargs['outdir'], triggername)
+    evclass = myIRF.evclass
+    outdir = kwargs['outdir']
     #if not os.path.exists(outdir):
     #    os.system('mkdir -pv %s' % outdir)
     METStart = kwargs['tstart']

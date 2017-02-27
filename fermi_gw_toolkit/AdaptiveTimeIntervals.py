@@ -5,10 +5,35 @@ import argparse
 import healpy as hp
 import scipy as sp
 import numpy as np
-from FT2 import FT2
+from fermi_gw_toolkit.FT2 import FT2
+
+__description__  = '''Create a text file with start and stop times for time adaptive interval'''
+
+formatter = argparse.ArgumentDefaultsHelpFormatter
+parser = argparse.ArgumentParser(description=__description__,
+                                 formatter_class=formatter)
+
+parser.add_argument('--in_map', help='Input HEALPIX map', type=str,
+                    required=True)
+parser.add_argument('--triggertime', help='MET of the trigger time', type=float,
+                    required=True)
+parser.add_argument('--nside', help='New NSIDE to degrade the HELPIX map',
+                    type=int, required=False, default=32)
+parser.add_argument('--ft2', help='ft2 files', type=str, required=True)
+parser.add_argument('--roi', help='Radius of the Region Of Interest (deg)',
+                    type=float, required=False, default=0)
+parser.add_argument('--theta_cut', help='Maximum off axis angle theta (deg)',
+                    type=float, required=False, default=70)
+parser.add_argument('--zenith_cut', help='Maximum Zenith Angle (deg)',
+                    type=float, required=False, default=100)
+parser.add_argument('--output', help='Output text file with starts and tstop (relative to met)',
+                    type=str,required=False, default='output.txt')
+parser.add_argument('--plot',help='Plot the results (0 or 1)', type=int,
+                    required=False, default=0, choices=[0,1])
 
 def pix_to_sky(idx, nside):
-    """Convert the pixels corresponding to the input indexes to sky coordinates (RA, Dec)"""    
+    """Convert the pixels corresponding to the input indexes to sky coordinates
+    (RA, Dec)"""
     theta, phi = hp.pix2ang(nside, idx)
     ra = np.rad2deg(phi)
     dec = np.rad2deg(0.5 * np.pi - theta)
@@ -18,10 +43,26 @@ def sky_to_pix(ra,dec, nside):
     """Convert the pixels corresponding to sky coordinates (RA, Dec) into input indexes """
     phi   = np.deg2rad(ra)
     theta = 0.5 * np.pi-np.deg2rad(dec)
-    #dec = np.rad2deg(0.5 * np.pi - theta)    
+    #dec = np.rad2deg(0.5 * np.pi - theta)
     return hp.ang2pix(nside, theta, phi)
 
-def Adaptive(healpix_map, ft2, triggertime, theta_max=70, zenith_max=100, degrade=32, output='output.txt', plot=0, orgx=0, orgy=0):
+
+def adaptive_time(**kwargs):
+    # Convenient names
+    healpix_map = kwargs['in_map']
+    degrade     = kwargs['nside']
+    ft2         = kwargs['ft2']
+    roi         = kwargs['roi']
+    triggertime = kwargs['triggertime']
+    theta_max   = kwargs['theta_cut']
+    zenith_max  = kwargs['zenith_cut']
+    output      = kwargs['output']
+    plot        = kwargs['plot']
+    
+    perc        = 0.1
+    orgx        = 0
+    orgy        = 0
+    
     ligo_map   = hp.read_map(healpix_map)
     if degrade>0: ligo_map = hp.ud_grade(ligo_map,degrade)
 
@@ -59,18 +100,18 @@ def Adaptive(healpix_map, ft2, triggertime, theta_max=70, zenith_max=100, degrad
     myFT2.fov(theta_max,zenith_max-masked_radius)
     times_t0=[]
     times_t1=[]
-    txt='# RA,     Dec,      T_enter,      T_exit,      Delta_T\n'
+    txt='# RA     Dec      T_enter      T_exit      Delta_T\n'
     #######################################
     for i in range(Nselected):
-        entry_time,exit_time=myFT2.getEntryExitTime(masked_ra[i],masked_dec[i],triggertime) 
+        entry_time,exit_time=myFT2.getEntryExitTime(masked_ra[i],masked_dec[i],triggertime)
         pix=pixels_selected[i]
         expo_time=exit_time-entry_time
         ligo_entry[pix]*=entry_time
         ligo_expo[pix]*=expo_time
         times_t0.append(entry_time)
         times_t1.append(exit_time)
-        print 'i/N:%7d/%7d pix:%7d ra:%10.3f dec:%10.3f entry:%10.3f exit:%10.3f exposure:%10.3f' %(i,Nselected,pix,masked_ra[i],masked_dec[i],entry_time,exit_time,expo_time)
-        txt+='%10.3f, %10.3f, %10.3f, %10.3f, %10.3f\n' %(masked_ra[i],masked_dec[i],entry_time,exit_time,exit_time-entry_time)
+        #print 'i/N:%7d/%7d pix:%7d ra:%10.3f dec:%10.3f entry:%10.3f exit:%10.3f exposure:%10.3f' %(i,Nselected,pix,masked_ra[i],masked_dec[i],entry_time,exit_time,expo_time)
+        txt+='%10.3f %10.3f %10.3f %10.3f %10.3f\n' %(masked_ra[i],masked_dec[i],entry_time,exit_time,exit_time-entry_time)
         # a=raw_input('')
         pass
     times_t0=np.array(times_t0)
@@ -91,7 +132,7 @@ def Adaptive(healpix_map, ft2, triggertime, theta_max=70, zenith_max=100, degrad
         ligo_entry[idx] = np.nan
 
         from matplotlib import cm
-        jet = plt.get_cmap('jet') 
+        jet = plt.get_cmap('jet')
         #jet = colors.Colormap('jet')
         cNorm  = colors.Normalize(vmin=times_t0.min(), vmax=times_t0.max())
         scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
@@ -101,7 +142,7 @@ def Adaptive(healpix_map, ft2, triggertime, theta_max=70, zenith_max=100, degrad
         cool_cmap.set_bad("w") # sets background to white
         #cb1 = mpl.colorbar.ColorbarBase(ax2, cmap=jet,norm=cNorm,orientation='horizontal')
         #cb1.set_label ('Time since LIGO trigger [s]')
-        rot=(orgx,orgy)        
+        rot=(orgx,orgy)
         hp.mollview(ligo_map/p_max, sub=221, title='Ligo Map',cmap=cool_cmap,rot=rot)
         hp.graticule()
         hp.mollview(ligo_selected, sub=222, title='Ligo Map ($>$%.1f)' % perc,cmap=cool_cmap,norm='lin',min=0,max=1.0,rot=rot)
@@ -117,40 +158,6 @@ def Adaptive(healpix_map, ft2, triggertime, theta_max=70, zenith_max=100, degrad
 
 # --------------------- #
     
-    
 if __name__=="__main__":
-    desc = '''Create a text file with start and stop times for time adaptive interval'''
-    parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument('--input',help='Input HEALPIX map', type=str, required=True)
-    parser.add_argument('--met',help='MET of the trigger time', type=float, required=True)
-    parser.add_argument('--nside',help='New NSIDE to degrade the HELPIX map', type=int, required=False,default=32)
-    parser.add_argument('--ft2',help='ft2 files', type=str, required=True)
-    parser.add_argument('--roi',help='Rqdius of the Region Of Interest (deg)', type=float, required=False, default=0)
-    parser.add_argument('--theta_max',help='Maximum off axis angle theta (deg)', type=float, required=False, default=70)
-    parser.add_argument('--zenith_max',help='Maximum Zenith Angle (deg)', type=float, required=False, default=100)
-    parser.add_argument('--output',help='Output text file with starts and tstop (relative to met)',
-                        type=str,required=False,default='output.txt')
-    parser.add_argument('--plot',help='Plot the results (0 or 1)',type=int,required=False,default=0)
     args = parser.parse_args()
-    
-    # Convenient names
-    healpix_map = args.input
-    degrade     = args.nside
-    ft2         = args.ft2
-    perc        = 0.1
-    roi         = args.roi
-    triggertime = args.met
-    theta_max   = args.theta_max
-    zenith_max  = args.zenith_max
-    output      = args.output
-    plot        = args.plot
-    orgx=0
-    orgy=0
-    #######
-    Adaptive(healpix_map, ft2, triggertime, 
-             theta_max, zenith_max, 
-             degrade, 
-             output, plot, orgx, orgy)
-        
-        
-    
+    adaptive_time(**args.__dict__)

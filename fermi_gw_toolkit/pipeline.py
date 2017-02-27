@@ -6,6 +6,8 @@ from fermi_gw_toolkit.rawdata2package import rawdata2package, parser as\
                                                         rawdata2package_parser
 from fermi_gw_toolkit.prepare_grid import prepare_grid, parser as\
                                                         prepare_grid_parser
+from fermi_gw_toolkit.AdaptiveTimeIntervals import adaptive_time, parser as\
+                                                        adaptive_time_parser
 from fermi_gw_toolkit.bayesian_ul import bayesian_ul, parser as\
                                                         bayesian_ul_parser
 from fermi_gw_toolkit.get_coverage import compute_coverage, parser as\
@@ -92,6 +94,17 @@ class gwPipeline:
         switches = self.command_line(**kwargs).split()
         kwargs = prepare_grid_parser.parse_args(switches).__dict__
         return prepare_grid(**kwargs)
+    
+    def adaptive_time(self, **kwargs):
+        """Create a text file with start, stop times and ra-dec coordinates for
+        time adaptive interval.
+        
+        All command-line switches accepted by adaptive_time can be passed as
+        keyword arguments here.
+        """
+        switches = self.command_line(**kwargs).split()
+        kwargs = adaptive_time_parser.parse_args(switches).__dict__
+        return adaptive_time(**kwargs)
     
     def doTimeResolvedLike(self, triggername, **kwargs):
         """Make the likelihood analysis in the selected roi and time interval.
