@@ -11,7 +11,6 @@ if __name__ == "__main__":
     parser.add_argument('triggername')
     parser.add_argument('--ra', required=True, type=float, nargs='+')
     parser.add_argument('--dec', required=True, type=float, nargs='+')
-    parser.add_argument('--outfile', required=True)
 
     # This will have in args the ra, dec and outfile parameters, and in everything else a list with all the other
     # parameters
