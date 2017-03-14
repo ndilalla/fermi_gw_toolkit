@@ -7,8 +7,14 @@ import sys
 
 import astropy.io.fits as pyfits
 import healpy as hp
+
+import matplotlib
+# Force matplotlib to not use any Xwindows backend.
+matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 import numpy as np
+
 
 from GtBurst.angularDistance import getAngularDistance
 
