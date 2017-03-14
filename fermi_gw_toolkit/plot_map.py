@@ -5,11 +5,13 @@ import argparse
 from check_file_exists import check_file_exists
 
 import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import healpy as hp
 import numpy as np
+from contour_finder import pix_to_sky
 from matplotlib import rc
-rc('text', usetex=True)
+#rc('text', usetex=True)
 
 if __name__=="__main__":
 
@@ -30,6 +32,8 @@ if __name__=="__main__":
                         required=False, type=str, default='jet')
     parser.add_argument('--rot', help='rotation to center the map',
                         required=False, type=str, default='180,0')
+    parser.add_argument('--type', help="'limit' or 'TS'", required=False, type=str,
+                        default='limit', choices=['limit','TS'])
 
     args = parser.parse_args()
     # Read map
@@ -56,7 +60,15 @@ if __name__=="__main__":
 
     if args.max_percentile != 100:
 
-        mmax = np.percentile(hpx_ul[idx],args.max_percentile)
+        mmax = np.percentile(hpx_ul[idx],args.max_percentile, interpolation='nearest')
+
+        mmax_idx = (hpx_ul == mmax).nonzero()[0][0]
+
+        print mmax_idx
+
+        ra, dec = pix_to_sky(mmax_idx, nside)
+
+        print("\n\n%s percentile is %s, at %s, %s" % (args.max_percentile, mmax, ra, dec))
 
     else:
 
@@ -85,8 +97,16 @@ if __name__=="__main__":
 
     # Get order of magnitude of the median (to scale the values)
 
-    magnitude = 10 ** np.floor(np.log10(np.median(hpx_ul[np.isfinite(hpx_ul)])))
-    
+    if args.type == 'limit':
+
+        magnitude = 10 ** np.floor(np.log10(np.median(hpx_ul[np.isfinite(hpx_ul)])))
+        label = r'Upper limit (0.1-1 GeV) [10$^{%.0f}$ erg cm$^{-2}$ s$^{-1}$]' % np.log10(magnitude)
+
+    else:
+
+        magnitude = 1.0
+        label = 'LRT Test Statistic'
+
     projected_map = hp.mollview(hpx_ul / magnitude, rot=rot,
                                 min=mmin / magnitude,
                                 max=mmax / magnitude,
@@ -99,14 +119,14 @@ if __name__=="__main__":
     ax = plt.gca()
     image = ax.get_images()[0]
     cmap = fig.colorbar(image, ax=ax, cmap=cmap, orientation='horizontal', shrink=0.5,
-                        label=r'Upper limit (0.1-1 GeV) [10$^{%.0f}$ erg cm$^{-2}$ s$^{-1}$]' % np.log10(magnitude),
+                        label=label,
                         ticks=np.linspace(mmin / magnitude, mmax / magnitude, 4),
                         format='%.2g')
 
     hp.graticule()
     lat=0
     for lon in range(60,360,60):
-        hp.visufunc.projtext(lon,lat,'--%d$' %(lon),lonlat=True,size=15,va='bottom')
+        hp.visufunc.projtext(lon,lat,r'--%d$^{\circ}$' %(lon),lonlat=True,size=15,va='bottom')
         pass
 
     lon=179.9-float(rot[0])
