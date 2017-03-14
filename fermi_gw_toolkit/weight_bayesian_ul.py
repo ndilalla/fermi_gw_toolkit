@@ -3,7 +3,7 @@
 __author__ = 'giacomov'
 
 import matplotlib as mpl
-mpl.use('Agg')
+mpl.use('agg')
 
 import matplotlib.pyplot as plt
 
@@ -100,11 +100,12 @@ class WeightedIntegralDistribution(object):
 
         return level
 
-    def plot(self, upper_bound, n_points, xlabel):
+    def plot(self, absolute_limit, n_points, xlabel, scale=1.0):
 
-        # Starts at 10% of the distribution
+        # Starts at 80% of the distribution
 
-        lower_bound = self.find_level(0.1, upper_bound)
+        lower_bound = self.find_level(0.85, absolute_limit)
+        upper_bound = self.find_level(0.99, absolute_limit)
 
         xs = np.logspace(math.log10(lower_bound), math.log10(upper_bound), n_points)
 
@@ -122,32 +123,83 @@ class WeightedIntegralDistribution(object):
 
             fig = plt.figure(figsize=(10,8*1.33))
 
-            plt.plot(xs, ys, lw=2)
-            plt.xscale("log")
+            plt.plot(xs / scale, ys, lw=2)
+
+            #plt.xscale("log")
 
             plt.xlabel(xlabel)
-            plt.ylabel("P(F < x)")
+            plt.ylabel("P(< F)")
 
             # Make the y ticks so that there is a mark and number every 0.05
 
-            plt.yticks(np.arange(0,1.05, 0.05))
+            plt.yticks([0.85,0.9,0.95,0.99])
 
             # Make the y ticks so that there is a mark in every unit in every scale
-            start_decade, stop_decade = int(math.log10(lower_bound)), int(math.log10(upper_bound)) + 1
+            # start_decade, stop_decade = int(math.log10(lower_bound)), int(math.log10(upper_bound)) + 1
+            #
+            # ticks = [pow(10, start_decade)]
+            #
+            # while ticks[-1] < pow(10, stop_decade):
+            #
+            #     ticks.extend(np.arange(2,11) * pow(10, start_decade))
+            #
+            #     start_decade += 1
+            #
+            # plt.xticks(ticks)
 
-            ticks = [pow(10, start_decade)]
-
-            while ticks[-1] < pow(10, stop_decade):
-
-                ticks.extend(np.arange(2,11) * pow(10, start_decade))
-
-                start_decade += 1
-
-            plt.xticks(ticks)
-
-            plt.xlim([lower_bound, upper_bound])
+            plt.xlim([lower_bound / scale, upper_bound / scale])
 
             return fig
+
+
+class WeightedDifferentialDistribution(object):
+
+    def __init__(self, samples_matrix, weights):
+
+        self._samples_matrix = np.array(samples_matrix)
+        self._weights = np.array(weights)
+
+    def _get_bins_boundaries(self, n_bins):
+
+        overall_maximum = self._samples_matrix.max()
+        overall_minimum = overall_maximum / 1e5
+
+        boundaries = np.logspace(np.log10(overall_minimum), np.log10(overall_maximum), n_bins)
+        boundaries = np.concatenate([[0.0], boundaries])
+
+        return boundaries
+
+    def plot(self, xlabel, upper_bound=None, n_bins = 70):
+
+        boundaries = self._get_bins_boundaries(n_bins)
+
+        histogram = np.zeros(boundaries.shape[0]-1)
+
+        for samples, weight in zip(self._samples_matrix, self._weights):
+
+            this_histo, _ = np.histogram(samples, boundaries)
+
+            histogram += (this_histo * weight)
+
+        bin_centers = (boundaries[:-1] + boundaries[1:]) / 2.0
+        bin_widths = boundaries[1:] - boundaries[:-1]
+
+        fig = plt.figure(figsize=(10, 8 / 1.33))
+
+        plt.step(bin_centers, histogram / bin_widths, lw=2, where='post')
+        plt.xscale("log")
+        plt.yscale("log")
+
+        plt.xlabel(xlabel)
+        plt.ylabel("P(F|D) (arbitrary scale)")
+
+        #plt.yticks([])
+
+        # Decide the xrange
+
+        plt.xlim([boundaries.max() / 1e4, upper_bound])
+
+        return fig
 
 
 def go(args):
@@ -188,6 +240,11 @@ def go(args):
     ph_flux_upper_bound = 0
     ene_flux_upper_bound = 0
 
+    all_samples_ph = []
+    all_samples_ene = []
+
+    weights = []
+
     for i, sample_file in enumerate(samples_files):
 
         if (i % 100)==0:
@@ -204,6 +261,8 @@ def go(args):
         pixel_id = sky_to_healpix_id(nside, ra, dec)
 
         weight = ligo_map[pixel_id]
+
+        weights.append(weight)
 
         # Accumulate the total weight
 
@@ -236,6 +295,9 @@ def go(args):
 
         ph_flux_upper_bound = max(ph_flux_upper_bound, photon_fluxes.max())
         ene_flux_upper_bound = max(ene_flux_upper_bound, energy_fluxes.max())
+
+        all_samples_ph.append(photon_fluxes)
+        all_samples_ene.append(energy_fluxes)
 
     sys.stderr.write("\r%s out of %s done\n" % (i+1,len(samples_files)))
     print("\n Total weight: %s\n" % total_weight)
@@ -271,11 +333,33 @@ def go(args):
 
     ene_fig = weighted_ene_integral_distribution.plot(ene_flux_upper_bound,
                                                       args.n_points,
-                                                      r"Energy flux (erg cm$^{-2}$ s$^{-1}$)")
+                                                      r"Energy flux (10$^{-9}$ erg cm$^{-2}$ s$^{-1}$)",
+                                                      scale=1e-9)
 
     ene_fig.tight_layout()
 
     ene_fig.savefig(args.outroot + "_ene.png")
+
+    # Make plots of the differential distribution
+
+    #upper_bound_ph = weighted_ph_integral_distribution.find_level(0.9, ph_flux_upper_bound) * 10
+
+    ph_d_fig = WeightedDifferentialDistribution(all_samples_ph, weights).plot(r"Photon flux (ph. cm$^{-2}$ s$^{-1}$)",
+                                                                              upper_bound=None)
+
+    ph_d_fig.tight_layout()
+
+    ph_d_fig.savefig(args.outroot + "_diff_ph.png")
+
+    #upper_bound_ene =  weighted_ene_integral_distribution.find_level(0.9, ene_flux_upper_bound) * 10
+
+    ene_d_fig = WeightedDifferentialDistribution(all_samples_ene, weights).plot(r"Energy flux (erg cm$^{-2}$ s$^{-1}$)",
+                                                                                upper_bound=None)
+
+    ene_d_fig.tight_layout()
+
+    ene_d_fig.savefig(args.outroot + "_diff_ene.png")
+
 
 if __name__=="__main__":
 
