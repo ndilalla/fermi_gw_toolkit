@@ -46,7 +46,8 @@ def rawdata2package(**kwargs):
     ra = kwargs['ra']
     dec = kwargs['dec']
     outdir = str(kwargs['outdir'])
-    
+    if not os.path.exists(outdir):
+        os.system('mkdir -pv %s' % outdir)
     # Rename ft1 and ft2
     new_ft1 = os.path.join(outdir, 'gll_ft1_tr_%s_v00.fit' % triggername)
     new_ft2 = os.path.join(outdir, 'gll_ft2_tr_%s_v00.fit' % triggername)
