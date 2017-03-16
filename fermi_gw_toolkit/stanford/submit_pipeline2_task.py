@@ -16,7 +16,10 @@ import traceback
 from utils import fail_with_error, execute_command
 
 logging.basicConfig(format='%(asctime)s %(message)s')
-logging.info('submit_pipeline2_task is starting')
+
+log = logging.getLogger("submit_pipeline2")
+log.setLevel(logging.DEBUG)
+log.info('submit_pipeline2_task is starting')
 
 # Add the path where the Stanford data catalog is
 sys.path.append('/storage/fermi-data/')
@@ -41,14 +44,14 @@ def submit_job(trigger_name, trigger_time, desired_tstart_met, desired_tstop_met
     if  get_maximum_available_MET() <= desired_tstart_met + 1000.0:
 
         # No available data
-        fail_with_error(logging, "No data available yet")
+        fail_with_error(log, "No data available yet")
 
     else:
 
         # Make sure map exists
         if not os.path.exists(map_path):
 
-            fail_with_error(logging, "submit_job: map %s does not exists!" % map_path)
+            fail_with_error(log, "submit_job: map %s does not exists!" % map_path)
 
         # Move it to SLAC
 
@@ -56,7 +59,7 @@ def submit_job(trigger_name, trigger_time, desired_tstart_met, desired_tstop_met
 
         cmd_line = 'rsync %s %s:%s' % (map_path, SLAC_HOST, slac_path)
 
-        execute_command(logging, cmd_line)
+        execute_command(log, cmd_line)
 
         # Now submit the job at SLAC using ssh
 
@@ -81,11 +84,11 @@ def submit_job(trigger_name, trigger_time, desired_tstart_met, desired_tstop_met
 
         try:
 
-            execute_command(logging, cmd_line)
+            execute_command(log, cmd_line)
 
         except:
 
-            fail_with_error(logging, "Could not execute %s. Traceback: \n\n %s" % (cmd_line, traceback.format_exc()))
+            fail_with_error(log, "Could not execute %s. Traceback: \n\n %s" % (cmd_line, traceback.format_exc()))
 
 
 if __name__ == "__main__":
