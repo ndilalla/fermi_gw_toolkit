@@ -65,7 +65,7 @@ def submit_job(trigger_name, trigger_time, desired_tstart_met, desired_tstop_met
 
         cmd_line += ' --define TRIGGERTIME=%s' % trigger_time
 
-        cmd_line += ' --define TSTART=0' % desired_tstart_met
+        cmd_line += ' --define TSTART=%s' % desired_tstart_met
         cmd_line += ' --define TSTOP=%s' % desired_tstop_met
 
         cmd_line += ' --define HEALPIX_PATH_MAP=%s' % slac_path
