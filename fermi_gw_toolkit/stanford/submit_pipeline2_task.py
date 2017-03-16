@@ -11,6 +11,7 @@ SLAC_HOST = 'ftp.slac.stanford.edu'  # I use ftp just because it is not as loade
 import logging
 import sys, os
 import argparse
+import traceback
 
 from utils import fail_with_error, execute_command
 
@@ -70,7 +71,13 @@ def submit_job(trigger_name, trigger_time, desired_tstart_met, desired_tstop_met
 
         cmd_line += ' --define HEALPIX_PATH_MAP=%s' % slac_path
 
-        execute_command(logging, cmd_line)
+        try:
+
+            execute_command(logging, cmd_line)
+
+        except:
+
+            fail_with_error(logging, "Could not execute %s. Traceback: \n\n %s" % (cmd_line, traceback.format_exc()))
 
 
 if __name__ == "__main__":
