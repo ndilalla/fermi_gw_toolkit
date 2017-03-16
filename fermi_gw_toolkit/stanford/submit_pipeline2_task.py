@@ -85,4 +85,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    submit_job(args.trigger_name, args.trigger_time, args.tstart, args.tstop, args.map)
+    submit_job(args.triggername, args.triggertime, args.tstart, args.tstop, args.map)
