@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
             error = traceback.format_exc()
 
-            fail_with_error(error)
+            fail_with_error(log, error)
 
         else:
 
