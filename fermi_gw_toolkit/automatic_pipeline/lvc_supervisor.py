@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     # Create list of unique triggers to be processed
 
-    triggers = map(lambda x: os.path.basename(x).split("_gwmap")[0], maps)
+    triggers = set(map(lambda x: os.path.basename(x).split("_gwmap")[0], maps))
 
     for trigger in triggers:
 
