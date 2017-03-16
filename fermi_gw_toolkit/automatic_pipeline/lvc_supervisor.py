@@ -5,7 +5,7 @@ import os
 import sys
 import logging
 from configuration import config
-from utils import execute_command, DataNotAvailable
+from utils import execute_command, send_email
 
 logging.basicConfig(format='%(asctime)s %(message)s')
 
@@ -81,6 +81,12 @@ if __name__ == "__main__":
             continue
 
         else:
+
+            text = "Submitted job for trigger %s with map %s" % (trigger, most_recent_map)
+
+            log.info(text)
+
+            send_email(text)
 
             # Move all the maps for this trigger away so we don't re-process them
             for map in this_maps:

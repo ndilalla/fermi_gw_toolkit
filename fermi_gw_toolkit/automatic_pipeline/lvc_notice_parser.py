@@ -79,7 +79,9 @@ if __name__ == "__main__":
 
             log.info(text)
 
-            send_email('giacomo.slac@gmail.com', 'LVC NOTICE PROCESSED', text)
+            if gcn['NOTICE_TYPE'].find("TEST") < 0:
+
+                send_email('giacomo.slac@gmail.com', 'LVC NOTICE PROCESSED', text)
 
     else:
 
