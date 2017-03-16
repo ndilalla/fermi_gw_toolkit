@@ -76,11 +76,11 @@ if __name__ == "__main__":
 
         except:
 
-            # Fail and send an email
+            # submit_pipeline2 will handle the failure, sending an email if necessary, so we don't need to do much
 
-            error = traceback.format_exc()
+            log.error("submit_pipeline2_task.py failed (maybe no data?)")
 
-            fail_with_error(log, error)
+            sys.exit(0)
 
         else:
 
