@@ -86,6 +86,17 @@ if __name__ == "__main__":
         # Make the new version string
         version = "v%02i" % (int(last_existing_version.replace("v", "")) + 1)
 
+    # Now create the directory
+
+    dir_path = os.path.join(this_trigger_input_dir, version)
+
+    os.makedirs(dir_path)
+
+    # Change directory permission to rw-rw-rw-
+    os.chmod(dir_path, 0o666)
+
+    # Finally run the stream
+
     # P2_EXE is the path to the executable, likely /afs/slac.stanford.edu/u/gl/glast/pipeline-II/prod/pipeline
 
     cmd_line = '%s createStream' % config.get('SLAC', 'P2_EXE')

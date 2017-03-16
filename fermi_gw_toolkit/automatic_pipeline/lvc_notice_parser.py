@@ -63,7 +63,7 @@ if __name__ == "__main__":
             # Add "bn" to the name (which is required otherwise some of the scripts might get confused)
             event_name = "bn" + event_name
 
-            os.rename(basename, '%s_%s' % (event_name, basename))
+            os.rename(basename, '%s_gwmap_%s' % (event_name, basename))
 
         except:
 
