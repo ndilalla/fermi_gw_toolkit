@@ -5,13 +5,15 @@
 
 import email
 import sys
-import subprocess
 import logging
 from utils import send_email, execute_command
 
 # Configure logger
 logging.basicConfig(format='%(asctime)s %(message)s')
-logging.info('lvc_notice_parser is starting')
+
+log = logging.getLogger("lvc_notice_parser")
+log.setLevel(logging.DEBUG)
+log.info('lvc_notice_parser is starting')
 
 
 if __name__ == "__main__":
@@ -39,7 +41,7 @@ if __name__ == "__main__":
 
         try:
 
-            execute_command(logging, command)
+            execute_command(log, command)
 
         except:
 
@@ -53,10 +55,10 @@ if __name__ == "__main__":
 
             text = "Downloaded %s with status: %s" % (gcn['SKYMAP_BASIC_URL'], status)
 
-            logging.info(text)
+            log.info(text)
 
             send_email('giacomo.slac@gmail.com', 'LVC NOTICE PROCESSED', text)
 
     else:
 
-        logging.info('Ignoring alert of type %s' % gcn['NOTICE_TYPE'])
+        log.info('Ignoring alert of type %s' % gcn['NOTICE_TYPE'])
