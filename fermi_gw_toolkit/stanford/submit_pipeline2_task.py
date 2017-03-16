@@ -34,8 +34,7 @@ def get_maximum_available_MET():
     return float(maxTimeLimit)
 
 
-
-def submit_job(trigger_name, trigger_time, desired_tstart_met, desired_tstop_met, map_path):
+def submit_job(trigger_name, trigger_time, desired_tstart_met, desired_tstop_met, map_path, simulate=False):
 
     # Only submit the job if there is at least 1 ks of data after the trigger time
 
@@ -56,9 +55,14 @@ def submit_job(trigger_name, trigger_time, desired_tstart_met, desired_tstop_met
         slac_path = "%s/%s_%s" % (SLAC_MAP_DIR, trigger_name, os.path.basename(map_path))
 
         cmd_line = 'rsync %s %s:%s' % (map_path, SLAC_HOST, slac_path)
+
         execute_command(logging, cmd_line)
 
-        cmd_line = '/afs/slac.stanford.edu/u/gl/glast/pipeline-II/prod/pipeline createStream'
+        # Now submit the job at SLAC using ssh
+
+        cmd_line = 'ssh %s' % SLAC_HOST
+
+        cmd_line += ' echo /afs/slac.stanford.edu/u/gl/glast/pipeline-II/prod/pipeline createStream'
 
         cmd_line += ' GWFUP'
 
@@ -70,6 +74,10 @@ def submit_job(trigger_name, trigger_time, desired_tstart_met, desired_tstop_met
         cmd_line += ' --define TSTOP=%s' % desired_tstop_met
 
         cmd_line += ' --define HEALPIX_PATH_MAP=%s' % slac_path
+
+        if simulate:
+
+            cmd_line += " --define SIMULATE_MODE=1"
 
         try:
 
@@ -89,7 +97,16 @@ if __name__ == "__main__":
     parser.add_argument('--tstart', required=True, type=float)
     parser.add_argument('--tstop', required=True, type=float)
     parser.add_argument('--map', required=True, type=str)
+    parser.add_argument('--simulate', action='store_true')
 
     args = parser.parse_args()
 
-    submit_job(args.triggername, args.triggertime, args.tstart, args.tstop, args.map)
+    if args.simulate:
+
+        simulate = True
+
+    else:
+
+        simulate = False
+
+    submit_job(args.triggername, args.triggertime, args.tstart, args.tstop, args.map, simulate=simulate)
