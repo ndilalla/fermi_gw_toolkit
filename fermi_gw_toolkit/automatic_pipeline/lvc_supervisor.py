@@ -39,6 +39,8 @@ if __name__ == "__main__":
 
     triggers = set(map(lambda x: os.path.basename(x).split("_gwmap")[0], maps))
 
+    log.info("Found %i unique triggers" % len(triggers))
+
     for trigger in triggers:
 
         log.info("Processing trigger %s" % trigger)
