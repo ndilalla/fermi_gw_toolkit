@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
         cmd_line += " --tstop 10000"
 
-        cmd_line += " --map %s"
+        cmd_line += " --map %s" % most_recent_map
 
         if config.getboolean("Stanford", "SIMULATE"):
 
