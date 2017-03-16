@@ -27,6 +27,10 @@ log.info('submit_pipeline2_task is starting')
 sys.path.append('/storage/fermi-data/')
 
 
+class DataNotAvailable(RuntimeError):
+    pass
+
+
 def get_maximum_available_MET():
 
     from myDataCatalog import DB
@@ -43,10 +47,10 @@ def submit_job(trigger_name, trigger_time, desired_tstart_met, desired_tstop_met
 
     # Only submit the job if there is at least 1 ks of data after the trigger time
 
-    if  get_maximum_available_MET() <= desired_tstart_met + 1000.0:
+    if get_maximum_available_MET() <= desired_tstart_met + 1000.0:
 
         # No available data
-        fail_with_error(log, "No data available yet")
+        raise DataNotAvailable("No data available yet")
 
     else:
 

@@ -2,12 +2,11 @@
 
 import glob
 import os
-import shutil
 import sys
 import logging
 from configuration import config
-from utils import execute_command, fail_with_error
-import traceback
+from utils import execute_command
+from submit_pipeline2_task import DataNotAvailable
 
 logging.basicConfig(format='%(asctime)s %(message)s')
 
@@ -76,11 +75,9 @@ if __name__ == "__main__":
 
             execute_command(log, cmd_line)
 
-        except:
+        except DataNotAvailable:
 
-            # submit_pipeline2 will handle the failure, sending an email if necessary, so we don't need to do much
-
-            log.error("submit_pipeline2_task.py failed (maybe no data?)")
+            log.error("no data available for this trigger")
 
             sys.exit(0)
 
