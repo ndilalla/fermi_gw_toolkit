@@ -78,7 +78,7 @@ if __name__ == "__main__":
 
             log.error("submit_pipeline2_task.py failed, probably no data is available for this trigger")
 
-            sys.exit(0)
+            continue
 
         else:
 
