@@ -96,7 +96,7 @@ def submit_job(trigger_name, trigger_time, desired_tstart_met, desired_tstop_met
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(prog='process_n_points')
+    parser = argparse.ArgumentParser(prog='submit_pipeline2_task')
 
     parser.add_argument('--tstop', required=True, type=float,
                         help='Stop of the time interval for the analysis, in time since the trigger')
