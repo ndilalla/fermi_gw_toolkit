@@ -5,6 +5,9 @@ import socket
 import getpass
 from configuration import config
 
+class DataNotAvailable(RuntimeError):
+    pass
+
 _message_primitive = """\
 From: %s
 To: %s

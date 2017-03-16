@@ -7,7 +7,7 @@ import sys, os
 import argparse
 import traceback
 from configuration import config
-from utils import fail_with_error, execute_command
+from utils import fail_with_error, execute_command, DataNotAvailable
 
 try:
 
@@ -26,9 +26,6 @@ log.info('submit_pipeline2_task is starting')
 # Add the path where the Stanford data catalog is
 sys.path.append('/storage/fermi-data/')
 
-
-class DataNotAvailable(RuntimeError):
-    pass
 
 
 def get_maximum_available_MET():

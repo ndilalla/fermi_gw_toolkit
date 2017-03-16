@@ -5,8 +5,7 @@ import os
 import sys
 import logging
 from configuration import config
-from utils import execute_command
-from submit_pipeline2_task import DataNotAvailable
+from utils import execute_command, DataNotAvailable
 
 logging.basicConfig(format='%(asctime)s %(message)s')
 
