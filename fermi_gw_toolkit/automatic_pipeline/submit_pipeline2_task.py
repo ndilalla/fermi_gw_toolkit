@@ -1,11 +1,21 @@
 #!/usr/bin/env python
 
+from GtBurst.dataHandling import date2met
+
 import logging
 import sys, os
 import argparse
 import traceback
 from configuration import config
 from utils import fail_with_error, execute_command
+
+try:
+
+    import astropy.io.fits as pyfits
+
+except ImportError:
+
+    import pyfits
 
 logging.basicConfig(format='%(asctime)s %(message)s')
 
@@ -88,10 +98,8 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(prog='process_n_points')
 
-    parser.add_argument('--triggername', required=True, type=str)
-    parser.add_argument('--triggertime', required=True, type=float)
-    parser.add_argument('--tstart', required=True, type=float)
-    parser.add_argument('--tstop', required=True, type=float)
+    parser.add_argument('--tstop', required=True, type=float,
+                        help='Stop of the time interval for the analysis, in time since the trigger')
     parser.add_argument('--map', required=True, type=str)
     parser.add_argument('--simulate', action='store_true')
 
@@ -105,4 +113,20 @@ if __name__ == "__main__":
 
         simulate = False
 
-    submit_job(args.triggername, args.triggertime, args.tstart, args.tstop, args.map, simulate=simulate)
+    # Read from the map trigger name and the UTC date and time
+    with pyfits.open(args.map) as f:
+
+        # We add bn otherwise some tools might get confused
+
+        triggername = "bn%s" % f[1].header['OBJECT']
+
+        trigger_date = f[1].header.get("DATE-OBS")
+
+    # Now transform the trigger_date in the triggertime (in MET)
+    triggertime = date2met(trigger_date.replace("T"," "))
+
+    tstart_met = triggertime
+    tstop_met = triggertime + args.tstop
+    # Transform the trigger
+
+    submit_job(triggername, triggertime, tstart_met, tstop_met, args.map, simulate=simulate)
