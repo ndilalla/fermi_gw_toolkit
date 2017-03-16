@@ -75,6 +75,9 @@ if __name__ == "__main__":
 
     else:
 
+        # Remove absolute path
+        existing_versions = map(os.path.basename, existing_versions)
+
         # Find the last existing version
         existing_versions.sort()
 
