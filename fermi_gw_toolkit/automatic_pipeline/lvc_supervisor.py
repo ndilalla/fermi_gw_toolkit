@@ -74,9 +74,9 @@ if __name__ == "__main__":
 
             execute_command(log, cmd_line)
 
-        except DataNotAvailable:
+        except:
 
-            log.error("no data available for this trigger")
+            log.error("submit_pipeline2_task.py failed, probably no data is available for this trigger")
 
             sys.exit(0)
 
