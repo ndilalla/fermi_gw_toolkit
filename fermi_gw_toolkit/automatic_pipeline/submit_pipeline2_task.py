@@ -94,6 +94,8 @@ def submit_job(trigger_name, trigger_time, desired_tstart_met, desired_tstop_met
 
             fail_with_error(log, "Could not execute %s. Traceback: \n\n %s" % (cmd_line, traceback.format_exc()))
 
+        return 0
+
 
 if __name__ == "__main__":
 
@@ -130,4 +132,6 @@ if __name__ == "__main__":
     tstop_met = triggertime + args.tstop
     # Transform the trigger
 
-    submit_job(triggername, triggertime, tstart_met, tstop_met, args.map, simulate=simulate)
+    ex_code = submit_job(triggername, triggertime, tstart_met, tstop_met, args.map, simulate=simulate)
+
+    sys.exit(ex_code)
