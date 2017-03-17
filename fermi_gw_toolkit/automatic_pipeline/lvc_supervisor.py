@@ -77,6 +77,8 @@ if __name__ == "__main__":
 
         except subprocess.CalledProcessError as grepexc:
 
+            import pdb;pdb.set_trace()
+
             if grepexc.returncode == -10:
 
                 # No data
