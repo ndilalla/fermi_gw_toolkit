@@ -47,7 +47,7 @@ def submit_job(trigger_name, trigger_time, desired_tstart_met, desired_tstop_met
     if get_maximum_available_MET() <= desired_tstart_met + 1000.0:
 
         # No available data
-        return 10
+        return -10
 
     else:
 
