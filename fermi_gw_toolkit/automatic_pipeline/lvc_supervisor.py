@@ -77,7 +77,7 @@ if __name__ == "__main__":
 
         except subprocess.CalledProcessError as grepexc:
 
-            if grepexc.returncode == 1:
+            if grepexc.returncode == 10:
 
                 # No data
 
