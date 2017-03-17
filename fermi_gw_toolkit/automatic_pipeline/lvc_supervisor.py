@@ -81,7 +81,7 @@ if __name__ == "__main__":
 
                 # No data
 
-                log.error("submit_pipeline2_task.py failed, probably no data is available for this trigger")
+                log.error("submit_pipeline2_task.py: no data is available for this trigger")
 
                 continue
 
