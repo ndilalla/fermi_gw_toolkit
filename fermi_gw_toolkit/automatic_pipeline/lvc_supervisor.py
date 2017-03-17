@@ -4,8 +4,9 @@ import glob
 import os
 import sys
 import logging
+import subprocess
 from configuration import config
-from utils import execute_command, send_email
+from utils import execute_command, send_email, fail_with_error
 
 logging.basicConfig(format='%(asctime)s %(message)s')
 
@@ -74,11 +75,20 @@ if __name__ == "__main__":
 
             execute_command(log, cmd_line)
 
-        except:
+        except subprocess.CalledProcessError as grepexc:
 
-            log.error("submit_pipeline2_task.py failed, probably no data is available for this trigger")
+            if grepexc.returncode == 1:
 
-            continue
+                # No data
+
+                log.error("submit_pipeline2_task.py failed, probably no data is available for this trigger")
+
+                continue
+
+            else:
+
+                # This is an uncaught error
+                fail_with_error(log, "Failed in an unexpected way")
 
         else:
 
