@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
             import pdb;pdb.set_trace()
 
-            if grepexc.returncode == -10:
+            if grepexc.returncode == 254:
 
                 # No data
 
