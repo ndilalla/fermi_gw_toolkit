@@ -40,6 +40,11 @@ def send_email(address, subject, msg_text):
     server.quit()
 
 
+def send_notice(subject, text):
+
+    send_email(config.get('EMAIL', 'ERRORS_RECIPIENT'), subject, text)
+
+
 def fail_with_error(log, error):
 
     log.error(error)

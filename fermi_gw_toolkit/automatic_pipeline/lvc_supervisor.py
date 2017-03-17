@@ -6,7 +6,7 @@ import sys
 import logging
 import subprocess
 from configuration import config
-from utils import execute_command, send_email, fail_with_error
+from utils import execute_command, send_notice, fail_with_error
 
 logging.basicConfig(format='%(asctime)s %(message)s')
 
@@ -96,7 +96,7 @@ if __name__ == "__main__":
 
             log.info(text)
 
-            send_email(text)
+            send_notice("LVC: submitted %s" % trigger, text)
 
             # Move all the maps for this trigger away so we don't re-process them
             for map in this_maps:
