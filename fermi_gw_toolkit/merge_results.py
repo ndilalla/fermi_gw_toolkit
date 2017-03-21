@@ -24,26 +24,34 @@ def merge_results(**kwargs):
     keyword = kwargs['keyword']
     if kwargs['outfile'] is None:
         outdir = kwargs['txtdir']
-        out_txt_name = '%s_all_%s.txt' %(triggername, keyword)
+        out_txt_name = '%s_%s_all.txt' %(triggername, keyword)
         out_txt = os.path.join(outdir, out_txt_name)
     else:
         out_txt = kwargs['outfile']
-    txtdir = '%s/%s_%s_*.txt' % (kwargs['txtdir'], triggername, keyword)
+    txtdir = '%s/%s_*_%s.txt' % (kwargs['txtdir'], triggername, keyword)
     txt_list = glob.glob(txtdir)
     #print "Txt-files to merge:\n%s" %txt_list
     print "Preparing to merge %d text files..." %len(txt_list)
     
-    print "Merging..."
-    first_txt = True
-    with open(out_txt, 'w') as outfile:
-        for txt in txt_list:
-            with open(txt) as infile:
-                if first_txt:
-                    first_txt = False
-                else:
-                    infile.next()
-                for line in infile:
-                    outfile.write(line)
+    print "Merging..."    
+    outfile=open(out_txt, 'w')
+    for i,txt in enumerate(txt_list):
+        lines=open(txt).readlines()
+        for line in lines:
+            if '#' in line and i>0: continue
+            outfile.write(line)
+            pass
+        pass
+    #first_txt = True
+    #with open(out_txt, 'w') as outfile:
+    #    for txt in txt_list:
+    #        with open(txt) as infile:
+    #            if first_txt:
+    #                first_txt = False
+    #            else:
+    #                infile.next()
+    #            for line in infile:
+    #                outfile.write(line)
     print "Done."
     return out_txt
     

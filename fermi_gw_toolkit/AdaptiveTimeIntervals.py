@@ -122,7 +122,9 @@ def adaptive_time(**kwargs):
     fout.close()
     
     if plot:
-        import matplotlib as mpl
+        import matplotlib
+        # Force matplotlib to not use any Xwindows backend.
+        matplotlib.use('Agg')
         import matplotlib.cm as cmx
         from matplotlib import pyplot as plt
         import matplotlib.colors as colors
@@ -152,7 +154,7 @@ def adaptive_time(**kwargs):
         hp.mollview(ligo_expo, sub=224, title='Exposure (s)',cmap=cool_cmap,norm='log',min=0.1,max=max(ligo_expo),rot=rot)
         hp.graticule()
         ax = plt.gca()
-        plot_file=output.replace('.txt','_adaptive_coverage_map.png')
+        plot_file=output.replace('.txt','_coverage_map.png')
         print 'Saving plot to: %s' % plot_file
         fig.savefig(plot_file)
         #plt.show()

@@ -182,8 +182,8 @@ def compute_coverage(**kwargs):
                         kwargs['zenith_cut'])
 
     #with sns.plotting_context("paper", font_scale=3):
-
-    fig = plt.figure(figsize=(16*3, 16*3 / 1.333), dpi=150)
+    #fig = plt.figure(figsize=(16*3, 16*3 / 1.333), dpi=150)
+    fig = plt.figure(figsize=(16, 10))
 
     dt = (t - kwargs['start_time']) / 1000.0
 
@@ -220,7 +220,8 @@ def compute_coverage(**kwargs):
 
     dt = (t - kwargs['start_time']) / 1000.0
 
-    fig = plt.figure(figsize=(16*3, 16*3 / 1.333), dpi=150)
+    fig = plt.figure(figsize=(16, 10))#, dpi=150)
+    #fig = plt.figure(figsize=(16*3, 16*3 / 1.333), dpi=150)
 
     plt.plot(dt, sky_coverage, '-', lw=4)
 

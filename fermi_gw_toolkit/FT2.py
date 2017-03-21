@@ -44,6 +44,7 @@ class FT2:
         self.FOV_ARRAY   = sp.zeros(self.NENTRIES)
         self.theta_max=65
         self.zenith_max=90
+        print 'In FT2 file %s found %d entrues' %(ft2file,self.NENTRIES)
         pass
 
     def fov(self,theta_max,zenith_max):
@@ -52,6 +53,9 @@ class FT2:
         pass
     
     def getIndex(self,time):
+        if (self.SC_TSTOP[0]>time):
+            print 'FT2 does not cover the trigger time!'
+            return 0
         return sp.argmax(self.SC_TSTOP[self.SC_TSTOP<time])
 
     def getTime(self,idx):
