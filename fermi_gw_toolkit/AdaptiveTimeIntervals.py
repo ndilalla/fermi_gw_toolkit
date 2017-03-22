@@ -2,10 +2,19 @@
 __author__ = 'omodei'
 
 import argparse
+import matplotlib
+# Force matplotlib to not use any Xwindows backend.
+matplotlib.use('Agg')
+import matplotlib.cm as cmx
+from matplotlib import pyplot as plt
+import matplotlib.colors as colors
+from matplotlib import cm
 import healpy as hp
 import scipy as sp
 import numpy as np
 from fermi_gw_toolkit.FT2 import FT2
+from fermi_gw_toolkit import contour_finder
+from fermi_gw_toolkit.check_file_exists import check_file_exists
 
 __description__  = '''Create a text file with start and stop times for time adaptive interval'''
 
@@ -13,12 +22,15 @@ formatter = argparse.ArgumentDefaultsHelpFormatter
 parser = argparse.ArgumentParser(description=__description__,
                                  formatter_class=formatter)
 
-parser.add_argument('--in_map', help='Input HEALPIX map', type=str,
+parser.add_argument('--in_map', help='Input HEALPIX map', type=check_file_exists,
                     required=True)
 parser.add_argument('--triggertime', help='MET of the trigger time', type=float,
                     required=True)
 parser.add_argument('--nside', help='New NSIDE to degrade the HELPIX map',
                     type=int, required=False, default=32)
+parser.add_argument('--cl',
+                    help='Containment level for the contour (default: 0.9, i.e., 90 percent)', default=0.9, type=float)
+
 parser.add_argument('--ft2', help='ft2 files', type=str, required=True)
 parser.add_argument('--roi', help='Radius of the Region Of Interest (deg)',
                     type=float, required=False, default=0)
@@ -31,14 +43,6 @@ parser.add_argument('--output', help='Output text file with starts and tstop (re
 parser.add_argument('--plot',help='Plot the results (0 or 1)', type=int,
                     required=False, default=0, choices=[0,1])
 
-def pix_to_sky(idx, nside):
-    """Convert the pixels corresponding to the input indexes to sky coordinates
-    (RA, Dec)"""
-    theta, phi = hp.pix2ang(nside, idx)
-    ra = np.rad2deg(phi)
-    dec = np.rad2deg(0.5 * np.pi - theta)
-    return ra, dec
-
 def sky_to_pix(ra,dec, nside):
     """Convert the pixels corresponding to sky coordinates (RA, Dec) into input indexes """
     phi   = np.deg2rad(ra)
@@ -50,7 +54,7 @@ def sky_to_pix(ra,dec, nside):
 def adaptive_time(**kwargs):
     # Convenient names
     healpix_map = kwargs['in_map']
-    degrade     = kwargs['nside']
+    nside       = kwargs['nside']
     ft2         = kwargs['ft2']
     roi         = kwargs['roi']
     triggertime = kwargs['triggertime']
@@ -58,43 +62,33 @@ def adaptive_time(**kwargs):
     zenith_max  = kwargs['zenith_cut']
     output      = kwargs['output']
     plot        = kwargs['plot']
-    
-    perc        = 0.1
+
     orgx        = 0
     orgy        = 0
-    
-    ligo_map   = hp.read_map(healpix_map)
-    if degrade>0: ligo_map = hp.ud_grade(ligo_map,degrade)
 
-    NPIX=hp.get_map_size(ligo_map)
-    NSIDE=hp.npix2nside(NPIX)
-    RESOLUTION=hp.nside2resol(NSIDE,arcmin=True)/60.
-    print 'N PIXEL      = ',NPIX
-    print 'NSIDE        = ',NSIDE
-    print 'RESOLUTION   = ',RESOLUTION
-    masked_radius = RESOLUTION
+    my_finder = contour_finder.ContourFinder(healpix_map, nside)
+    
+
+    print("The intermediate map has an average pixel size of %.3f deg" % my_finder.pixel_size)
+
+    indexes = my_finder.find_contour(kwargs['cl'])
+
+    Nselected = indexes.shape[0]
+    print("Found %s points within the %s percent containment level" % (Nselected, kwargs['cl'] * 100.0))
+    
+    ligo_map=my_finder.map
+    print Nselected, len(ligo_map)
+    ligo_selected = np.zeros(len(ligo_map))
+    ligo_entry    = np.zeros(len(ligo_map))
+    ligo_expo     = np.zeros(len(ligo_map))
+
+    # Get R.A. and Dec for the pixels within the contour                                                                                                                                                                                                                    
+    masked_ra, masked_dec = my_finder.get_sky_coordinates(indexes)
+
+    masked_radius = my_finder.pixel_size
+
     if roi: masked_radius=roi
-
-    print len(ligo_map)
-    pixels = np.arange(NPIX)
-    #print ligo_map*([)ligo_map>1e-5)
-    p_max=ligo_map.max()
-    p_min=ligo_map.min()
-
-    p_selected=(perc)*p_max
-    ones      = np.ones(len(ligo_map))
-    mask      = (ligo_map>p_selected)
-    ligo_selected  = ones*(mask)
-    ligo_entry=ones*(mask)
-    ligo_expo=ones*(mask)
-    pixels_selected = pixels[mask]
     
-    #ra,dec = pix_to_sky(pixels,NSIDE)
-
-    masked_ra,masked_dec = pix_to_sky(pixels_selected,NSIDE)
-    #masked_ra_dec= coord.SkyCoord(ra=masked_ra*u.degree, dec=masked_dec*u.degree, frame='icrs')
-    
-    Nselected=len(pixels_selected)
     print 'Number of selected pixels:',Nselected
     myFT2=FT2(ft2,triggertime-100000,triggertime+100000)
     myFT2.fov(theta_max,zenith_max-masked_radius)
@@ -104,10 +98,12 @@ def adaptive_time(**kwargs):
     #######################################
     for i in range(Nselected):
         entry_time,exit_time=myFT2.getEntryExitTime(masked_ra[i],masked_dec[i],triggertime)
-        pix=pixels_selected[i]
+        pix=indexes[i]
         expo_time=exit_time-entry_time
-        ligo_entry[pix]*=entry_time
-        ligo_expo[pix]*=expo_time
+        #print i,pix,masked_ra[i],masked_dec[i],entry_time,expo_time
+        ligo_entry[pix]=entry_time
+        ligo_expo[pix]=expo_time
+        ligo_selected[pix]=1
         times_t0.append(entry_time)
         times_t1.append(exit_time)
         #print 'i/N:%7d/%7d pix:%7d ra:%10.3f dec:%10.3f entry:%10.3f exit:%10.3f exposure:%10.3f' %(i,Nselected,pix,masked_ra[i],masked_dec[i],entry_time,exit_time,expo_time)
@@ -122,18 +118,13 @@ def adaptive_time(**kwargs):
     fout.close()
     
     if plot:
-        import matplotlib
-        # Force matplotlib to not use any Xwindows backend.
-        matplotlib.use('Agg')
-        import matplotlib.cm as cmx
-        from matplotlib import pyplot as plt
-        import matplotlib.colors as colors
-
+        p_max=ligo_map.max()
         fig=plt.figure(figsize=(20,10),facecolor='w')
         idx = ligo_entry == 0
         ligo_entry[idx] = np.nan
+        #idx = ligo_expo == 0
+        #ligo_expo[idx] = np.nan
 
-        from matplotlib import cm
         jet = plt.get_cmap('jet')
         #jet = colors.Colormap('jet')
         cNorm  = colors.Normalize(vmin=times_t0.min(), vmax=times_t0.max())
@@ -147,7 +138,7 @@ def adaptive_time(**kwargs):
         rot=(orgx,orgy)
         hp.mollview(ligo_map/p_max, sub=221, title='Ligo Map',cmap=cool_cmap,rot=rot)
         hp.graticule()
-        hp.mollview(ligo_selected, sub=222, title='Ligo Map ($>$%.1f)' % perc,cmap=cool_cmap,norm='lin',min=0,max=1.0,rot=rot)
+        hp.mollview(ligo_selected, sub=222, title='Ligo Map (%.1f c.l.)' % kwargs['cl'],cmap=cool_cmap,norm='lin',min=0,max=1.0,rot=rot)
         hp.graticule()
         hp.mollview(ligo_entry, sub=223, title='Entry Time',cmap=jet,norm='lin',min=times_t0.min(),max=times_t0.max(),rot=rot)
         hp.graticule()

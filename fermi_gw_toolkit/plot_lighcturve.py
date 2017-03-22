@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse
 import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import healpy as hp
 import numpy as np
@@ -8,11 +9,11 @@ from matplotlib.ticker import NullFormatter
 import matplotlib.colors as colors
 import matplotlib.cm as cmx
 
-from matplotlib import rc
 from check_file_exists import check_file_exists
 import glob
+#from matplotlib import rc
+#rc('text', usetex=True)
 
-rc('text', usetex=True)
 def sky_to_healpix_id(this_ra, this_dec,nside):
 
     theta = 0.5 * np.pi - np.deg2rad(this_dec)

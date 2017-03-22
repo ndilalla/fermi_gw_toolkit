@@ -5,11 +5,12 @@ import argparse
 from check_file_exists import check_file_exists
 
 import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import healpy as hp
 import numpy as np
-from matplotlib import rc
-rc('text', usetex=True)
+#from matplotlib import rc
+#rc('text', usetex=True)
 
 if __name__=="__main__":
 
