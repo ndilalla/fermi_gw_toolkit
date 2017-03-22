@@ -16,7 +16,9 @@ formatter = argparse.ArgumentDefaultsHelpFormatter
 parser = argparse.ArgumentParser(description=desc, formatter_class=formatter)
 
 parser.add_argument('--in_map', help='Input HEALPIX map',
-                    type=check_file_exists, required=True)
+                    type=check_file_exists, required=False)
+parser.add_argument('--nside', help='NSIDE of the output map',
+                    type=int, required=False,default=0)
 parser.add_argument('--text_file', type=check_file_exists,required=True,
                     help='Input text file (results from the doTimeResolvedLike script of gtburst)')
 parser.add_argument('--out_uls_map', type=str, required=True,
@@ -46,10 +48,13 @@ def fill_maps(**kwargs):
     dec = data['dec']
 
     # Get the NSIDE from the input healpix map
-
-    hpx_orig, header = hp.read_map(kwargs['in_map'], h=True, verbose=False)
-
-    nside = hp.npix2nside(hpx_orig.shape[0])
+    nside=kwargs['nside']
+    if nside==0:
+        try:
+            hpx_orig, header = hp.read_map(kwargs['in_map'], h=True, verbose=False)
+            nside = hp.npix2nside(hpx_orig.shape[0])
+        except:
+            raise IOError("Either provide NSIDE or an hHelPic Map!")
 
     # Generate a new empty map
 
