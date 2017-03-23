@@ -51,6 +51,8 @@ parser.add_argument("--img_folder", help="Image folder", type=str,
                     required=False, default=".")
 parser.add_argument("--template", help="Template", type=str, required=False,
                     default='results_template.html')
+parser.add_argument("--styles", help="Css file for style", type=str,
+                    required=False, default='styles.css')
 
 content = '''
 <tr><td rowspan="2" align="center">TS<br>{}</td><td>Ra</td><td>{}&deg</td></tr>
@@ -62,11 +64,11 @@ def get_date(ligo_map):
     date_obs = hdulist[1].header['DATE-OBS']
     return date_obs[:10], date_obs[11:19]
 
-def load_template(template):
-    f = open(template)
-    web_page = f.read()
+def load_file(file_path):
+    f = open(file_path)
+    page = f.read()
     f.close()
-    return web_page
+    return page
 
 def write_file(text, outfile):
     output = open(outfile, "w")
@@ -99,7 +101,8 @@ def insert_ts_list(ts_map, ts_cut, nside):
     return table
     
 def show_results(**kwargs):
-    web_page = load_template(kwargs['template'])
+    web_page = load_file(kwargs['template'])
+    styles = load_file(kwargs['styles'])
     
     #define all the variables to be used in the template
     triggername = kwargs['triggername'].replace('bn','')
