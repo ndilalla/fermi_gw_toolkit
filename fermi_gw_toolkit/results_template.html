@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Analysis report for {triggername}</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <table align="center" >
+      <tr>
+        <td colspan="2">
+          <table class="disclaimer">
+            <tr>
+              <td>
+                <p align="center"><font color="red">
+                <b><u>CONFIDENTIAL</u></b><br>
+                THIS ANALYSIS IS SUBJECT TO THE LAT-LIGO MOU <br>
+                ALL RESULTS ARE EMBARGOED UNTIL THE LIGO TEAM PUBLISHES THEIR GCNS/PAPER <br>
+                DO NOT DISTRIBUTE OR DISCUSS OUTSIDE OF THE LAT COLLABORATION</td>
+                </font></p>
+              </td>
+            </tr>
+          </table>
+      </tr>
+      <tr>
+        <td valign="top">
+          <table class="left_table" border="1">
+            <tr><td class="td_title" colspan="2">SUMMARY</td></tr>
+            <tr><td>Name</td><td>{triggername}</td></tr>
+            <tr><td>Trigger MET</td><td>{triggertime}</td></tr>
+            <tr><td>Date</td><td>{date}</td></tr>
+            <tr><td>Time</td><td>{time}</td></tr>
+            <tr><td>E Min</td><td>{emin} MeV</td></tr>
+            <tr><td>E Max</td><td>{emax} MeV</td></tr>
+            <tr><td>T Start</td><td>{tstart} s</td></tr>
+            <tr><td>T Stop</td><td>{tstop} s</td></tr>
+            <tr><td>Theta Max</td><td>{thetamax}&deg</td></tr>
+            <tr><td>Z Max</td><td>{zmax}&deg</td></tr>
+            <tr><td>ROI</td><td>{roi}&deg</td></tr>
+            <tr><td>IRF</td><td>{irf}</td></tr>
+            <tr><td>Galactic Model</td><td>{gal_model}</td></tr>
+            <tr><td>Strategy</td><td>{strategy}</td></tr>
+            <tr><td>Particle Model</td><td>{part_model}</td></tr>
+            <tr><td>NSide</td><td>{nside}</td></tr>
+          </table>
+          </p>
+        </td>
+        <td valign="top">
+          <table table class="right_table" border="1">
+            <tr><td class="td_title">FIXED TIME ANALYSIS</td></tr>
+            <tr>
+              <td align="center">
+                <b>Coverage plot</b>
+                <img src={coverage} alt="coverage" width="100%">
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top" rowspan="2">
+          <table class="left_table" border="1">
+            <tr><td class="td_title" colspan="3">TS MAXIMUM</td></tr>
+            <tr>
+              <td rowspan="2" align="center">
+                TS<br>{fti_ts_max}</td>
+              <td>Ra</td><td>{fti_ra_max}&deg</td>
+            </tr>
+            <tr><td>Dec</td><td>{fti_dec_max}&deg</td></tr>
+            <tr><td colspan="3"></td></tr>
+            <tr><td class="td_title" colspan="3">LIST OF TS &gt {ts_cut} </td></tr>
+            {fti_ts_list}
+          </table>
+        </td>
+        <td>
+          <table table class="right_table" border="1">
+            <tr>
+              <td align="center">
+                <b>TS map</b>
+                <img src={fti_ts_map} alt="ts" width="100%">
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <table table class="right_table" border="1">
+            <tr>
+              <td align="center">
+                <b>Upper limits map</b>
+                <img src={fti_ul_map} alt="ul" width="100%">
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr><td colspan="3"><p></p></td></tr>
+      <tr>
+        <td></td>
+        <td>
+          <table table class="right_table" border="1">
+            <tr><td class="td_title">ADAPTIVE TIME ANALYSIS</td></tr>
+            <tr>
+              <td align="center">
+                <b>Temporal and spatial distribution of the Upper Bounds</b>
+                <img src={ati_lc} alt="upper bound" width="100%">
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top" rowspan="2">
+          <table class="left_table" border="1">
+            <tr><td class="td_title" colspan="3">TS MAXIMUM</td></tr>
+            <tr>
+              <td rowspan="2" align="center">
+                TS<br>{ati_ts_max}</td>
+              <td>Ra</td><td>{ati_ra_max}&deg</td>
+            </tr>
+            <tr><td>Dec</td><td>{ati_dec_max}&deg</td></tr>
+            <tr><td></td></tr>
+            <tr><td class="td_title" colspan="3">LIST OF TS &gt {ts_cut} </td></tr>
+            {ati_ts_list}
+          </table>
+        </td>
+        <td>
+          <table table class="right_table" border="1">
+            <tr>
+              <td align="center">
+                <b>TS map</b>
+                <img src={ati_ts_map} alt="adaptive ts map" width="100%">
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <table table class="right_table" border="1">
+            <tr>
+              <td align="center">
+                <b>Upper limits map</b>
+                <img src={ati_ul_map} alt="adaptive ul" width="100%">
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+  <footer>
+    <small>
+    <p id="date" align="center"></p>
+    <script>
+    document.getElementById("date").innerHTML = Date();
+    </script>
+    </small>
+  </footer>
+</html>

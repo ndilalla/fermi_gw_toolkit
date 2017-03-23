@@ -1,0 +1,26 @@
+.disclaimer {
+    border-collapse:collapse;
+    width:100%;
+    border: 1px solid red;
+}
+
+.left_table {
+  border-collapse:collapse;
+  width:300px;
+  border: 1px solid black;
+}
+
+.right_table {
+  border-collapse:collapse;
+  width:100%;
+  max-width:1000px;
+  border: 1px solid black;
+  
+}
+
+.td_title {
+  color: blue;
+  text-align: center;
+  font-weight:bold;
+  border: 1px solid black;
+}
