@@ -1,11 +1,17 @@
+#!/usr/bin/env python
 import os, glob, argparse
 import numpy
 import healpy as hp
 #import webbrowser
 import astropy.io.fits as pyfits
-
+from contour_finder import  pix_to_sky
 formatter = argparse.ArgumentDefaultsHelpFormatter
 parser = argparse.ArgumentParser(formatter_class=formatter)
+
+def fix_path(local_path):
+    _html_home='http://glast-ground.slac.stanford.edu/Decorator/exp/Fermi/Decorate/groups/grb/GWPIPELINE/'
+    _nfs_home='/nfs/farm/g/glast/u26/GWPIPELINE'
+    return local_path.replace(_nfs_home,_html_home)
 
 parser.add_argument("--triggername", help="Trigger name", type=str,
                     required=True)
@@ -73,7 +79,8 @@ def max_ts(map_path, ts_cut):
     nside = header['NSIDE']
     ts_max = round(ts_map.max(),2)
     px_max = numpy.argmax(ts_map)
-    ra_max, dec_max = hp.pix2ang(nside, px_max, lonlat=True)
+    ra_max, dec_max = pix_to_sky(px_max,nside)
+    # hp.pix2ang(nside, px_max, lonlat=True)
     ra_max = round(ra_max, 2)
     dec_max = round(dec_max, 2)
     ts_list = insert_ts_list(ts_map, ts_cut, nside)
@@ -84,7 +91,8 @@ def insert_ts_list(ts_map, ts_cut, nside):
     table = ""
     for px in ts_px.T[0]:
         ts = round(ts_map[px],2)
-        ra, dec = hp.pix2ang(nside, px, lonlat=True)
+        ra, dec = pix_to_sky(px,nside)
+        #ra, dec = hp.pix2ang(nside, px, lonlat=True)
         ra = round(ra, 2)
         dec = round(dec, 2)
         table += content.format(ts, ra, dec)
@@ -94,7 +102,7 @@ def show_results(**kwargs):
     web_page = load_template(kwargs['template'])
     
     #define all the variables to be used in the template
-    triggername = kwargs['triggername']
+    triggername = kwargs['triggername'].replace('bn','')
     triggertime = kwargs['triggertime']
     date, time = get_date(kwargs['ligo_map'])
     emin = kwargs['emin']
@@ -111,14 +119,16 @@ def show_results(**kwargs):
     
     #get all the plot from the image folder
     img_folder = kwargs['img_folder']
-    coverage_name = 'bn'+ triggername +'_prob_coverage.png'
-    coverage = glob.glob(img_folder + coverage_name)[0]
-    fti_ts_map = glob.glob(img_folder + 'FTI_ts_map.png')[0]
-    fti_ul_map = glob.glob(img_folder + 'FTI_ul_map.png')[0]
-    #ati_ub = glob.glob(img_folder + 'ad_ub.png')[0]
-    ati_ts_map = glob.glob(img_folder + 'ATI_ts_map.png')[0]
-    ati_ul_map = glob.glob(img_folder + 'ATI_ul_map.png')[0]
-    ati_lc = glob.glob(img_folder + 'ATI_compositeLC.png')[0]
+    coverage_name = 'bn'+triggername +'_prob_coverage.png'
+    print img_folder + coverage_name
+    coverage = fix_path(glob.glob(img_folder + coverage_name)[0])
+    
+    fti_ts_map = fix_path(glob.glob(img_folder + 'FTI_ts_map.png')[0])
+    fti_ul_map = fix_path(glob.glob(img_folder + 'FTI_ul_map.png')[0])
+    #ati_ub     = fix_path(glob.glob(img_folder + 'ad_ub.png')[0])
+    ati_ts_map = fix_path(glob.glob(img_folder + 'ATI_ts_map.png')[0])
+    ati_ul_map = fix_path(glob.glob(img_folder + 'ATI_ul_map.png')[0])
+    ati_lc     = fix_path(glob.glob(img_folder + 'ATI_compositeLC.png')[0])
     
     #take the max ts and the ts_list from ati e fti ts maps
     ts_cut = kwargs['ts_cut']
