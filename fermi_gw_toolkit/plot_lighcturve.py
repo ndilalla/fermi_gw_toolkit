@@ -67,7 +67,7 @@ if __name__=="__main__":
         ylabel = "Upper Bound (0.1 - 1 GeV) [cm$^{-2}$ s$^{-1}$]"
         ylabel = "Upper Bound [cm$^{-2}$ s$^{-1}$]"
         pass
-
+    ticks_size=20
     ##################################################
     # READ THE DATA:
     ##################################################
@@ -146,10 +146,10 @@ if __name__=="__main__":
     # THIS IS THE LIGHTCURVE FRAME
     axLC = plt.axes(rect_scatter)
     plt.yscale('log')
-    axLC.set_xlabel(xlabel,size=25)
-    axLC.set_ylabel(ylabel,size=25)
-    plt.xticks(size=25)
-    plt.yticks(size=25)
+    axLC.set_xlabel(xlabel,size=ticks_size)
+    axLC.set_ylabel(ylabel,size=ticks_size)
+    plt.xticks(size=ticks_size)
+    plt.yticks(size=ticks_size)
     
     background='w'
     background='ivory'
@@ -176,11 +176,11 @@ if __name__=="__main__":
     # THIS IS THE COLORBAR ON THE TOP OF THE LC
     thickness=0.05
     ax2 = fig.add_axes([left, height+0.1, width, thickness])
-    plt.xticks(size=20)
+    plt.xticks(size=ticks_size)
     
     cb1 = matplotlib.colorbar.ColorbarBase(ax2, cmap=cmap,norm=cNorm,orientation='horizontal',ticklocation='top')
-    cb1.set_label(xlabel,size=25)
-    ax2.xaxis.set_label_coords(0.05, 1.5)
+    cb1.set_label(xlabel,size=ticks_size)
+    ax2.xaxis.set_label_coords(0.05, 1.7)
 
     cb1.ax.tick_params(labelsize=25)
     if args.lc is not None:
@@ -195,14 +195,18 @@ if __name__=="__main__":
         #axHistx = plt.axes(rect_histx)
         axHisty = plt.axes(rect_histy)
         plt.yscale('log')
+        plt.xscale('log') 
         # no labels
         nullfmt = NullFormatter()  
         #axHistx.xaxis.set_major_formatter(nullfmt)
         axHisty.yaxis.set_major_formatter(nullfmt)
         h,b,p=axHisty.hist(flux,bins=np.logspace(np.log10(ymin),np.log10(ymax),20), orientation='horizontal',color='grey')#np.logspace(np.log10(ymin),np.log10(ymax),20))
         axHisty.set_ylim((ymin, ymax))
-        plt.xticks(range(0, int(max(h)),100),size=25)
-        #plt.yticks(size=20)
+        
+        #plt.xticks(range(0, int(max(h)),int(max(h)/10)),size=25)
+        #plt.xticks(np.linspace(0, int(max(h)),4),size=25)
+        plt.xticks(size=ticks_size)
+        #plt.yticks(size=ticks_size)
         #ticks=np.linspace(data['ra'].min(),data['ra'].max(),10)
         #ticks=np.linspace(start.min(),start.max(),3)
         pass
@@ -210,7 +214,7 @@ if __name__=="__main__":
     # THIS IS THE SKYMAP ON TOP:
     # THIS IS THE SKYMAP:
     #axSM = plt.axes(rect_histx)
-    ticks_size=25
+
     if args.nside:
         hp.mollview(healpix_map, title='',cmap=cmap,norm='lin',min=vmin,max=vmax,rot=(180,0),sub=211,cbar=False)
         hp.graticule()
@@ -233,8 +237,8 @@ if __name__=="__main__":
             hp.projtext(lon,lat, r'%d$^{\circ}$ ' %(lat),lonlat=True,size=ticks_size,horizontalalignment='right',va=va)
 
             pass
-        #plt.text(-2.2,0,'Dec',rotation=90,size=20)
-        #plt.text(0,-1.1,'RA',size=20,ha='center')
+        #plt.text(-2.2,0,'Dec',rotation=90,size=ticks_size)
+        #plt.text(0,-1.1,'RA',size=ticks_size,ha='center')
         pass
 
     #print dir(cb1)
