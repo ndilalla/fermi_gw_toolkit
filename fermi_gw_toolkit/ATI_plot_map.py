@@ -81,6 +81,12 @@ if __name__=="__main__":
         cmap = matplotlib.cm.afmhot_r
         cmap.set_bad('#f0f0f0')
         pass
+    elif args.cmap=='copper':
+        cmap = matplotlib.cm.copper
+        background='antiquewhite'
+        cmap.set_bad(background)
+        cmap.set_under("w",alpha=0) # sets background to white                                                                                                                                                                                   
+
     # Rotation for the mollview map:
     rot=args.rot.split(',')
 
@@ -112,7 +118,7 @@ if __name__=="__main__":
                                 norm=args.zscale,
                                 return_projected_map=True, xsize=1000, coord='C',
                                 title='',
-                                cmap=cmap,
+                                cmap=args.cmap,
                                 fig=1, cbar=None,notext=True)
 
     ax = plt.gca()
