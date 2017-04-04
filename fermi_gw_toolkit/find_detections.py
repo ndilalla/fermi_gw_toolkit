@@ -28,7 +28,7 @@ def Hopkins_method(healpix_tsmap, fdr, psf_size, hopkins_correction=True):
 
     # Get the corresponding p-values
     # We use here the result from Mattox et al. 1996, that TS is distributed as 0.5 chi2(1 dof)
-    p_values = 0.5 * scipy.stats.chi2(1).pdf(ts_map_array)  # type: np.ndarray
+    p_values = 0.5 * scipy.stats.chi2(1).sf(ts_map_array)  # type: np.ndarray
 
     # Order the p-values from the smallest to the largest. We use argsort to keep track of the reordering
     sort_idx = p_values.argsort()
