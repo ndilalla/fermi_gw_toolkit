@@ -107,8 +107,11 @@ if __name__ == "__main__":
 
     cmd_line += ' --define TRIGGERTIME=%s' % args.triggertime
 
-    cmd_line += ' --define TSTART=%s' % args.tstart_met
-    cmd_line += ' --define TSTOP=%s' % args.tstop_met
+    cmd_line += ' --define MET_TSTART=%s' % args.tstart_met
+    cmd_line += ' --define MET_TSTOP=%s' % args.tstop_met
+
+    cmd_line += ' --define MET_FT2TSTART=%s' % (args.tstart_met - 10000.0)
+    cmd_line += ' --define MET_FT2TSTOP=%s' % (args.tstop_met + 10000.0)
 
     cmd_line += ' --define HEALPIX_MAP=%s' % args.map
 
