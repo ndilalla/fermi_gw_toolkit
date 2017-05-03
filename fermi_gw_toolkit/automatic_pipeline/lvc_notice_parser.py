@@ -58,7 +58,7 @@ if __name__ == "__main__":
             basename = os.path.basename(gcn['SKYMAP_BASIC_URL'])
 
             # Get the name of the event
-            event_name = pyfits.getval(basename, 'OBJECT', ext=1)
+            event_name = gcn['TRIGGER_NUM'].replace(" ","")
 
             # Add "bn" to the name (which is required otherwise some of the scripts might get confused)
             event_name = "bn" + event_name
@@ -66,9 +66,8 @@ if __name__ == "__main__":
             os.rename(basename, '%s_gwmap_%s' % (event_name, basename))
 
         except:
-
             status = 'failed'
-
+            raise
         else:
 
             status = 'success'
