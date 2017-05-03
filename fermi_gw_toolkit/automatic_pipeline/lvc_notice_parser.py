@@ -72,7 +72,7 @@ if __name__ == "__main__":
                 
                 if 'OBJECT' not in f[1].header:
                     
-                    f[1].header['OBJECT'] = event_name 
+                    f[1].header['OBJECT'] = event_name.replace("bn","") 
 
         except:
             status = 'failed'
