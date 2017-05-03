@@ -62,8 +62,17 @@ if __name__ == "__main__":
 
             # Add "bn" to the name (which is required otherwise some of the scripts might get confused)
             event_name = "bn" + event_name
-
-            os.rename(basename, '%s_gwmap_%s' % (event_name, basename))
+            
+            new_name = '%s_gwmap_%s' % (event_name, basename)
+            
+            os.rename(basename, new_name)
+            
+            # Open the FITS file and set the OBJECT keyword if it is not present
+            with pyfits.open(new_name, mode='update') as f:
+                
+                if 'OBJECT' not in f[1].header:
+                    
+                    f[1].header['OBJECT'] = event_name 
 
         except:
             status = 'failed'
