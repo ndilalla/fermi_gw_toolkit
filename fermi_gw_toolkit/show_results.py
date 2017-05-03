@@ -102,7 +102,7 @@ def insert_ts_list(ts_map, ts_cut, nside):
     
 def show_results(**kwargs):
     web_page = load_file(kwargs['template'])
-    styles = load_file(kwargs['styles'])
+    #styles = load_file(kwargs['styles'])
     
     #define all the variables to be used in the template
     triggername = kwargs['triggername'].replace('bn','')

@@ -113,6 +113,8 @@ if __name__ == "__main__":
     cmd_line += ' --define MET_FT2TSTART=%s' % (args.tstart_met - 10000.0)
     cmd_line += ' --define MET_FT2TSTOP=%s' % (args.tstop_met + 10000.0)
 
+    cmd_line += ' --define EMAX=1000'
+
     cmd_line += ' --define HEALPIX_MAP=%s' % args.map
 
     cmd_line += ' --define VERSION=%s' % version
