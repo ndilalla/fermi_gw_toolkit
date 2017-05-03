@@ -63,7 +63,12 @@ def submit_job(trigger_name, trigger_time, desired_tstart_met, desired_tstop_met
         cmd_line = 'rsync %s %s:%s' % (map_path, config.get("SLAC","SSH_HOST"), slac_path)
 
         execute_command(log, cmd_line)
-
+        
+        # Now fix the permission at SLAC
+        log.info("Fixing permission at SLAC...")
+        cmd_line = 'ssh %s chmod ga+rw %s' % (config.get("SLAC", "SSH_HOST"), slac_path)
+        execute_command(log, cmd_line)
+        
         # Now submit the job at SLAC using ssh
 
         cmd_line = 'ssh %s' % config.get("SLAC","SSH_HOST")
