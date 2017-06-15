@@ -67,8 +67,10 @@ if __name__=="__main__":
 
     # Now set to nan all negative or zero pixels
 
+
     idx = hpx_ul <= 0
     hpx_ul[idx] = np.nan
+
     if args.cmap=='jet':
         background='w'
         background='ivory'
@@ -96,13 +98,13 @@ if __name__=="__main__":
     
     if args.map_type == 'EFLUX':
         magnitude = 10 ** np.floor(np.log10(np.median(hpx_ul[np.isfinite(hpx_ul)])))
-        z_title  =r'Upper limit (0.1-1 GeV) [10$^{%.0f}$ erg cm$^{-2}$ s$^{-1}$]' % np.log10(magnitude)
+        z_title  =r'Flux Upper Bound (0.1-1 GeV) [10$^{%.0f}$ erg cm$^{-2}$ s$^{-1}$]' % np.log10(magnitude)
 
     elif args.map_type == 'FLUX':
         magnitude = 10 ** np.floor(np.log10(np.median(hpx_ul[np.isfinite(hpx_ul)])))
-        z_title  =r'Upper limit (0.1-1 GeV) [10$^{%.0f}$ cm$^{-2}$ s$^{-1}$]' % np.log10(magnitude)
+        z_title  =r'Flux Upper Bound (0.1-1 GeV) [10$^{%.0f}$ cm$^{-2}$ s$^{-1}$]' % np.log10(magnitude)
     elif args.map_type == 'TS':
-        z_title  =r'TS (0.1-1 GeV) ' 
+        z_title  =r'TS ' 
         magnitude = 1
     else:
         print 'Unrecognized map type %s. Use EFLUX, FLUX or TS' % args.map_type
@@ -112,10 +114,15 @@ if __name__=="__main__":
         
     print 'Minimum Value = ', hpx_ul[idx].min()
     print 'Maximum Value = ', hpx_ul[idx].max()
+    norm = args.zscale
+    if norm == 'linear': 
+        norm=None
+        #mmin=0
+    print 'Normalization of the axis:',norm
     projected_map = hp.mollview(hpx_ul / magnitude, rot=rot,
                                 min=mmin / magnitude,
                                 max=mmax / magnitude,
-                                norm=args.zscale,
+                                norm=norm,
                                 return_projected_map=True, xsize=1000, coord='C',
                                 title='',
                                 cmap=args.cmap,

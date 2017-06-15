@@ -118,6 +118,7 @@ if __name__=="__main__":
     ymax=1.1*flux.max()
     tmin=start.min()
     tmax=end.max()
+    vmax=start.max()
     if args.tmin is not None: tmin=float(args.tmin)
     if args.tmax is not None: tmax=float(args.tmax)
 
@@ -164,7 +165,7 @@ if __name__=="__main__":
     #vmin=start.min()
     #vmax=start.max()
     vmin=tmin
-    vmax=tmax
+    #vmax=tmax
     
     cNorm  = colors.Normalize(vmin=vmin, vmax=vmax)
     scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cmap)
