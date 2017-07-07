@@ -140,6 +140,8 @@ class CustomSimulator(object):
 
         assert n_simulated_events == n_simulated_events_after_cuts, "Some events were lost when cutting with gtselect!"
 
+        log.info("Generated %s events of class %s" % (n_simulated_events_after_cuts, self._irfs))
+
     def _track_temp_file(self, filename):
 
         self._temp_files.append(filename)
