@@ -218,6 +218,9 @@ class CustomSimulator(object):
 
             # Need to merge all the xml files
             # Parse the list and extract all the XML files
+
+            import pdb;pdb.set_trace()
+
             with open(sanitize_filename(config.get("SLAC", "SIM_XML")), "r") as f:
 
                 xml_list = []
