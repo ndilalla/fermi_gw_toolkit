@@ -45,6 +45,10 @@ def do_one_simulation(ft2, tstart, simulation_time, seed=None, irfs="P8R2_SOURCE
                      }
 
     gtobssim_app = GtApp('gtobssim')
+
+    # We need to setup the environment variable SKYMODEL_DIR before running gtobssim
+    os.environ['SKYMODEL_DIR'] = config.get("SLAC","SKYMODEL_DIR")
+
     gtobssim_app.run(**gtobssim_args)
 
 
