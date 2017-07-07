@@ -3,6 +3,7 @@ import glob
 import os
 from configuration import config
 import numpy as np
+from xml.etree import ElementTree
 
 from GtApp import GtApp
 from GtBurst import IRFS
@@ -21,6 +22,11 @@ logging.basicConfig(format='%(asctime)s %(message)s')
 
 log = logging.getLogger("full_sky_simulation.py")
 log.setLevel(logging.DEBUG)
+
+
+def sanitize_filename(filename):
+
+    return os.path.abspath(os.path.expandvars(os.path.expanduser(filename)))
 
 
 class CustomSimulator(object):
@@ -46,7 +52,11 @@ class CustomSimulator(object):
         :param emax:
         :param ltfrac:
         """
-        self._ft2 = ft2
+
+        # At the moment we only support source class
+        assert self._irfs == "P8R2_SOURCE_V6", "At the moment we only support P8R2_SOURCE_V6"
+
+        self._ft2 = sanitize_filename(ft2)
         self._tstart = tstart
         self._simulation_time = simulation_time
         self._irfs = irfs
@@ -77,8 +87,8 @@ class CustomSimulator(object):
         _gtobssim_args = {'emin': self._emin,
                           'emax': self._emax,
                           'edisp': 'yes',
-                          'infile': config.get("SLAC", "SIM_XML"),
-                          'srclist': config.get("SLAC", "SIM_SRC_LIST"),
+                          'infile': sanitize_filename(config.get("SLAC", "SIM_XML")),
+                          'srclist': sanitize_filename(config.get("SLAC", "SIM_SRC_LIST")),
                           'scfile': self._ft2,
                           'evroot': evroot,
                           'simtime': self._simulation_time,
@@ -165,9 +175,9 @@ class CustomSimulator(object):
 
     def _track_temp_file(self, filename):
 
-        self._temp_files.append(filename)
+        self._temp_files.append(sanitize_filename(filename))
 
-        return os.path.abspath(os.path.expandvars(os.path.expanduser(filename)))
+        return self._temp_files[-1]
 
     def _cleanup(self):
 
@@ -175,9 +185,86 @@ class CustomSimulator(object):
 
             os.remove(filename)
 
+    def _get_sources_from_XML(self, xmlfile):
+
+        # Open and parse
+        with open(sanitize_filename(xmlfile)) as xml:
+
+            tree = ElementTree.parse(xml)
+
+        # Get the root, which is "source_library"
+        library = tree.getroot()
+
+        # Get all the sources
+        sources = library.findall("source")
+
+        return sources
+
     def run_gtdiffrsp(self):
 
+        # Check that we have a simulated FT1
+
         assert self._simulated_ft1 is not None, "You have to run the simulation before computing the diffuse response"
+
+        # Check the type of model file. If the model file is not a xml (doesn't end with .xml), then it is considered
+        # a text file containing a list of XML files. These XML files are appended one after the other to make a big
+        # XML file so that gtdiffrsp can actually read it
+        if os.path.splitext(config.get("SLAC", "SIM_XML"))[-1] == '.xml':
+
+            # All good, this is an xml
+            xml_file = sanitize_filename(config.get("SLAC", "SIM_XML"))
+
+        else:
+
+            # Need to merge all the xml files
+            # Parse the list and extract all the XML files
+            with open(sanitize_filename(config.get("SLAC", "SIM_XML")), "r") as f:
+
+                xml_list = []
+
+                for line in f.readlines():
+
+                    if line[0] == "#":
+
+                        # A comment
+                        continue
+
+                    if len(line.replace(" ", "")) > 0:
+
+                        # Interpret it as a path
+                        this_path = sanitize_filename(line.replace("\n", ""))
+
+                        assert os.path.exists(this_path), "XML file %s does not exist" % this_path
+
+                        xml_list.append(this_path)
+
+                    else:
+
+                        # Empty line
+                        continue
+
+            # Now extract all sources from the XML files
+            all_sources = []
+
+            for xmlfile in xml_list:
+
+                these_sources = self._get_sources_from_XML(xmlfile)
+
+                log.info("Found %s sources in %s" % (len(these_sources), xmlfile))
+
+                all_sources.extend(these_sources)
+
+            log.info("Found %s sources in %s XML files" % (len(all_sources), len(xml_list)))
+
+            # Now create a new XML with all the sources
+            new_tree = ElementTree.Element("source_library")
+            new_tree.extend(all_sources)
+
+            xml_file = self._track_temp_file("__merged_xml.xml")
+
+            with open(xml_file, "w+") as f:
+
+                f.write(ElementTree.tostring(new_tree))
 
         gtdiffrsp_app = GtApp('gtdiffrsp')
 
@@ -186,7 +273,7 @@ class CustomSimulator(object):
         print("\n\n")
 
         gtdiffrsp_app.run(evfile=self._simulated_ft1, scfile=self._ft2,
-                          srcmdl=config.get("SLAC", "SIM_XML"),
+                          srcmdl=xml_file,
                           irfs=self._irfs,
                           evclass=IRFS.IRFS[self._irfs].evclass,
                           convert="yes")
