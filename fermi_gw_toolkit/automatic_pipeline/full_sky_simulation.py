@@ -219,8 +219,6 @@ class CustomSimulator(object):
             # Need to merge all the xml files
             # Parse the list and extract all the XML files
 
-            import pdb;pdb.set_trace()
-
             with open(sanitize_filename(config.get("SLAC", "SIM_XML")), "r") as f:
 
                 xml_list = []
@@ -264,6 +262,7 @@ class CustomSimulator(object):
 
             # Now create a new XML with all the sources
             new_tree = ElementTree.Element("source_library")
+            new_tree.set("title", "source_library")
             new_tree.extend(all_sources)
 
             xml_file = self._track_temp_file("__merged_xml.xml")
