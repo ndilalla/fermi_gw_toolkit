@@ -129,14 +129,14 @@ class CustomSimulator(object):
 
             with pyfits.open(ft1) as f:
 
-                n_simulated_events += len(f['EVENTS'])
+                n_simulated_events += len(f['EVENTS'].data)
 
         # Now get the number of events which survived the cut
         n_simulated_events_after_cuts = 0
 
         with pyfits.open(outfile) as f:
 
-            n_simulated_events_after_cuts += len(f['EVENTS'])
+            n_simulated_events_after_cuts += len(f['EVENTS'].data)
 
         assert n_simulated_events == n_simulated_events_after_cuts, "Some events were lost when cutting with gtselect!"
 
