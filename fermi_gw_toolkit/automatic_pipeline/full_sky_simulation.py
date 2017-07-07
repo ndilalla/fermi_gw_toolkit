@@ -229,7 +229,10 @@ class CustomSimulator(object):
                         # A comment
                         continue
 
-                    if len(line.replace(" ", "")) > 0:
+                    # Remove all spaces
+                    line_nospace = line.replace(" ", "")
+
+                    if len(line_nospace) > 0 and line_nospace[-4:].lower() == '.xml':
 
                         # Interpret it as a path (removing extraneous characters)
                         this_path = sanitize_filename(line.replace("\n", "").replace(")","").replace("(",""))
