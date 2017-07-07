@@ -233,7 +233,7 @@ class CustomSimulator(object):
                         continue
 
                     # Remove all spaces
-                    line_nospace = line.replace(" ", "")
+                    line_nospace = line.replace(" ", "").replace("\n", "")
 
                     if len(line_nospace) > 0 and line_nospace[-4:].lower() == '.xml':
 
