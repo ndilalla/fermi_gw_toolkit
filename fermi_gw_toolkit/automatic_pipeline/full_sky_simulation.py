@@ -54,7 +54,7 @@ class CustomSimulator(object):
         """
 
         # At the moment we only support source class
-        assert self._irfs == "P8R2_SOURCE_V6", "At the moment we only support P8R2_SOURCE_V6"
+        assert irfs == "P8R2_SOURCE_V6", "At the moment we only support P8R2_SOURCE_V6"
 
         self._ft2 = sanitize_filename(ft2)
         self._tstart = tstart
