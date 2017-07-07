@@ -90,7 +90,14 @@ class CustomSimulator(object):
 
         gtobssim_app = GtApp('gtobssim')
 
+        log.info("About to start simulation")
+        log.info("#### gtobsim output start #####")
+        print("\n\n")
+
         gtobssim_app.run(**_gtobssim_args)
+
+        print("\n\n")
+        log.info("#### gtobsim output stop #####")
 
         # Now find out the FT1 file produced by the simulation
         event_files = glob.glob("%s_events_*.fits" % evroot)
@@ -113,6 +120,10 @@ class CustomSimulator(object):
 
         gtselect_app = GtApp('gtselect')
 
+        log.info("Merging simulated event files")
+        log.info("#### gtselect output start #####")
+        print("\n\n")
+
         gtselect_app.run(infile=ft1_file_list, outfile=outfile,
                          ra=0.0, dec=0.0, rad=180.0,
                          tmin=self._tstart, tmax=self._tstart + self._simulation_time,
@@ -121,6 +132,9 @@ class CustomSimulator(object):
                          evclass=IRFS.IRFS[self._irfs].evclass,
                          evtype="INDEF",
                          convtype='-1')
+
+        print("\n\n")
+        log.info("#### gtselect output stop #####")
 
         # Now check how many events we had before gtselect
         n_simulated_events = 0
