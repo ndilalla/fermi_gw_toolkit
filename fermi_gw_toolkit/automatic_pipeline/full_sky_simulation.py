@@ -231,8 +231,8 @@ class CustomSimulator(object):
 
                     if len(line.replace(" ", "")) > 0:
 
-                        # Interpret it as a path
-                        this_path = sanitize_filename(line.replace("\n", ""))
+                        # Interpret it as a path (removing extraneous characters)
+                        this_path = sanitize_filename(line.replace("\n", "").replace(")","").replace("(",""))
 
                         assert os.path.exists(this_path), "XML file %s does not exist" % this_path
 
