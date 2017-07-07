@@ -57,6 +57,8 @@ class CustomSimulator(object):
         # This will contain the list of temporary files produced
         self._temp_files = []
 
+        self._simulated_ft1 = None
+
     def run_simulation(self, outfile='gwt_sim', seed=None):
         """
 
@@ -156,17 +158,41 @@ class CustomSimulator(object):
 
         log.info("Generated %s events of class %s" % (n_simulated_events_after_cuts, self._irfs))
 
+        self._cleanup()
+
+        # Store for future use
+        self._simulated_ft1 = outfile
+
     def _track_temp_file(self, filename):
 
         self._temp_files.append(filename)
 
         return os.path.abspath(os.path.expandvars(os.path.expanduser(filename)))
 
+    def _cleanup(self):
+
+        for filename in self._temp_files:
+
+            os.remove(filename)
+
     def run_gtdiffrsp(self):
 
-        pass
+        assert self._simulated_ft1 is not None, "You have to run the simulation before computing the diffuse response"
 
-        #gtdiffrsp_args = {'evfile':}
+        gtdiffrsp_app = GtApp('gtdiffrsp')
+
+        log.info("Computing diffuse response")
+        log.info("#### gtdiffrsp output start #####")
+        print("\n\n")
+
+        gtdiffrsp_app.run(evfile=self._simulated_ft1, scfile=self._ft2,
+                          srcmdl=config.get("SLAC", "SIM_XML"),
+                          irfs=self._irfs,
+                          evclass=IRFS.IRFS[self._irfs].evclass,
+                          convert="yes")
+
+        print("\n\n")
+        log.info("#### gtdiffrsp output stop #####")
 
         # evfile, f, a, "/afs/slac.stanford.edu/u/gl/giacomov/workspace/DATA/GRBOUT/081102365/081102365_events__ROI_0.000_2.000.fits",, , "Event data file"
         # evtable, s, h, "EVENTS",, , "Event data extension"
