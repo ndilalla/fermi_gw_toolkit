@@ -223,6 +223,8 @@ class CustomSimulator(object):
         # Find all spatialModel tokens for the extended sources
         ext_sources = tree.findall("source/spatialModel[@file]")
 
+        import pdb;pdb.set_trace()
+
         for spatial_model in ext_sources:
 
             file_path = spatial_model.get("file")
