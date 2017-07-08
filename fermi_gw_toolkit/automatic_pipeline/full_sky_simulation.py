@@ -170,8 +170,8 @@ class CustomSimulator(object):
 
         self._cleanup()
 
-        # Store for future use
-        self._simulated_ft1 = outfile
+        # Store for future use with its absolute path
+        self._simulated_ft1 = sanitize_filename(outfile)
 
     def _track_temp_file(self, filename):
 
