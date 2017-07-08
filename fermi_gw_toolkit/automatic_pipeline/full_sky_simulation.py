@@ -221,7 +221,7 @@ class CustomSimulator(object):
 
         # Now get the full sky XML file, update the path of the Galactic and isotropic diffuse, and
         # copy it here to be used in gtdiffrsp
-        orig_file_path = os.path.join(os.path.dirname(__file__), 'pipeline.conf')
+        orig_file_path = os.path.join(os.path.dirname(__file__), 'fullsky_xml_gtlike.xml')
 
         with open(orig_file_path, "r") as f:
 
