@@ -185,6 +185,8 @@ class CustomSimulator(object):
 
             os.remove(filename)
 
+        self._temp_files = []
+
     def _fix_galactic_diffuse_path(self, tree):
 
         # Find Galactic template in this system
