@@ -218,7 +218,7 @@ class CustomSimulator(object):
 
         # Get the data path for GtBurst, which contains the templates for the diffuse sources
 
-        new_path = getDataPath()
+        new_path = os.path.join(getDataPath(), "templates")
 
         # Find all spatialModel tokens for the extended sources
         ext_sources = tree.findall("source/spatialModel[@file]")
