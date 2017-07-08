@@ -13,7 +13,7 @@ from GtBurst.LikelihoodComponent import findTemplate
 from GtBurst.getDataPath import getDataPath
 from GtBurst.dataHandling import _makeDatasetsOutOfLATdata
 
-from utils import sanitize_filename
+from utils import sanitize_filename, within_directory
 
 try:
 
@@ -286,19 +286,23 @@ class CustomSimulator(object):
 
             trigger_time = self._tstart
 
-        # Rename ft1 and ft2
-        new_ft1 = 'gll_ft1_tr_bn%s_v00.fit' % trigger_name
-        new_ft2 = 'gll_ft2_tr_bn%s_v00.fit' % trigger_name
+        destination_dir = sanitize_filename(destination_dir)
 
-        shutil.copy(self._simulated_ft1, new_ft1)
-        shutil.copy(self._ft2, new_ft2)
+        with within_directory(destination_dir, create=True):
 
-        _makeDatasetsOutOfLATdata(new_ft1,
-                                  new_ft2,
-                                  trigger_name, self._tstart, self._tstart + self._simulation_time,
-                                  ra, dec, trigger_time,
-                                  localRepository=destination_dir,
-                                  cspecstart=0, cspecstop=10)
+            # Rename ft1 and ft2
+            new_ft1 = 'gll_ft1_tr_bn%s_v00.fit' % trigger_name
+            new_ft2 = 'gll_ft2_tr_bn%s_v00.fit' % trigger_name
+
+            shutil.copy(self._simulated_ft1, new_ft1)
+            shutil.copy(self._ft2, new_ft2)
+
+            _makeDatasetsOutOfLATdata(new_ft1,
+                                      new_ft2,
+                                      trigger_name, self._tstart, self._tstart + self._simulation_time,
+                                      ra, dec, trigger_time,
+                                      localRepository=".",
+                                      cspecstart=0, cspecstop=10)
 
         # Remove all other files
         self._cleanup()
