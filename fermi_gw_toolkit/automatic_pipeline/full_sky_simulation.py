@@ -4,6 +4,7 @@ import os
 from configuration import config
 import numpy as np
 from xml.etree import ElementTree
+import shutil
 
 from GtApp import GtApp
 
@@ -286,8 +287,15 @@ class CustomSimulator(object):
 
             trigger_time = self._tstart
 
-        _makeDatasetsOutOfLATdata(self._simulated_ft1,
-                                  self._ft2,
+        # Rename ft1 and ft2
+        new_ft1 = 'gll_ft1_tr_bn%s_v00.fit' % trigger_name
+        new_ft2 = 'gll_ft2_tr_bn%s_v00.fit' % trigger_name
+
+        shutil.copy(self._simulated_ft1, new_ft1)
+        shutil.copy(self._ft2, new_ft2)
+
+        _makeDatasetsOutOfLATdata(new_ft1,
+                                  new_ft2,
                                   trigger_name, self._tstart, self._tstart + self._simulation_time,
                                   ra, dec, trigger_time,
                                   localRepository=destination_dir,
