@@ -251,7 +251,7 @@ class CustomSimulator(object):
         # Fix the path of the Galactic and isotropic template, as well as extended sources with FITS maps
         self._fix_galactic_diffuse_path(tree)
         self._fix_isotropic_diffuse_path(tree)
-        self._fix_extended_sources_path(tree)
+        #self._fix_extended_sources_path(tree)
 
         # Write to a temporary file
         xml_file = self._track_temp_file("__gw_toolkit_xml.xml")
