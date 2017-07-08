@@ -276,7 +276,7 @@ class CustomSimulator(object):
         print("\n\n")
         log.info("#### gtdiffrsp output stop #####")
 
-    def make_data_package(self, trigger_name, ra=0.0, dec=0.0, trigger_time=None, destination_dir='.'):
+    def make_data_package_files(self, trigger_name, ra=0.0, dec=0.0, trigger_time=None, destination_dir='.'):
         """
         Make data package for gtburst
 
