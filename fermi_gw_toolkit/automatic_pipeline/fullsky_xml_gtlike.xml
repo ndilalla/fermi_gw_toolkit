@@ -489,7 +489,7 @@
       <parameter error="0.009722911849" free="0" max="5" min="-1" name="beta" scale="1" value="0.1035224448" />
       <parameter free="0" max="300000" min="20" name="Eb" scale="1" value="1312.543712" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/W51C.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/W51C.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -1225,7 +1225,7 @@
       <parameter error="0.262573613" free="0" max="10" min="-5" name="beta" scale="0.1" value="2.179434211" />
       <parameter free="0" max="100000" min="100" name="Eb" scale="1" value="524.2047962" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/CygnusLoop.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/CygnusLoop.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -1507,7 +1507,7 @@
       <parameter error="0.05382913248" free="0" max="10" min="-5" name="beta" scale="0.1" value="1.335088491" />
       <parameter free="0" max="300000" min="20" name="Eb" scale="1" value="1484.417837" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/IC443.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/IC443.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="3.402823466e+38" min="-3.402823466e+38" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -1690,7 +1690,7 @@
       <parameter free="0" max="1000000" min="20" name="LowerLimit" scale="1" value="1000" />
       <parameter free="0" max="1000000" min="20" name="UpperLimit" scale="1" value="100000" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/HESSJ1303-631.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/HESSJ1303-631.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -2463,7 +2463,7 @@
       <parameter free="0" max="200000" min="20" name="LowerLimit" scale="1" value="200" />
       <parameter free="0" max="1000000" min="20" name="UpperLimit" scale="1" value="200000" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/S147.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/S147.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -2474,7 +2474,7 @@
       <parameter free="0" max="200000" min="20" name="LowerLimit" scale="1" value="1000" />
       <parameter free="0" max="1000000" min="20" name="UpperLimit" scale="1" value="100000" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/MSH15-52.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/MSH15-52.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -3235,7 +3235,7 @@
       <parameter free="0" max="200000" min="20" name="LowerLimit" scale="1" value="1000" />
       <parameter free="0" max="1000000" min="20" name="UpperLimit" scale="1" value="100000" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/HESSJ1614-518.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/HESSJ1614-518.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -3246,7 +3246,7 @@
       <parameter free="0" max="200000" min="20" name="LowerLimit" scale="1" value="1000" />
       <parameter free="0" max="1000000" min="20" name="UpperLimit" scale="1" value="100000" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/HESSJ1616-508.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/HESSJ1616-508.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -3571,7 +3571,7 @@
       <parameter error="0.4693497608" free="0" max="10" min="-5" name="beta" scale="0.1" value="3.764086462" />
       <parameter free="0" max="100000" min="100" name="Eb" scale="1" value="608.7838873" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/HB21.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/HB21.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -4212,7 +4212,7 @@
       <parameter free="0" max="200000" min="20" name="LowerLimit" scale="1" value="1000" />
       <parameter free="0" max="1000000" min="20" name="UpperLimit" scale="1" value="100000" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/HESSJ1632-478.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/HESSJ1632-478.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -6151,7 +6151,7 @@
       <parameter error="0.01238410818" free="0" max="5" min="-1" name="beta" scale="1" value="0.205881288" />
       <parameter free="0" max="300000" min="20" name="Eb" scale="1" value="1709.141023" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/W28.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/W28.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -6663,7 +6663,7 @@
       <parameter error="0.01684212119" free="0" max="5" min="-1" name="beta" scale="1" value="0.1026083389" />
       <parameter free="0" max="300000" min="20" name="Eb" scale="1" value="3275.664097" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/W30.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/W30.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -7689,7 +7689,7 @@
       <parameter error="0.550639713" free="0" max="10" min="-10" name="beta" scale="0.1" value="1.82794223" />
       <parameter free="0" max="300" min="0.02" name="Eb" scale="1000" value="23.91720826" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/HESSJ1825-137.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/HESSJ1825-137.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -8511,7 +8511,7 @@
       <parameter free="0" max="200000" min="20" name="LowerLimit" scale="1" value="1000" />
       <parameter free="0" max="1000000" min="20" name="UpperLimit" scale="1" value="100000" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/HESSJ1837-069.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/HESSJ1837-069.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -9392,7 +9392,7 @@
       <parameter free="0" max="1000000" min="10" name="LowerLimit" scale="1" value="100" />
       <parameter free="0" max="1000000" min="10" name="UpperLimit" scale="1" value="500000" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/CenALobes.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/CenALobes.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -10174,7 +10174,7 @@
       <parameter error="0.01224075272" free="0" max="5" min="-1" name="beta" scale="1" value="0.2532196784" />
       <parameter free="0" max="300000" min="20" name="Eb" scale="1" value="1737.352167" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/W44.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/W44.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -12037,7 +12037,7 @@
       <parameter free="0" max="200000" min="20" name="LowerLimit" scale="1" value="1000" />
       <parameter free="0" max="1000000" min="20" name="UpperLimit" scale="1" value="100000" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/CygnusCocoon.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/CygnusCocoon.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -12434,7 +12434,7 @@
       <parameter error="0.008944406882" free="0" max="5" min="0" name="beta" scale="1" value="0.08629245786" />
       <parameter free="0" max="100" min="0.01" name="Eb" scale="1000" value="0.42" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/LMC.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/LMC.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -19219,7 +19219,7 @@
       <parameter error="0.03390641045" free="0" max="-0.1" min="-5" name="Index" scale="1" value="-2.220979942" />
       <parameter free="0" max="1000000" min="10" name="Scale" scale="1" value="549.4330214" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/SMC.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/SMC.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -24974,7 +24974,7 @@
       <parameter free="0" max="200000" min="20" name="LowerLimit" scale="1" value="1000" />
       <parameter free="0" max="1000000" min="20" name="UpperLimit" scale="1" value="100000" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/gammaCygni.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/gammaCygni.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -27072,7 +27072,7 @@
       <parameter error="0.02809769897" free="0" max="0" min="-5" name="Index" scale="1" value="-2.051624856" />
       <parameter free="0" max="300" min="0.02" name="Scale" scale="1000" value="2.499008065" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/PuppisA.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/PuppisA.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -31359,7 +31359,7 @@
       <parameter free="0" max="200000" min="20" name="LowerLimit" scale="1" value="1000" />
       <parameter free="0" max="1000000" min="20" name="UpperLimit" scale="1" value="100000" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/RXJ1713.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/RXJ1713.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -32842,7 +32842,7 @@
       <parameter free="0" max="1000000" min="20" name="LowerLimit" scale="1" value="1000" />
       <parameter free="0" max="1000000" min="20" name="UpperLimit" scale="1" value="100000" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/HESSJ1841-055.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/HESSJ1841-055.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -34010,7 +34010,7 @@
       <parameter free="0" max="200000" min="20" name="LowerLimit" scale="1" value="100" />
       <parameter free="0" max="1000000" min="20" name="UpperLimit" scale="1" value="200000" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/VelaX.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/VelaX.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
@@ -34223,7 +34223,7 @@
       <parameter free="0" max="200000" min="20" name="LowerLimit" scale="1" value="1000" />
       <parameter free="0" max="1000000" min="20" name="UpperLimit" scale="1" value="300000" />
     </spectrum>
-    <spatialModel file="/home/giacomov/develop/pyBurstAnalysisGUI/data/templates/VelaJr.fits" map_based_integral="true" type="SpatialMap">
+    <spatialModel file="$EXT_3FL_TEMPLATES/VelaJr.fits" map_based_integral="true" type="SpatialMap">
       <parameter free="0" max="1000" min="0.001" name="Prefactor" scale="1" value="1" />
     </spatialModel>
   </source>
