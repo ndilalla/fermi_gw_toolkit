@@ -8,6 +8,7 @@ from xml.etree import ElementTree
 from GtApp import GtApp
 from GtBurst import IRFS
 from GtBurst.LikelihoodComponent import findTemplate
+from GtBurst.getDataPath import getDataPath
 
 from utils import fail_with_error, execute_command, DataNotAvailable
 
@@ -213,6 +214,23 @@ class CustomSimulator(object):
 
         src.findall("spectrum")[0].set("file", templ)
 
+    def _fix_extended_sources_path(self, tree):
+
+        # Get the data path for GtBurst, which contains the templates for the diffuse sources
+
+        new_path = getDataPath()
+
+        # Find all spatialModel tokens for the extended sources
+        ext_sources = tree.findall("source/spatialModel[@file]")
+
+        for spatial_model in ext_sources:
+
+            file_path = spatial_model.get("file")
+
+            if file_path.find("__FIXME__TEMPLATE_PATH"):
+
+                spatial_model.set("file", file_path.replace("__FIXME__TEMPLATE_PATH", new_path))
+
     def run_gtdiffrsp(self):
 
         # Check that we have a simulated FT1
@@ -227,9 +245,10 @@ class CustomSimulator(object):
 
             tree = ElementTree.parse(f)
 
-        # Fix the path of the diffuse components
+        # Fix the path of the Galactic and isotropic template, as well as extended sources with FITS maps
         self._fix_galactic_diffuse_path(tree)
         self._fix_isotropic_diffuse_path(tree)
+        self._fix_extended_sources_path(tree)
 
         # Write to a temporary file
         xml_file = self._track_temp_file("__gw_toolkit_xml.xml")
