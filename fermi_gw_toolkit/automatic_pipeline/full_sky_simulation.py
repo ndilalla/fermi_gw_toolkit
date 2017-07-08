@@ -270,7 +270,6 @@ class CustomSimulator(object):
         gtdiffrsp_app.run(evfile=self._simulated_ft1, scfile=self._ft2,
                           srcmdl=xml_file,
                           irfs=self._irfs,
-                          evclass=IRFS.IRFS[self._irfs].evclass,
                           convert="yes")
 
         print("\n\n")
