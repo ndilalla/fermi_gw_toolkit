@@ -236,7 +236,7 @@ class CustomSimulator(object):
 
         with open(xml_file, "w+") as f:
 
-            f.write(ElementTree.tostring(tree))
+            f.write(ElementTree.tostring(tree.getroot()))
 
         # Run gtdiffrsp
 
