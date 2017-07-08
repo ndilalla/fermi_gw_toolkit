@@ -160,9 +160,14 @@ class CustomSimulator(object):
         # Now get the number of events which survived the cut
         n_simulated_events_after_cuts = 0
 
-        with pyfits.open(outfile) as f:
+        with pyfits.open(outfile, mode='update') as f:
 
             n_simulated_events_after_cuts += len(f['EVENTS'].data)
+
+            # Need to fix this because gtobssim writes "1", which is not an acceptable reprocessing
+            # version for gtburst
+
+            f[0].header['PROC_VER'] = 302
 
         assert n_simulated_events == n_simulated_events_after_cuts, "Some events were lost when cutting with gtselect!"
 
