@@ -229,7 +229,7 @@ class CustomSimulator(object):
 
             file_path = spatial_model.get("file")
 
-            if file_path.find("__FIXME__TEMPLATE_PATH"):
+            if file_path.find("__FIXME__TEMPLATE_PATH") >= 0:
 
                 spatial_model.set("file", file_path.replace("__FIXME__TEMPLATE_PATH", new_path))
 
