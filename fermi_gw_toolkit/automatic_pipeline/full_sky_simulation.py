@@ -13,7 +13,7 @@ from GtBurst.LikelihoodComponent import findTemplate
 from GtBurst.getDataPath import getDataPath
 from GtBurst.dataHandling import _makeDatasetsOutOfLATdata
 
-from utils import fail_with_error, execute_command, DataNotAvailable
+from utils import sanitize_filename
 
 try:
 
@@ -27,11 +27,6 @@ logging.basicConfig(format='%(asctime)s %(message)s')
 
 log = logging.getLogger("full_sky_simulation.py")
 log.setLevel(logging.DEBUG)
-
-
-def sanitize_filename(filename):
-
-    return os.path.abspath(os.path.expandvars(os.path.expanduser(filename)))
 
 
 class CustomSimulator(object):
@@ -276,6 +271,8 @@ class CustomSimulator(object):
         print("\n\n")
         log.info("#### gtdiffrsp output stop #####")
 
+        self._cleanup()
+
     def make_data_package_files(self, trigger_name, ra=0.0, dec=0.0, trigger_time=None, destination_dir='.'):
         """
         Make data package for gtburst
@@ -300,3 +297,9 @@ class CustomSimulator(object):
                                   ra, dec, trigger_time,
                                   localRepository=destination_dir,
                                   cspecstart=0, cspecstop=10)
+
+        # Remove all other files
+        self._cleanup()
+
+        os.remove(self._simulated_ft1)
+        self._simulated_ft1 = None

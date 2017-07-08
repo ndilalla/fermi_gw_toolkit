@@ -3,6 +3,7 @@ import sys
 import subprocess
 import socket
 import getpass
+import os
 from configuration import config
 
 class DataNotAvailable(RuntimeError):
@@ -60,3 +61,8 @@ def execute_command(log, cmd_line):
     log.info(cmd_line)
 
     subprocess.check_call(cmd_line, shell=True)
+
+
+def sanitize_filename(filename):
+
+    return os.path.abspath(os.path.expandvars(os.path.expanduser(filename)))
