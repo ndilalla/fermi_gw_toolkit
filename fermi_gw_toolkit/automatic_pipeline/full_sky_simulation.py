@@ -6,9 +6,11 @@ import numpy as np
 from xml.etree import ElementTree
 
 from GtApp import GtApp
+
 from GtBurst import IRFS
 from GtBurst.LikelihoodComponent import findTemplate
 from GtBurst.getDataPath import getDataPath
+from GtBurst.dataHandling import _makeDatasetsOutOfLATdata
 
 from utils import fail_with_error, execute_command, DataNotAvailable
 
@@ -223,8 +225,6 @@ class CustomSimulator(object):
         # Find all spatialModel tokens for the extended sources
         ext_sources = tree.findall("source/spatialModel[@file]")
 
-        import pdb;pdb.set_trace()
-
         for spatial_model in ext_sources:
 
             file_path = spatial_model.get("file")
@@ -275,37 +275,20 @@ class CustomSimulator(object):
         print("\n\n")
         log.info("#### gtdiffrsp output stop #####")
 
-        # evfile, f, a, "/afs/slac.stanford.edu/u/gl/giacomov/workspace/DATA/GRBOUT/081102365/081102365_events__ROI_0.000_2.000.fits",, , "Event data file"
-        # evtable, s, h, "EVENTS",, , "Event data extension"
-        # scfile, f, a, "/afs/slac.stanford.edu/u/gl/giacomov/workspace/DATA/FITS/LAT/081102365_P8_P302_BASE_ft2_247307702_247358302.fits",, , "Spacecraft data file"
-        # sctable, s, h, "SC_DATA",, , "Spacecraft data extension"
-        # srcmdl, fr, a, "/afs/slac.stanford.edu/u/gl/giacomov/workspace/DATA/GRBOUT/081102365/081102365_model__ROI_0.000_2.000.xml",, , "Source model file"
-        # irfs, s, a, "P8R2_TRANSIENT020E_V6",, , "Response functions to use"
-        # evclsmin, i, h, 0,, , "Minimum event class level"
-        # evclass, i, h, INDEF,, , "Target class level"
-        # evtype, i, h, INDEF,, , "Event type selections"
-        # convert, b, h, no,, , "convert header to new diffrsp format?"
-        #
-        # chatter, i, h, 2, 0, 4, Output
-        # verbosity
-        # clobber, b, h, no,, , "Overwrite existing output files"
-        # debug, b, h, no,, , "Activate debugging mode"
-        # gui, b, h, no,, , "GUI mode activated"
-        # mode, s, h, "ql",, , "Mode of automatic parameters"
+    def make_data_package(self, trigger_name, ra=0.0, dec=0.0, trigger_time=None, destination_dir='.'):
+        """
+        Make data package for gtburst
 
+        :return:
+        """
 
-        # gtobssim
-        # emin = 100
-        # emax = 100000
-        # edisp = yes
-        # infile = "/nfs/farm/g/glast/u29/MC-tasks/skySimData/SkyModels/3FGLSkyPass8R2/xml_files.txt"
-        # srclist = "/nfs/farm/g/glast/u29/MC-tasks/skySimData/SkyModels/3FGLSkyPass8R2/source_names.txt"
-        # scfile = "/afs/slac.stanford.edu/u/gl/giacomov/FermiData/bn080916009/gll_ft2_tr_bn080916009_v00.fit"
-        # evroot = sim
-        # simtime = 10000
-        # ltfrac = 0.9
-        # tstart = 243211748.6
-        # use_ac = no
-        # irfs = P8R2_SOURCE_V6
-        # evtype = none
-        # seed = 4328671012
+        if trigger_time is None:
+
+            trigger_time = self._tstart
+
+        _makeDatasetsOutOfLATdata(self._simulated_ft1,
+                                  self._ft2,
+                                  trigger_name, self._tstart, self._tstart + self._simulation_time,
+                                  ra, dec, trigger_time,
+                                  localRepository=destination_dir,
+                                  cspecstart=0, cspecstop=10)
