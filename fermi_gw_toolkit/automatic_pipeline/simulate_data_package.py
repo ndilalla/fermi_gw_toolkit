@@ -56,7 +56,14 @@ if __name__ == "__main__":
 
     with pyfits.open(response_files[-1]) as rsp:
 
-        trigger_time = rsp[0].header['UREFTIME']
+        if 'UREFTIME' in rsp[0].header:
+
+            trigger_time = rsp[0].header['UREFTIME']
+
+        else:
+
+            trigger_time = rsp[0].header['TRIGTIME']
+
         ra_obj = rsp[0].header['RA_OBJ']
         dec_obj = rsp[0].header['DEC_OBJ']
 
