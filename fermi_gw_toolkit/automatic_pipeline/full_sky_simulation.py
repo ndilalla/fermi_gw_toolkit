@@ -296,8 +296,8 @@ class CustomSimulator(object):
         with within_directory(destination_dir, create=True):
 
             # Rename ft1 and ft2
-            new_ft1 = 'gll_ft1_tr_bn%s_v00.fit' % trigger_name
-            new_ft2 = 'gll_ft2_tr_bn%s_v00.fit' % trigger_name
+            new_ft1 = 'gll_ft1_tr_bn%s_v00.fit' % trigger_name.replace("bn","")
+            new_ft2 = 'gll_ft2_tr_bn%s_v00.fit' % trigger_name.replace("bn","")
 
             shutil.copy(self._simulated_ft1, new_ft1)
             shutil.copy(self._ft2, new_ft2)
