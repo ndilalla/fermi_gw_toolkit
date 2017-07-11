@@ -57,12 +57,11 @@ if __name__=="__main__":
 
         mmin = hpx_ul[idx].min()
 
-    if args.max_percentile != 100:
-
+    if args.max_percentile < 100:
         mmax = np.percentile(hpx_ul[idx],args.max_percentile)
-
+    elif args.max_percentile > 100.:
+        mmax=hpx_ul[idx].max()*float(args.max_percentile)/100.
     else:
-
         mmax = hpx_ul[idx].max()
 
     # Now set to nan all negative or zero pixels
@@ -87,8 +86,17 @@ if __name__=="__main__":
         cmap = matplotlib.cm.copper
         background='antiquewhite'
         cmap.set_bad(background)
-        cmap.set_under("w",alpha=0) # sets background to white                                                                                                                                                                                   
-
+        cmap.set_under("w",alpha=0) # sets background to white 
+    elif args.cmap=='summer':
+        cmap = matplotlib.cm.summer
+        background='antiquewhite'
+        cmap.set_bad(background)
+        cmap.set_under("w",alpha=0) # sets background to white
+    elif args.cmap=='Greens':
+        cmap = matplotlib.cm.Greens
+        background='antiquewhite'
+        cmap.set_bad(background)
+        cmap.set_under("w",alpha=0) # sets background to white
     # Rotation for the mollview map:
     rot=args.rot.split(',')
 
@@ -99,7 +107,6 @@ if __name__=="__main__":
     if args.map_type == 'EFLUX':
         magnitude = 10 ** np.floor(np.log10(np.median(hpx_ul[np.isfinite(hpx_ul)])))
         z_title  =r'Flux Upper Bound (0.1-1 GeV) [10$^{%.0f}$ erg cm$^{-2}$ s$^{-1}$]' % np.log10(magnitude)
-
     elif args.map_type == 'FLUX':
         magnitude = 10 ** np.floor(np.log10(np.median(hpx_ul[np.isfinite(hpx_ul)])))
         z_title  =r'Flux Upper Bound (0.1-1 GeV) [10$^{%.0f}$ cm$^{-2}$ s$^{-1}$]' % np.log10(magnitude)
@@ -115,8 +122,10 @@ if __name__=="__main__":
     print 'Minimum Value = ', hpx_ul[idx].min()
     print 'Maximum Value = ', hpx_ul[idx].max()
     norm = args.zscale
+    ticks=np.logspace(np.log10(mmin / magnitude), np.log10(mmax / magnitude), 4),
     if norm == 'linear': 
         norm=None
+        ticks=np.linspace(mmin / magnitude, mmax / magnitude, 4),
         #mmin=0
     print 'Normalization of the axis:',norm
     projected_map = hp.mollview(hpx_ul / magnitude, rot=rot,
@@ -132,7 +141,7 @@ if __name__=="__main__":
     image = ax.get_images()[0]
     cmap = fig.colorbar(image, ax=ax, cmap=cmap, orientation='horizontal', shrink=0.5,
                         label=z_title,
-                        ticks=np.linspace(mmin / magnitude, mmax / magnitude, 4),
+                        ticks=ticks,
                         format='%.2g')
 
     hp.graticule()
