@@ -93,7 +93,7 @@ class SimulationFeeder(object):
 
             shutil.copy2(path_of_tar_file_with_ft1_files, ".")
 
-            execute_command("tar zxvf %s" % path_of_tar_file_with_ft1_files)
+            execute_command(log, "tar zxvf %s" % path_of_tar_file_with_ft1_files)
 
             os.remove(os.path.basename(path_of_tar_file_with_ft1_files))
 
