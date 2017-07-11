@@ -174,7 +174,7 @@ class SimulationFeeder(object):
                    '&& ENERGY >= %s && ENERGY <= %s] %s ' \
                    'copyall=yes clobber=yes history=YES' %(simulated_ft1, region_file, tmin, tmax, emin, emax, outfile)
 
-        execute_command(log, cmd_line)
+        execute_command(log, cmd_line, shell=True)
 
 
     @staticmethod
