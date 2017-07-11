@@ -169,11 +169,13 @@ class SimulationFeeder(object):
         #         new['GTI'] = orig['GTI']
 
         # Now filter
-        cmd_line = 'ftcopy %s[EVENTS][gtifilter("%s") && regfilter("%s") ' \
-                   '&& TIME>=%s && TIME<=%s ' \
-                   '&& ENERGY >=%s && ENERGY <=%s] %s ' \
-                   'copyall=yes clobber=yes history=YES' %(simulated_ft1, original_ft1, region_file,
-                                                           tmin, tmax, emin, emax, outfile)
+
+        my_filter = 'gtifilter("%s") && regfilter("%s") ' \
+                    '&& TIME>=%s && TIME<=%s && ENERGY >=%s && ENERGY <=%s' % (original_ft1, region_file,
+                                                                               tmin, tmax, emin, emax)
+
+        cmd_line = "ftcopy '%s[EVENTS][%s]' %s copyall=yes clobber=yes history=yes" % (simulated_ft1,
+                                                                                       my_filter, outfile)
 
         execute_command(log, cmd_line)
 
