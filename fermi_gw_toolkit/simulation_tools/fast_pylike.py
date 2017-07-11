@@ -8,7 +8,7 @@ import glob
 import logging
 
 import astropy.io.fits as pyfits
-from automatic_pipeline.utils import within_directory, execute_command, sanitize_filename
+from fermi_gw_toolkit.automatic_pipeline.utils import within_directory, execute_command, sanitize_filename
 
 import UnbinnedAnalysis
 import pyLikelihood as pyLike
