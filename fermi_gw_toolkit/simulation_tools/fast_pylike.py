@@ -161,20 +161,21 @@ class SimulationFeeder(object):
     def _filter_simulated_ft1(original_ft1, simulated_ft1, region_file, tmin, tmax, emin, emax, outfile):
 
         # Add the GTI extension to the data file
-        with pyfits.open(sanitize_filename(original_ft1)) as orig:
-
-            with pyfits.open(simulated_ft1, mode='update') as new:
-                # Copy the GTIs from the original file
-
-                new['GTI'] = orig['GTI']
+        # with pyfits.open(sanitize_filename(original_ft1)) as orig:
+        #
+        #     with pyfits.open(simulated_ft1, mode='update') as new:
+        #         # Copy the GTIs from the original file
+        #
+        #         new['GTI'] = orig['GTI']
 
         # Now filter
-        cmd_line = 'ftcopy %s[EVENTS][gtifilter() && regfilter("%s") ' \
-                   '&& TIME >= %s && TIME <= %s ' \
-                   '&& ENERGY >= %s && ENERGY <= %s] %s ' \
-                   'copyall=yes clobber=yes history=YES' %(simulated_ft1, region_file, tmin, tmax, emin, emax, outfile)
+        cmd_line = 'ftcopy %s[EVENTS][gtifilter("%s") && regfilter("%s") ' \
+                   '&& TIME>=%s && TIME<=%s ' \
+                   '&& ENERGY >=%s && ENERGY <=%s] %s ' \
+                   'copyall=yes clobber=yes history=YES' %(simulated_ft1, original_ft1, region_file,
+                                                           tmin, tmax, emin, emax, outfile)
 
-        execute_command(log, cmd_line, shell=True)
+        execute_command(log, cmd_line)
 
 
     @staticmethod
