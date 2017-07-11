@@ -219,7 +219,9 @@ def go(args):
     indir = os.path.abspath(os.path.expandvars(os.path.expanduser(args.ul_directory)))
 
     # Get the list of the samples files
-    samples_files = glob.glob(os.path.join(indir,'ra_*_dec_*.npz'))
+    #    samples_files = glob.glob(os.path.join(indir,'ra_*_dec_*.npz'))
+    #Modifying so that it picks up the _bayesian_ul.npz files
+    samples_files = glob.glob(os.path.join(indir,'*_*_*_bayesian_ul.npz'))
 
     if len(samples_files) == 0:
 
@@ -252,7 +254,9 @@ def go(args):
             sys.stderr.write("\r%s out of %s" % (i, len(samples_files)))
 
         # Get RA,Dec for this point
-        _, ra, _, dec = (os.path.basename(sample_file).replace(".npz", "")).split("_")
+        #_, ra, _, dec = (os.path.basename(sample_file).replace(".npz", "")).split("_")
+        
+        trigname, ra, dec,bayes,ulstr = (os.path.basename(sample_file).replace(".npz", "")).split("_")
 
         # Transform to floating point
         ra, dec = float(ra), float(dec)
