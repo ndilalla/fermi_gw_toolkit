@@ -67,9 +67,15 @@ class SimulationFeeder(object):
 
     def __init__(self, original_ft1, original_ft2, path_of_tar_file_with_ft1_files, workdir="simulated_ft1s"):
 
+        # Make absolute path and resolve env. variables (if any)
+
+        original_ft1 = sanitize_filename(original_ft1)
+        original_ft2 = sanitize_filename(original_ft2)
+        path_of_tar_file_with_ft1_files = sanitize_filename(path_of_tar_file_with_ft1_files)
+
         # Read from the original FT1 the cuts
         roi_cuts = pyLike.RoiCuts()
-        roi_cuts.readCuts(sanitize_filename(original_ft1))
+        roi_cuts.readCuts(original_ft1)
 
         # ROI definition
 
@@ -82,9 +88,6 @@ class SimulationFeeder(object):
 
             tstart = f['EVENTS'].header['TSTART']
             tstop = f['EVENTS'].header['TSTOP']
-
-        # Make absolute path and resolve env. variables (if any)
-        path_of_tar_file_with_ft1_files = sanitize_filename(path_of_tar_file_with_ft1_files)
 
         # Unpack tar file here
         with within_directory(workdir, create=True):
