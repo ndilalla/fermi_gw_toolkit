@@ -9,6 +9,7 @@ import logging
 
 import astropy.io.fits as pyfits
 from fermi_gw_toolkit.automatic_pipeline.utils import within_directory, execute_command, sanitize_filename
+from setup_ftools import setup_ftools_non_interactive
 
 import UnbinnedAnalysis
 import pyLikelihood as pyLike
@@ -21,6 +22,8 @@ logging.basicConfig(format='%(asctime)s %(message)s')
 log = logging.getLogger("fast_pylike.py")
 log.setLevel(logging.DEBUG)
 
+# Setup FTOOLS to be non-interactive
+setup_ftools_non_interactive()
 
 
 class FastUnbinnedObs(UnbinnedAnalysis.UnbinnedObs):
@@ -81,6 +84,14 @@ class SimulationFeeder(object):
 
         ra_center, dec_center, radius = roi_cuts.roiCone()
 
+        # Write region file
+        region_file = sanitize_filename("__roi_region.reg")
+
+        with open(region_file, "w+") as f:
+
+            f.write("fk5\n")
+            f.write('circle(%.5f,%.5f,%s")\n' % (ra_center, dec_center, radius * 3600.0))
+
         # Energy minimum and maximum
         emin, emax = roi_cuts.getEnergyCuts()
 
@@ -119,27 +130,52 @@ class SimulationFeeder(object):
 
                     log.info("Processed %i of %i" % (i+1, len(all_ft1s_raw)))
 
-                temp_file1 = "__temp_ft1.fit"
-
-                self.gtmktime_from_file(original_ft1, original_ft2, this_simulated_ft1, temp_file1)
-
-                temp_file2 = "__temp_ft1_2.fit"
-
-                self.gtselect(ra_center, dec_center, radius, tstart, tstop, emin, emax, temp_file1, temp_file2)
-
-                os.remove(temp_file1)
-
+                # temp_file1 = "__temp_ft1.fit"
+                #
+                # self.gtmktime_from_file(original_ft1, original_ft2, this_simulated_ft1, temp_file1)
+                #
+                # temp_file2 = "__temp_ft1_2.fit"
+                #
+                # self.gtselect(ra_center, dec_center, radius, tstart, tstop, emin, emax, temp_file1, temp_file2)
+                #
+                # os.remove(temp_file1)
+                #
                 basename = os.path.splitext(os.path.basename(this_simulated_ft1))[0]
 
                 new_name = "%s_filt.fit" % basename
 
-                os.rename(temp_file2, new_name)
+                self._filter_simulated_ft1(original_ft1, this_simulated_ft1, region_file, tstart, tstop, emin, emax,
+                                           new_name)
+
+                # os.rename(temp_file2, new_name)
 
                 self._all_ft1s.append(sanitize_filename(new_name))
 
                 # Remove the simulated FT1 to save space
 
                 os.remove(this_simulated_ft1)
+
+        os.remove(region_file)
+
+    @staticmethod
+    def _filter_simulated_ft1(original_ft1, simulated_ft1, region_file, tmin, tmax, emin, emax, outfile):
+
+        # Add the GTI extension to the data file
+        with pyfits.open(sanitize_filename(original_ft1)) as orig:
+
+            with pyfits.open(simulated_ft1, mode='update') as new:
+                # Copy the GTIs from the original file
+
+                new['GTI'] = orig['GTI']
+
+        # Now filter
+        cmd_line = 'ftcopy %s[EVENTS][gtifilter() && regfilter("%s") ' \
+                   '&& TIME >= %s && TIME <= %s ' \
+                   '&& ENERGY >= %s && ENERGY <= %s] %s ' \
+                   'copyall=yes clobber=yes history=YES' %(simulated_ft1, region_file, tmin, tmax, emin, emax, outfile)
+
+        execute_command(log, cmd_line)
+
 
     @staticmethod
     def gtselect(ra_center, dec_center, radius, tmin, tmax, emin, emax, simulated_ft1, output_ft1):
