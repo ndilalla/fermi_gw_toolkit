@@ -187,7 +187,7 @@ class SimulationFeeder(object):
 
         # Now run gtmktime which will update the headers and select the events based on the GTIs
 
-        gtmktime = GtApp.GtApp('gtmktime')
+        gtmktime = GtApp('gtmktime')
 
         gtmktime.run(evfile=simulated_ft1,
                      outfile=output_ft1,
