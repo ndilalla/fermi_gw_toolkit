@@ -2,8 +2,25 @@
 # data for the same ROI, so exposure map, livetime cube, diffuse models and so on are identical to the dataset
 # we are simulating
 
+import os
+import shutil
+import glob
+import logging
+
+import astropy.io.fits as pyfits
+from automatic_pipeline.utils import within_directory, execute_command, sanitize_filename
+
 import UnbinnedAnalysis
 import pyLikelihood as pyLike
+from GtApp import GtApp
+
+
+# Configure logger
+logging.basicConfig(format='%(asctime)s %(message)s')
+
+log = logging.getLogger("fast_pylike.py")
+log.setLevel(logging.DEBUG)
+
 
 
 class FastUnbinnedObs(UnbinnedAnalysis.UnbinnedObs):
@@ -46,6 +63,138 @@ class FastUnbinnedObs(UnbinnedAnalysis.UnbinnedObs):
         self._readData(ft2, new_event_file)
 
 
+class SimulationFeeder(object):
+
+    def __init__(self, original_ft1, original_ft2, path_of_tar_file_with_ft1_files, workdir="simulated_ft1s"):
+
+        # Read from the original FT1 the cuts
+        roi_cuts = pyLike.RoiCuts()
+        roi_cuts.readCuts(sanitize_filename(original_ft1))
+
+        # ROI definition
+
+        ra_center, dec_center, radius = roi_cuts.roiCone()
+
+        # Energy minimum and maximum
+        emin, emax = roi_cuts.getEnergyCuts()
+
+        with pyfits.open(original_ft1) as f:
+
+            tstart = f['EVENTS'].header['TSTART']
+            tstop = f['EVENTS'].header['TSTOP']
+
+        # Make absolute path and resolve env. variables (if any)
+        path_of_tar_file_with_ft1_files = sanitize_filename(path_of_tar_file_with_ft1_files)
+
+        # Unpack tar file here
+        with within_directory(workdir, create=True):
+
+            # Copy tar here, unpack, then remove copy
+
+            shutil.copy2(path_of_tar_file_with_ft1_files, ".")
+
+            execute_command("tar zxvf %s" % path_of_tar_file_with_ft1_files)
+
+            os.remove(os.path.basename(path_of_tar_file_with_ft1_files))
+
+            # Now get the names of all ft1s
+            all_ft1s_raw = glob.glob("gll_ft1_tr_bn*_v00.fit")
+
+            log.info("Found %s simulated FT1 files in archive %s" % (len(all_ft1s_raw),
+                                                                     path_of_tar_file_with_ft1_files))
+
+            log.info("Filtering them with the same cuts as in %s" % (original_ft1))
+
+            self._all_ft1s = []
+
+            # Apply the cuts to them
+            for i, this_simulated_ft1 in enumerate(all_ft1s_raw):
+
+                if (i+1) % 100 == 0:
+
+                    log.info("Processed %i of %i" % (i+1, len(all_ft1s_raw)))
+
+                temp_file1 = "__temp_ft1.fit"
+
+                self.gtmktime_from_file(original_ft1, original_ft2, this_simulated_ft1, temp_file1)
+
+                temp_file2 = "__temp_ft1_2.fit"
+
+                self.gtselect(ra_center, dec_center, radius, tstart, tstop, emin, emax, temp_file1, temp_file2)
+
+                os.remove(temp_file1)
+
+                basename = os.path.splitext(os.path.basename(this_simulated_ft1))[0]
+
+                new_name = "%s_filt.fit" % basename
+
+                os.rename(temp_file2, new_name)
+
+                self._all_ft1s.append(sanitize_filename(new_name))
+
+                # Remove the simulated FT1 to save space
+
+                os.remove(this_simulated_ft1)
+
+    @staticmethod
+    def gtselect(ra_center, dec_center, radius, tmin, tmax, emin, emax, simulated_ft1, output_ft1):
+
+        # NOTE: we assume there is no need for a Zenith cut, because the Zenith cut has been made with
+        # gtmktime
+        gtselect = GtApp('gtselect')
+
+        gtselect.run(infile=sanitize_filename(simulated_ft1),
+                     outfile=output_ft1,
+                     ra=ra_center,
+                     dec=dec_center,
+                     rad=radius,
+                     tmin=tmin,
+                     tmax=tmax,
+                     emin=emin,
+                     emax=emax,
+                     zmin=0,
+                     zmax=180, # Zenith cut must be applied with gtmktime
+                     evclass="INDEF",  # Assume simulation has been made with the same evclass of the input file
+                     evtype='INDEF')
+
+    @staticmethod
+    def gtmktime_from_file(original_ft1, original_ft2, simulated_ft1, output_ft1):
+        """
+
+        :param original_ft1:
+        :param original_ft2:
+        :param simulated_ft1:
+        :param output_ft1:
+        :return:
+        """
+
+        # Add the GTI extension to the data file
+        with pyfits.open(sanitize_filename(original_ft1)) as orig:
+
+            with pyfits.open(simulated_ft1, mode='update') as new:
+
+                # Copy the GTIs from the original file
+
+                new['GTI'] = orig['GTI']
+
+                # Re-write header info (inaccuracy due to pil conversion float to str)
+                for ehdu, ghdu in zip(new, orig):
+                    ehdu.header['TSTART'] = ghdu.header['TSTART']
+                    ehdu.header['TSTOP'] = ghdu.header['TSTOP']
+
+        # Now run gtmktime which will update the headers and select the events based on the GTIs
+
+        gtmktime = GtApp.GtApp('gtmktime')
+
+        gtmktime.run(evfile=simulated_ft1,
+                     outfile=output_ft1,
+                     scfile=original_ft2,
+                     filter='T',  # This filter is always true, which means we are not adding any new filter
+                     roicut='no',
+                     apply_filter='yes'  # This will make gtmktime cut on the GTIs
+                     )
+
+
 class FastTS(object):
     """
     A simple wrapper around the UnbinnedAnalysis machinery that avoid reloading the Galactic and Isotropic template,
@@ -57,9 +206,15 @@ class FastTS(object):
     """
     def __init__(self, orig_log_like, target_source="GRB"):
 
+        # Store original likelihood object
+
         self._orig_log_like = orig_log_like
 
+        # Make sure the target is contained in the likelihood object
+
         assert target_source in self._orig_log_like.sourceNames()
+
+        # Store target
 
         self._target = target_source
 
