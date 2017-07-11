@@ -3,7 +3,9 @@ import sys
 import subprocess
 import socket
 import getpass
+import os
 from configuration import config
+from contextlib import contextmanager
 
 class DataNotAvailable(RuntimeError):
     pass
@@ -60,3 +62,38 @@ def execute_command(log, cmd_line):
     log.info(cmd_line)
 
     subprocess.check_call(cmd_line, shell=True)
+
+
+def sanitize_filename(filename):
+
+    return os.path.abspath(os.path.expandvars(os.path.expanduser(filename)))
+
+
+@contextmanager
+def within_directory(directory, create=False):
+
+    current_dir = os.getcwd()
+
+    directory = sanitize_filename(directory)
+
+    if not os.path.exists(directory):
+
+        if not create:
+
+            raise IOError("Directory %s does not exists!" % os.path.abspath(directory))
+
+        else:
+
+            os.makedirs(directory)
+
+    try:
+
+        os.chdir(directory)
+
+    except OSError:
+
+        raise IOError("Cannot access %s" % os.path.abspath(directory))
+
+    yield
+
+    os.chdir(current_dir)
