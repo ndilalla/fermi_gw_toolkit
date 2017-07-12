@@ -173,6 +173,21 @@ class SimulationFeeder(object):
 
         execute_command(log, cmd_line)
 
+        # Now update the DS keywords from the orginal file, so that downstream software will understand
+        # the file even though we didn't use gtselect nor gtmktime
+
+        with pyfits.open(sanitize_filename(original_ft1)) as orig:
+
+            with pyfits.open(outfile, mode='update') as new:
+
+                # Copy keywords from original file
+                orig_header = orig['EVENTS'].header
+                relevant_keywords = filter(lambda x:x.find("DS")==0 or x == "NDSKEYS", orig['EVENTS'].header.keys())
+
+                for keyword in relevant_keywords:
+
+                    new['EVENTS'].header[keyword] = orig_header[keyword]
+
 
     @staticmethod
     def gtselect(ra_center, dec_center, radius, tmin, tmax, emin, emax, simulated_ft1, output_ft1):
