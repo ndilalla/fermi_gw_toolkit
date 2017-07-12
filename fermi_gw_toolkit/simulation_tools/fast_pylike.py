@@ -69,13 +69,34 @@ class FastUnbinnedObs(UnbinnedAnalysis.UnbinnedObs):
 
 class SimulationFeeder(object):
 
-    def __init__(self, original_ft1, original_ft2, path_of_tar_file_with_ft1_files, workdir="simulated_ft1s"):
+    def __init__(self, ft1, ft2, expmap, ltcube, xml_file, path_of_tar_file_with_simulated_ft1_files):
+
+        # Process the simulations applying the same cuts as in the data file
+        sp = SimulationProcessor(ft1, ft2, path_of_tar_file_with_simulated_ft1_files)
+
+        # Now create the likelihood object
+        obs = UnbinnedAnalysis.UnbinnedObs(ft1, ft2, expMap=expmap, expCube=ltcube)
+        like = UnbinnedAnalysis.UnbinnedAnalysis(obs, xml_file, "MINUIT")
+
+        fast_ts = FastTS(like)
+
+        # Get the TSs
+        self._tss = []
+
+        for ft1 in sp.processed_ft1s:
+
+            self._tss.append(fast_ts.get_TS(ft1))
+
+
+class SimulationProcessor(object):
+
+    def __init__(self, original_ft1, original_ft2, path_of_tar_file_with_simulated_ft1_files, workdir="simulated_ft1s"):
 
         # Make absolute path and resolve env. variables (if any)
 
         original_ft1 = sanitize_filename(original_ft1)
         original_ft2 = sanitize_filename(original_ft2)
-        path_of_tar_file_with_ft1_files = sanitize_filename(path_of_tar_file_with_ft1_files)
+        path_of_tar_file_with_simulated_ft1_files = sanitize_filename(path_of_tar_file_with_simulated_ft1_files)
 
         # Read from the original FT1 the cuts
         roi_cuts = pyLike.RoiCuts()
@@ -98,17 +119,17 @@ class SimulationFeeder(object):
 
             # Copy tar here, unpack, then remove copy
 
-            shutil.copy2(path_of_tar_file_with_ft1_files, ".")
+            shutil.copy2(path_of_tar_file_with_simulated_ft1_files, ".")
 
-            execute_command(log, "tar zxvf %s" % path_of_tar_file_with_ft1_files)
+            execute_command(log, "tar zxvf %s" % path_of_tar_file_with_simulated_ft1_files)
 
-            os.remove(os.path.basename(path_of_tar_file_with_ft1_files))
+            os.remove(os.path.basename(path_of_tar_file_with_simulated_ft1_files))
 
             # Now get the names of all ft1s
             all_ft1s_raw = glob.glob("gll_ft1_tr_bn*_v00.fit")
 
             log.info("Found %s simulated FT1 files in archive %s" % (len(all_ft1s_raw),
-                                                                     path_of_tar_file_with_ft1_files))
+                                                                     path_of_tar_file_with_simulated_ft1_files))
 
             log.info("Filtering them with the same cuts as in %s" % (original_ft1))
 
@@ -151,9 +172,30 @@ class SimulationFeeder(object):
 
                 os.remove(this_simulated_ft1)
 
+    @property
+    def processed_ft1s(self):
+
+        return self._all_ft1s
+
     @staticmethod
     def _filter_simulated_ft1(original_ft1, simulated_ft1,
                               ra, dec, radius, tmin, tmax, emin, emax, outfile):
+        """
+        This accomplish what gtselect and gtmktime would do, but in one single command (much faster). This is possible
+        again because we are applying GTIs that are already known.
+
+        :param original_ft1:
+        :param simulated_ft1:
+        :param ra:
+        :param dec:
+        :param radius:
+        :param tmin:
+        :param tmax:
+        :param emin:
+        :param emax:
+        :param outfile:
+        :return:
+        """
 
         # Now filter
 
