@@ -84,14 +84,6 @@ class SimulationFeeder(object):
 
         ra_center, dec_center, radius = roi_cuts.roiCone()
 
-        # Write region file
-        region_file = sanitize_filename("__roi_region.reg")
-
-        with open(region_file, "w+") as f:
-
-            f.write("fk5\n")
-            f.write('circle(%.5f,%.5f,%s")\n' % (ra_center, dec_center, radius * 3600.0))
-
         # Energy minimum and maximum
         emin, emax = roi_cuts.getEnergyCuts()
 
@@ -144,7 +136,10 @@ class SimulationFeeder(object):
 
                 new_name = "%s_filt.fit" % basename
 
-                self._filter_simulated_ft1(original_ft1, this_simulated_ft1, region_file, tstart, tstop, emin, emax,
+                self._filter_simulated_ft1(original_ft1, this_simulated_ft1,
+                                           ra_center, dec_center, radius,
+                                           tstart, tstop,
+                                           emin, emax,
                                            new_name)
 
                 # os.rename(temp_file2, new_name)
@@ -155,10 +150,9 @@ class SimulationFeeder(object):
 
                 os.remove(this_simulated_ft1)
 
-        os.remove(region_file)
-
     @staticmethod
-    def _filter_simulated_ft1(original_ft1, simulated_ft1, region_file, tmin, tmax, emin, emax, outfile):
+    def _filter_simulated_ft1(original_ft1, simulated_ft1,
+                              ra, dec, radius, tmin, tmax, emin, emax, outfile):
 
         # Add the GTI extension to the data file
         # with pyfits.open(sanitize_filename(original_ft1)) as orig:
@@ -170,8 +164,8 @@ class SimulationFeeder(object):
 
         # Now filter
 
-        my_filter = 'gtifilter("%s") && regfilter("%s") ' \
-                    '&& TIME>=%s && TIME<=%s && ENERGY >=%s && ENERGY <=%s' % (original_ft1, region_file,
+        my_filter = 'gtifilter("%s") && ANGSEP(RA, DEC, %s, %s) <= %s ' \
+                    '&& TIME>=%s && TIME<=%s && ENERGY >=%s && ENERGY <=%s' % (original_ft1, ra, dec, radius,
                                                                                tmin, tmax, emin, emax)
 
         cmd_line = "ftcopy '%s[EVENTS][%s]' %s copyall=yes clobber=yes history=yes" % (simulated_ft1,
