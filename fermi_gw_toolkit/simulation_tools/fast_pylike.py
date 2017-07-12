@@ -6,6 +6,7 @@ import os
 import shutil
 import glob
 import logging
+import subprocess
 
 import astropy.io.fits as pyfits
 from fermi_gw_toolkit.automatic_pipeline.utils import within_directory, execute_command, sanitize_filename
@@ -154,14 +155,6 @@ class SimulationFeeder(object):
     def _filter_simulated_ft1(original_ft1, simulated_ft1,
                               ra, dec, radius, tmin, tmax, emin, emax, outfile):
 
-        # Add the GTI extension to the data file
-        # with pyfits.open(sanitize_filename(original_ft1)) as orig:
-        #
-        #     with pyfits.open(simulated_ft1, mode='update') as new:
-        #         # Copy the GTIs from the original file
-        #
-        #         new['GTI'] = orig['GTI']
-
         # Now filter
 
         my_filter = 'gtifilter("%s") && ANGSEP(RA, DEC, %s, %s) <= %s ' \
@@ -171,7 +164,7 @@ class SimulationFeeder(object):
         cmd_line = "ftcopy '%s[EVENTS][%s]' %s copyall=yes clobber=yes history=yes" % (simulated_ft1,
                                                                                        my_filter, outfile)
 
-        execute_command(log, cmd_line)
+        subprocess.check_call(cmd_line, shell=True)
 
         # Now update the DS keywords from the orginal file, so that downstream software will understand
         # the file even though we didn't use gtselect nor gtmktime
