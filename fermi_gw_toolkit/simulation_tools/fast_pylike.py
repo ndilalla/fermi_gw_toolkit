@@ -7,6 +7,7 @@ import shutil
 import glob
 import logging
 import subprocess
+import numpy as np
 
 import astropy.io.fits as pyfits
 from fermi_gw_toolkit.automatic_pipeline.utils import within_directory, execute_command, sanitize_filename
@@ -15,6 +16,7 @@ from setup_ftools import setup_ftools_non_interactive
 import UnbinnedAnalysis
 import pyLikelihood as pyLike
 from GtApp import GtApp
+from GtBurst.fast_ts_map import FastTSMap
 
 
 # Configure logger
@@ -69,23 +71,36 @@ class FastUnbinnedObs(UnbinnedAnalysis.UnbinnedObs):
 
 class SimulationFeeder(object):
 
-    def __init__(self, ft1, ft2, expmap, ltcube, xml_file, path_of_tar_file_with_simulated_ft1_files):
+    def __init__(self, ft1, ft2, expmap, ltcube, xml_file, path_of_tar_file_with_simulated_ft1_files, tsmap_spec=None):
 
         # Process the simulations applying the same cuts as in the data file
         sp = SimulationProcessor(ft1, ft2, path_of_tar_file_with_simulated_ft1_files)
+
+        ra_center, dec_center, radius = sp.roi
 
         # Now create the likelihood object
         obs = UnbinnedAnalysis.UnbinnedObs(ft1, ft2, expMap=expmap, expCube=ltcube)
         like = UnbinnedAnalysis.UnbinnedAnalysis(obs, xml_file, "MINUIT")
 
-        fast_ts = FastTS(like)
+        fast_ts = FastTS(like, ts_map_spec=tsmap_spec)
 
         # Get the TSs
-        self._tss = []
+        self._tss = fast_ts.process_ft1s(sp.processed_ft1s, ra_center=ra_center, dec_center=dec_center)
 
-        for ft1 in sp.processed_ft1s:
+    @property
+    def TSs(self):
 
-            self._tss.append(fast_ts.get_TS(ft1))
+        return self._tss
+
+    def write(self, filename):
+        """
+        Write TSs to disk in the given filename (with .npy extension)
+
+        :param filename:
+        :return:
+        """
+
+        np.save(filename, self.TSs)
 
 
 class SimulationProcessor(object):
@@ -95,7 +110,7 @@ class SimulationProcessor(object):
         # Make absolute path and resolve env. variables (if any)
 
         original_ft1 = sanitize_filename(original_ft1)
-        original_ft2 = sanitize_filename(original_ft2)
+        original_ft2 = sanitize_filename(original_ft2)  # This is needed only if we want to switch back to gtmktime
         path_of_tar_file_with_simulated_ft1_files = sanitize_filename(path_of_tar_file_with_simulated_ft1_files)
 
         # Read from the original FT1 the cuts
@@ -105,6 +120,11 @@ class SimulationProcessor(object):
         # ROI definition
 
         ra_center, dec_center, radius = roi_cuts.roiCone()
+
+        # Store them as well
+        self._ra_center = ra_center
+        self._dec_center = dec_center
+        self._radius = radius
 
         # Energy minimum and maximum
         emin, emax = roi_cuts.getEnergyCuts()
@@ -171,6 +191,11 @@ class SimulationProcessor(object):
                 # Remove the simulated FT1 to save space
 
                 os.remove(this_simulated_ft1)
+
+    @property
+    def roi(self):
+
+        return (self._ra_center, self._dec_center, self._radius)
 
     @property
     def processed_ft1s(self):
@@ -294,7 +319,7 @@ class FastTS(object):
     the original dataset, except for the FT1 file.
 
     """
-    def __init__(self, orig_log_like, target_source="GRB"):
+    def __init__(self, orig_log_like, ts_map_spec=None, target_source="GRB"):
 
         # Store original likelihood object
 
@@ -308,6 +333,9 @@ class FastTS(object):
 
         self._target = target_source
 
+        # Store TS map specification
+        self._tsmap_spec = ts_map_spec
+
     def _new_log_like(self, event_file):
 
         new_obs = FastUnbinnedObs(event_file, self._orig_log_like.observation)
@@ -318,8 +346,8 @@ class FastTS(object):
         with open("__empty_xml.xml", "w+") as f:
             f.write('<source_library title="source library"></source_library>')
 
-        # Load pyLike
-        new_like = UnbinnedAnalysis.UnbinnedAnalysis(new_obs, "__empty_xml.xml", optimizer="Minuit")
+        # Load pyLike (we use DRMNFB because it is fast, much faster than Minuit, and we do not care about the errors)
+        new_like = UnbinnedAnalysis.UnbinnedAnalysis(new_obs, "__empty_xml.xml", optimizer="DRMNFB")
 
         # Now load the sources from the other object
         for source_name in self._orig_log_like.sourceNames():
@@ -328,16 +356,57 @@ class FastTS(object):
 
         return new_like
 
-    def get_TS(self, simulated_ft1):
+    def get_TS(self, simulated_ft1, ra_center=None, dec_center=None):
         """
         Get the new TS for the target source using the simulated ft1 file
 
         :param simulated_ft1:
+        :param ra_center:
+        :param dec_center:
         :return:
         """
 
         new_like = self._new_log_like(simulated_ft1)
 
-        new_like.optimize(verbosity=0)
+        if self._tsmap_spec is not None:
 
-        return new_like.Ts(self._target, reoptimize=True, approx=False)
+            assert ra_center is not None and dec_center is not None, "If you use the TS map you have to provide " \
+                                                                     "ra_center and dec_center"
+
+            # Need to do a quick TS map
+
+            half_size, n_side = self._tsmap_spec.replace(" ", "").split(",")
+
+            half_size = float(half_size)
+            n_side = int(n_side)
+
+            ftm = FastTSMap(new_like)
+            _, this_TS = ftm.search_for_maximum(ra_center, dec_center,
+                                                half_size, n_side,
+                                                verbose=False)
+
+        else:
+
+            new_like.optimize(verbosity=0)
+
+            this_TS = new_like.Ts(self._target, reoptimize=True, approx=False)
+
+        return this_TS
+
+    def process_ft1s(self, ft1s, ra_center=None, dec_center=None):
+
+        # Get the TSs
+        tss = np.zeros(len(ft1s))
+
+        log.info("Computing TSs...")
+
+        for i, ft1 in enumerate(ft1s):
+
+            if i % 100 == 0:
+                log.info("Processed %i out of %i" % (i + 1, len(ft1s)))
+
+            tss[i] = self.get_TS(ft1, ra_center, dec_center)
+
+        log.info("done")
+
+        return tss
