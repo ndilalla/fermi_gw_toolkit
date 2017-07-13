@@ -395,7 +395,9 @@ class FastTS(object):
 
     def _new_log_like(self, event_file):
 
-        new_obs = FastUnbinnedObs(event_file, self._orig_log_like.observation)
+        #new_obs = FastUnbinnedObs(event_file, self._orig_log_like.observation)
+
+        self._orig_log_like.observation._readEvents(event_file)
 
         # Create empty XML to trick UnbinnedAnalysis in not reading up any source.
         # We will then add the source that have been already loaded in the original likelihood object.
@@ -404,7 +406,8 @@ class FastTS(object):
             f.write('<source_library title="source library"></source_library>')
 
         # Load pyLike (we use DRMNFB because it is fast, much faster than Minuit, and we do not care about the errors)
-        new_like = UnbinnedAnalysis.UnbinnedAnalysis(new_obs, "__empty_xml.xml", optimizer=self._optimizer)
+        new_like = UnbinnedAnalysis.UnbinnedAnalysis(self._orig_log_like.observation, "__empty_xml.xml",
+                                                     optimizer=self._optimizer)
 
         new_like.model = self._orig_log_like.model
 
@@ -430,8 +433,7 @@ class FastTS(object):
         :return:
         """
 
-        #new_like = self._new_log_like(simulated_ft1)
-        self._orig_log_like.observation._readEvents(simulated_ft1)
+        new_like = self._new_log_like(simulated_ft1)
 
         if self._tsmap_spec is not None:
 
@@ -445,7 +447,7 @@ class FastTS(object):
             half_size = float(half_size)
             n_side = int(n_side)
 
-            ftm = FastTSMap(self._orig_log_like, test_source=test_source)
+            ftm = FastTSMap(new_like, test_source=test_source)
             _, this_TS = ftm.search_for_maximum(ra_center, dec_center,
                                                 half_size, n_side,
                                                 verbose=False)
