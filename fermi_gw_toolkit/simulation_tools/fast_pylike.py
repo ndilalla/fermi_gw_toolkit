@@ -395,9 +395,7 @@ class FastTS(object):
 
     def _new_log_like(self, event_file):
 
-        #new_obs = FastUnbinnedObs(event_file, self._orig_log_like.observation)
-
-        self._orig_log_like.observation._readEvents(event_file)
+        new_obs = FastUnbinnedObs(event_file, self._orig_log_like.observation)
 
         # Create empty XML to trick UnbinnedAnalysis in not reading up any source.
         # We will then add the source that have been already loaded in the original likelihood object.
@@ -406,13 +404,13 @@ class FastTS(object):
             f.write('<source_library title="source library"></source_library>')
 
         # Load pyLike (we use DRMNFB because it is fast, much faster than Minuit, and we do not care about the errors)
-        new_like = UnbinnedAnalysis.UnbinnedAnalysis(self._orig_log_like.observation, "__empty_xml.xml",
+        new_like = UnbinnedAnalysis.UnbinnedAnalysis(new_obs, "__empty_xml.xml",
                                                      optimizer=self._optimizer)
 
         # Now load the sources from the other object
         for source_name in self._orig_log_like.sourceNames():
 
-            if source_name[-1]=='e':
+            if source_name[-1] == 'e':
 
                 # Extended source, jump it (we didn't compute gtdiffrsp because it crashes)
                 continue
