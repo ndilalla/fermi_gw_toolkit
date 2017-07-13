@@ -409,17 +409,15 @@ class FastTS(object):
         new_like = UnbinnedAnalysis.UnbinnedAnalysis(self._orig_log_like.observation, "__empty_xml.xml",
                                                      optimizer=self._optimizer)
 
-        new_like.model = self._orig_log_like.model
-
         # Now load the sources from the other object
-        # for source_name in self._orig_log_like.sourceNames():
-        #
-        #     if source_name[-1]=='e':
-        #
-        #         # Extended source, jump it (we didn't compute gtdiffrsp because it crashes)
-        #         continue
-        #
-        #     new_like.addSource(self._orig_log_like.logLike.source(source_name))
+        for source_name in self._orig_log_like.sourceNames():
+
+            if source_name[-1]=='e':
+
+                # Extended source, jump it (we didn't compute gtdiffrsp because it crashes)
+                continue
+
+            new_like.addSource(self._orig_log_like.logLike.source(source_name))
 
         return new_like
 
