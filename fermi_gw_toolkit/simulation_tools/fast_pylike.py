@@ -12,12 +12,13 @@ import numpy as np
 
 import astropy.io.fits as pyfits
 from fermi_gw_toolkit.automatic_pipeline.utils import within_directory, execute_command, sanitize_filename
+from fast_ts_map import FastTSMap
 from setup_ftools import setup_ftools_non_interactive
 
 import UnbinnedAnalysis
 import pyLikelihood as pyLike
 from GtApp import GtApp
-from GtBurst.fast_ts_map import FastTSMap
+
 
 
 # Configure logger
@@ -360,7 +361,7 @@ class FastTS(object):
 
         return new_like
 
-    def get_TS(self, simulated_ft1, ra_center=None, dec_center=None):
+    def get_TS(self, simulated_ft1, ra_center=None, dec_center=None, test_source=None):
         """
         Get the new TS for the target source using the simulated ft1 file
 
@@ -389,6 +390,8 @@ class FastTS(object):
                                                 half_size, n_side,
                                                 verbose=False)
 
+            self._test_source = ftm.test_source
+
         else:
 
             new_like.optimize(verbosity=0)
@@ -406,9 +409,18 @@ class FastTS(object):
 
         start_time = time.time()
 
+        # This will contain the test source after the first iteration, so we do not re-compute the exposure for the
+        # test source at every iteration (which is slow)
+
+        test_source = None
+
         for i, ft1 in enumerate(ft1s):
 
-            tss[i] = self.get_TS(ft1, ra_center, dec_center)
+            tss[i] = self.get_TS(ft1, ra_center, dec_center, test_source=test_source)
+
+            if i==0:
+
+                test_source = self._test_source
 
             if (i+1) % 100 == 0:
 
