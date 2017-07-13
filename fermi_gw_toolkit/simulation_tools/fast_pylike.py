@@ -320,7 +320,7 @@ class FastTS(object):
     the original dataset, except for the FT1 file.
 
     """
-    def __init__(self, orig_log_like, ts_map_spec=None, target_source="GRB"):
+    def __init__(self, orig_log_like, ts_map_spec=None, target_source="GRB", optimizer="DRMNFB"):
 
         # Store original likelihood object
 
@@ -337,6 +337,9 @@ class FastTS(object):
         # Store TS map specification
         self._tsmap_spec = ts_map_spec
 
+        # Store optimizer
+        self._optimizer = optimizer
+
     def _new_log_like(self, event_file):
 
         new_obs = FastUnbinnedObs(event_file, self._orig_log_like.observation)
@@ -348,7 +351,7 @@ class FastTS(object):
             f.write('<source_library title="source library"></source_library>')
 
         # Load pyLike (we use DRMNFB because it is fast, much faster than Minuit, and we do not care about the errors)
-        new_like = UnbinnedAnalysis.UnbinnedAnalysis(new_obs, "__empty_xml.xml", optimizer="DRMNFB")
+        new_like = UnbinnedAnalysis.UnbinnedAnalysis(new_obs, "__empty_xml.xml", optimizer=self._optimizer)
 
         # Now load the sources from the other object
         for source_name in self._orig_log_like.sourceNames():
