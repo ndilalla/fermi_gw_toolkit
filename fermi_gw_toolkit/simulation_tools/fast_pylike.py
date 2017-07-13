@@ -7,6 +7,7 @@ import shutil
 import glob
 import logging
 import subprocess
+import time, datetime
 import numpy as np
 
 import astropy.io.fits as pyfits
@@ -400,12 +401,22 @@ class FastTS(object):
 
         log.info("Computing TSs...")
 
+        start_time = time.time()
+
         for i, ft1 in enumerate(ft1s):
 
-            if i % 100 == 0:
-                log.info("Processed %i out of %i" % (i + 1, len(ft1s)))
-
             tss[i] = self.get_TS(ft1, ra_center, dec_center)
+
+            if (i+1) % 100 == 0:
+
+                this_time = time.time()
+                elapsed_time = (this_time - start_time)
+                time_per_ts = elapsed_time / (i+1)
+                remaining_time = (len(ft1s) - (i+1)) * time_per_ts
+
+                log.info("Processed %i out of %i" % (i + 1, len(ft1s)))
+                log.info("Elapsed time: %s, remaining time: %s" % (datetime.timedelta(seconds=elapsed_time),
+                                                                   datetime.timedelta(seconds=remaining_time)))
 
         log.info("done")
 
