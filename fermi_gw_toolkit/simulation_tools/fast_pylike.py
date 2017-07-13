@@ -51,7 +51,7 @@ class MyUnbinnedObs(UnbinnedAnalysis.UnbinnedObs):
         #     self._scData.clear_arrays()
 
 
-class FastUnbinnedObs(UnbinnedAnalysis.UnbinnedObs):
+class FastUnbinnedObs(MyUnbinnedObs):
     """
     A simple wrapper around UnbinnedAnalysis.UnbinnedObs that avoid reloading the livetime cube and the exposure map,
     and instead reuse the one that have been already loaded in RAM in the original pyLikelihood object
