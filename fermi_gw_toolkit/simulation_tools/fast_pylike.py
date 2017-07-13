@@ -31,6 +31,23 @@ log.setLevel(logging.DEBUG)
 setup_ftools_non_interactive()
 
 
+# The pyLikelihood code contains a statement where scData are emptied after the observation has been set up
+# We want to avoid that, so we can reuse those data without reading them over and over again
+# therefore we override only that part
+class MyUnbinnedObs(UnbinnedAnalysis.UnbinnedObs):
+
+    def _readData(self, scFile, eventFile):
+        self._readScData(scFile, eventFile)
+        self._readEvents(eventFile)
+
+        # This part is in the pyLikelihood code, but we actually want to keep the scData in memory
+        # so we can reuse them!
+
+        # if self.expCube is not None and self.expCube != "":
+        #     # Clear the spacecraft data to save memory for long observations.
+        #     self._scData.clear_arrays()
+
+
 class FastUnbinnedObs(UnbinnedAnalysis.UnbinnedObs):
     """
     A simple wrapper around UnbinnedAnalysis.UnbinnedObs that avoid reloading the livetime cube and the exposure map,
