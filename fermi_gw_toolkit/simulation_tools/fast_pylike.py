@@ -38,8 +38,6 @@ class MyUnbinnedObs(UnbinnedAnalysis.UnbinnedObs):
 
     def _readData(self, scFile, eventFile):
 
-        print("\n\nMY OWN READER")
-
         self._readScData(scFile, eventFile)
         self._readEvents(eventFile)
 
