@@ -399,17 +399,24 @@ class FastTS(object):
 
         # Create empty XML to trick UnbinnedAnalysis in not reading up any source.
         # We will then add the source that have been already loaded in the original likelihood object.
-        # This save 10-15 s because sources like the Galactic template do not need to be reloaded again from disk
+        # This saves a lot because sources like the Galactic template do not need to be reloaded again from disk
         with open("__empty_xml.xml", "w+") as f:
             f.write('<source_library title="source library"></source_library>')
 
         # Load pyLike (we use DRMNFB because it is fast, much faster than Minuit, and we do not care about the errors)
         new_like = UnbinnedAnalysis.UnbinnedAnalysis(new_obs, "__empty_xml.xml", optimizer=self._optimizer)
 
-        # Now load the sources from the other object
-        for source_name in self._orig_log_like.sourceNames():
+        new_like.model = self._orig_log_like.model
 
-            new_like.addSource(self._orig_log_like.logLike.source(source_name))
+        # Now load the sources from the other object
+        # for source_name in self._orig_log_like.sourceNames():
+        #
+        #     if source_name[-1]=='e':
+        #
+        #         # Extended source, jump it (we didn't compute gtdiffrsp because it crashes)
+        #         continue
+        #
+        #     new_like.addSource(self._orig_log_like.logLike.source(source_name))
 
         return new_like
 
@@ -423,7 +430,8 @@ class FastTS(object):
         :return:
         """
 
-        new_like = self._new_log_like(simulated_ft1)
+        #new_like = self._new_log_like(simulated_ft1)
+        self._orig_log_like.observation._readEvents(simulated_ft1)
 
         if self._tsmap_spec is not None:
 
@@ -437,7 +445,7 @@ class FastTS(object):
             half_size = float(half_size)
             n_side = int(n_side)
 
-            ftm = FastTSMap(new_like, test_source=test_source)
+            ftm = FastTSMap(self._orig_log_like, test_source=test_source)
             _, this_TS = ftm.search_for_maximum(ra_center, dec_center,
                                                 half_size, n_side,
                                                 verbose=False)
