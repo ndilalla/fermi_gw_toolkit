@@ -390,10 +390,6 @@ class FastTS(object):
                                                 half_size, n_side,
                                                 verbose=False)
 
-            if test_source is None:
-
-                self._test_source = ftm.test_source.clone()
-
         else:
 
             new_like.optimize(verbosity=0)
@@ -402,7 +398,7 @@ class FastTS(object):
 
         return this_TS
 
-    def process_ft1s(self, ft1s, ra_center=None, dec_center=None):
+    def process_ft1s(self, ft1s, ra_center, dec_center):
 
         # Get the TSs
         tss = np.zeros(len(ft1s))
@@ -411,18 +407,17 @@ class FastTS(object):
 
         start_time = time.time()
 
-        # This will contain the test source after the first iteration, so we do not re-compute the exposure for the
-        # test source at every iteration (which is slow)
+        # Create a test source outside of the loop, so the exposure is computed only here (and not for every
+        # ft1 file). This can be done because all ft1s are assumed to be a simulation of the
+        # same ROI in the same interval, so they share the same livetime cube and exposure map
 
-        test_source = None
+        test_source = pyLike.PointSource(ra_center, dec_center, self._orig_log_like.observation())
+        test_source.setSpectrum(self._orig_log_like[self._target].spectrum())
+        test_source.setName("_test_source")
 
         for i, ft1 in enumerate(ft1s):
 
             tss[i] = self.get_TS(ft1, ra_center, dec_center, test_source=test_source)
-
-            if i==0:
-
-                test_source = self._test_source
 
             if (i+1) % 100 == 0:
 
