@@ -385,7 +385,7 @@ class FastTS(object):
             half_size = float(half_size)
             n_side = int(n_side)
 
-            ftm = FastTSMap(new_like)
+            ftm = FastTSMap(new_like, test_source=test_source)
             _, this_TS = ftm.search_for_maximum(ra_center, dec_center,
                                                 half_size, n_side,
                                                 verbose=False)
