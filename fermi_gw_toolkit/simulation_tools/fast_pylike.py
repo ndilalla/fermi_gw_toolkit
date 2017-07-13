@@ -63,8 +63,8 @@ class FastUnbinnedObs(UnbinnedAnalysis.UnbinnedObs):
 
         self._expCube = other_obs._expCube
 
-        self._eventCont = pyLike.EventContainer(self._respFuncs, self._roiCuts,
-                                                self._scData)
+        self._eventCont = other_obs._eventCont
+        
         self.observation = pyLike.Observation(self._respFuncs, self._scData,
                                               self._roiCuts, self._expCube,
                                               self._expMap, self._eventCont)
