@@ -390,7 +390,9 @@ class FastTS(object):
                                                 half_size, n_side,
                                                 verbose=False)
 
-            self._test_source = ftm.test_source
+            if test_source is None:
+
+                self._test_source = ftm.test_source.clone()
 
         else:
 
