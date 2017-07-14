@@ -49,7 +49,7 @@ class MyUnbinnedObs(UnbinnedAnalysis.UnbinnedObs):
         #     self._scData.clear_arrays()
 
 
-class FastUnbinnedObs(UnbinnedAnalysis.UnbinnedObs):
+class FastUnbinnedObs(MyUnbinnedObs):
     """
     A simple wrapper around UnbinnedAnalysis.UnbinnedObs that avoid reloading the livetime cube and the exposure map,
     and instead reuse the one that have been already loaded in RAM in the original pyLikelihood object
@@ -88,39 +88,39 @@ class FastUnbinnedObs(UnbinnedAnalysis.UnbinnedObs):
                                               self._expMap, self._eventCont)
         self._readData(ft2, new_event_file)
 
-    # # Override these with faster versions, which avoid to re-read data that have been already read
-    #
-    # def _readEvents(self, eventFile):
-    #
-    #     if eventFile is not None:
-    #         eventFiles = self._fileList(eventFile)
-    #
-    #         # This has been already read
-    #
-    #         #self._roiCuts.readCuts(eventFiles, 'EVENTS', False)
-    #
-    #         for file in eventFiles:
-    #
-    #             self._eventCont.getEvents(file)
-    #
-    #         self.eventFiles = eventFiles
-    #
-    # def _readScData(self, scFile, eventFile):
-    #
-    #     # This is useless (it has been already read)
-    #
-    #     # if eventFile is not None:
-    #     #     eventFiles = self._fileList(eventFile)
-    #     #     self._roiCuts.readCuts(eventFiles, 'EVENTS', False)
-    #
-    #     # tmin = self._roiCuts.minTime()
-    #     # tmax = self._roiCuts.maxTime()
-    #     scFiles = self._fileList(scFile)
-    #
-    #     # This has been already read
-    #     #self._scData.readData(scFiles, tmin, tmax, self.sctable)
-    #
-    #     self.scFiles = scFiles
+    # Override these with faster versions, which avoid to re-read data that have been already read
+
+    def _readEvents(self, eventFile):
+
+        if eventFile is not None:
+            eventFiles = self._fileList(eventFile)
+
+            # This has been already read
+
+            #self._roiCuts.readCuts(eventFiles, 'EVENTS', False)
+
+            for file in eventFiles:
+
+                self._eventCont.getEvents(file)
+
+            self.eventFiles = eventFiles
+
+    def _readScData(self, scFile, eventFile):
+
+        # This is useless (it has been already read)
+
+        # if eventFile is not None:
+        #     eventFiles = self._fileList(eventFile)
+        #     self._roiCuts.readCuts(eventFiles, 'EVENTS', False)
+
+        # tmin = self._roiCuts.minTime()
+        # tmax = self._roiCuts.maxTime()
+        scFiles = self._fileList(scFile)
+
+        # This has been already read
+        #self._scData.readData(scFiles, tmin, tmax, self.sctable)
+
+        self.scFiles = scFiles
 
 
 class SimulationFeeder(object):
