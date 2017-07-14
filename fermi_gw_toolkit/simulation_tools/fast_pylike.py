@@ -475,7 +475,7 @@ class FastTS(object):
 
         for i, ft1 in enumerate(ft1s):
 
-            tss[i] = self.get_TS(ft1, ra_center, dec_center, test_source=test_source)
+            tss[i] = self.get_TS(ft1, ra_center, dec_center, test_source=None)
 
             if (i+1) % 100 == 0:
 
