@@ -37,8 +37,6 @@ class FastTSMap(object):
 
             self._test_source = test_source
 
-        logLike.addSource(self._test_source, False)
-
         # compute the value for the likelihood without the point source
         logLike0 = logLike.value()
 
@@ -118,8 +116,7 @@ class FastTSMap(object):
             print("Maximum ang. dist: %s deg" % max(ang_sep))
 
         # Restore original likelihood
-        self._pylike_object.logLike.deleteSource("_test_source")
-        self._pylike_object.logLike.addSource(self._target_source)
+        self._pylike_object.addSource(self._target_source)
 
         # Find maximum and its position
         return max_ts_position, max_ts
@@ -130,7 +127,7 @@ class FastTSMap(object):
 
         # The first False says not to recompute the exposure, the second one avoid verbosity
         self._test_source.setDir(ra, dec, False, False)
-        #logLike.addSource(self._test_source, False)
+        logLike.addSource(self._test_source, False)
 
         # This is the fastest way to minimize -logL if we don't care about errors
 
@@ -138,7 +135,7 @@ class FastTSMap(object):
 
         logLike1 = logLike.value()
         TS = 2.0 * (logLike1 - self._logLike0)
-        #logLike.deleteSource("_test_source")
+        logLike.deleteSource("_test_source")
 
         # Restore the parameters of the model without the source to their best fit
         # values
