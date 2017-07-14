@@ -38,11 +38,10 @@ class FastTSMap(object):
             self._test_source = test_source
 
         # compute the value for the likelihood without the point source
-        logLike0 = logLike.value()
 
         # Optimize (i.e., fit) the model without the point source
         self._pylike_object.optimize(verbosity=0)
-        logLike0 = max(logLike.value(), logLike0)
+        logLike0 = logLike.value()
 
         # Store it
         self._logLike0 = float(logLike0)
