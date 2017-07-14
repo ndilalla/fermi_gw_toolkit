@@ -133,7 +133,7 @@ class SimulationFeeder(object):
         ra_center, dec_center, radius = sp.roi
 
         # Now create the likelihood object
-        obs = UnbinnedAnalysis.UnbinnedObs(ft1, ft2, expMap=expmap, expCube=ltcube)
+        obs = MyUnbinnedObs(ft1, ft2, expMap=expmap, expCube=ltcube)
         like = UnbinnedAnalysis.UnbinnedAnalysis(obs, xml_file, "MINUIT")
 
         fast_ts = FastTS(like, ts_map_spec=tsmap_spec)
