@@ -410,10 +410,10 @@ class FastTS(object):
         # Now load the sources from the other object
         for source_name in self._orig_log_like.sourceNames():
 
-            if source_name[-1] == 'e':
-
-                # Extended source, jump it (we didn't compute gtdiffrsp because it crashes)
-                continue
+            # if source_name[-1] == 'e':
+            #
+            #     # Extended source, jump it (we didn't compute gtdiffrsp because it crashes)
+            #     continue
 
             new_like.addSource(self._orig_log_like.logLike.source(source_name))
 
@@ -469,9 +469,9 @@ class FastTS(object):
         # ft1 file). This can be done because all ft1s are assumed to be a simulation of the
         # same ROI in the same interval, so they share the same livetime cube and exposure map
 
-        test_source = pyLike.PointSource(ra_center, dec_center, self._orig_log_like.logLike.observation())
-        test_source.setSpectrum(self._orig_log_like[self._target].spectrum())
-        test_source.setName("_test_source")
+        # test_source = pyLike.PointSource(ra_center, dec_center, self._orig_log_like.logLike.observation())
+        # test_source.setSpectrum(self._orig_log_like[self._target].spectrum())
+        # test_source.setName("_test_source")
 
         for i, ft1 in enumerate(ft1s):
 

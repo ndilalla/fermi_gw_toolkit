@@ -116,7 +116,7 @@ class FastTSMap(object):
             print("Maximum ang. dist: %s deg" % max(ang_sep))
 
         # Restore original likelihood
-        self._pylike_object.addSource(self._target_source)
+        #self._pylike_object.addSource(self._target_source)
 
         # Find maximum and its position
         return max_ts_position, max_ts
