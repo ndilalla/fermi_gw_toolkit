@@ -127,7 +127,7 @@ class FastTSMap(object):
 
         # The first False says not to recompute the exposure, the second one avoid verbosity
         self._test_source.setDir(ra, dec, False, False)
-        logLike.addSource(self._test_source, False)
+        logLike.addSource(self._test_source)
 
         # This is the fastest way to minimize -logL if we don't care about errors
 
