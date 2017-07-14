@@ -30,7 +30,7 @@ class FastTSMap(object):
             # This is quite slow, so if you can, provide the test source already
 
             self._test_source = pyLikelihood.PointSource(ra, dec, logLike.observation())
-            self._test_source.setSpectrum(self._target_source.spectrum())
+            self._test_source.setSpectrum(self._target_source.spectrum().clone())
             self._test_source.setName("_test_source")
 
         else:

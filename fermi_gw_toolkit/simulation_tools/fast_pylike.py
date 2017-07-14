@@ -469,13 +469,13 @@ class FastTS(object):
         # ft1 file). This can be done because all ft1s are assumed to be a simulation of the
         # same ROI in the same interval, so they share the same livetime cube and exposure map
 
-        # test_source = pyLike.PointSource(ra_center, dec_center, self._orig_log_like.logLike.observation())
-        # test_source.setSpectrum(self._orig_log_like[self._target].spectrum())
-        # test_source.setName("_test_source")
+        test_source = pyLike.PointSource(ra_center, dec_center, self._orig_log_like.logLike.observation())
+        test_source.setSpectrum(self._orig_log_like[self._target].spectrum().clone())
+        test_source.setName("_test_source")
 
         for i, ft1 in enumerate(ft1s):
 
-            tss[i] = self.get_TS(ft1, ra_center, dec_center, test_source=None)
+            tss[i] = self.get_TS(ft1, ra_center, dec_center, test_source=test_source)
 
             if (i+1) % 100 == 0:
 
