@@ -195,7 +195,7 @@ class SimulationProcessor(object):
             log.info("Copying %s to %s..." % (path_of_tar_file_with_simulated_ft1_files, workdir))
             shutil.copy2(path_of_tar_file_with_simulated_ft1_files, ".")
 
-            execute_command(log, "tar zxf %s" % path_of_tar_file_with_simulated_ft1_files)
+            execute_command(log, "tar zxf --checkpoint=100 %s" % path_of_tar_file_with_simulated_ft1_files)
 
             os.remove(os.path.basename(path_of_tar_file_with_simulated_ft1_files))
 
