@@ -212,8 +212,6 @@ class SimulationProcessor(object):
             # Apply the cuts to them
             for i, this_simulated_ft1 in enumerate(all_ft1s_raw):
 
-                log.info(this_simulated_ft1)
-
                 if (i+1) % 100 == 0:
 
                     log.info("Processed %i of %i" % (i+1, len(all_ft1s_raw)))
