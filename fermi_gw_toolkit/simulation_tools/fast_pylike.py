@@ -371,7 +371,7 @@ class FastTS(object):
     the original dataset, except for the FT1 file.
 
     """
-    def __init__(self, orig_log_like, ts_map_spec=None, target_source="GRB", optimizer="DRMNFB"):
+    def __init__(self, orig_log_like, ts_map_spec=None, target_source="GRB", optimizer="MINUIT"):
 
         # Store original likelihood object
 
