@@ -408,10 +408,10 @@ class FastTS(object):
         # Now load the sources from the other object
         for source_name in self._orig_log_like.sourceNames():
 
-            # if source_name[-1] == 'e':
-            #
-            #     # Extended source, jump it (we didn't compute gtdiffrsp because it crashes)
-            #     continue
+            if source_name[-1] == 'e' and source_name.find("Template") < 0:
+
+                # Extended source, jump it (we didn't compute gtdiffrsp because it crashes)
+                continue
 
             new_like.addSource(self._orig_log_like.logLike.source(source_name))
 
