@@ -215,18 +215,16 @@ if __name__=="__main__":
     # THIS IS THE SKYMAP ON TOP:
     # THIS IS THE SKYMAP:
     #axSM = plt.axes(rect_histx)
-
+    lons=[60,120,180,240,300]
+    lats=[-60,-30,30,60]
     if args.nside:
         hp.mollview(healpix_map, title='',cmap=cmap,norm='lin',min=vmin,max=vmax,rot=(180,0),sub=211,cbar=False)
         hp.graticule()
         ax = plt.gca()
         lat=0
-        for lon in range(60,360,30):
-            hp.projtext(lon,lat,'%d$^{\circ}$' %(lon),lonlat=True,size=ticks_size,va='bottom')
-            pass
-        
+        for lon in lons:  hp.projtext(lon,lat,'%d$^{\circ}$' %(lon),lonlat=True,size=ticks_size,va='bottom')
         lon=179.9+180
-        for lat in range(-60,90,15):
+        for lat in lats:
             if lat==0:
                 va='center'
                 continue

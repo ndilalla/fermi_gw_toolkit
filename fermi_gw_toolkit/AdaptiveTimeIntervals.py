@@ -90,8 +90,8 @@ def adaptive_time(**kwargs):
     if roi: masked_radius=roi
     
     print 'Number of selected pixels:',Nselected
-    myFT2=FT2(ft2,triggertime-100000,triggertime+100000)
-    myFT2.fov(theta_max,zenith_max-masked_radius)
+    myFT2=FT2(ft2,triggertime-11000,triggertime+11000)
+    myFT2.fov(theta_max-masked_radius,zenith_max-masked_radius)
     times_t0=[]
     times_t1=[]
     txt='# RA     Dec      T_enter      T_exit      Delta_T\n'

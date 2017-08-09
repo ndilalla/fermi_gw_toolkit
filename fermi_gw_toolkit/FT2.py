@@ -40,11 +40,14 @@ class FT2:
         # ZENITH
         self.RA_ZENITH   = SC_data.field('RA_ZENITH')[FILTER]
         self.DEC_ZENITH  = SC_data.field('DEC_ZENITH')[FILTER]
+        # SAA
+        self.IN_SAA      = SC_data.field('IN_SAA')[FILTER]
+
         self.IDX_ARRAY   = sp.arange(self.NENTRIES)
         self.FOV_ARRAY   = sp.zeros(self.NENTRIES)
         self.theta_max=65
         self.zenith_max=90
-        print 'In FT2 file %s found %d entrues' %(ft2file,self.NENTRIES)
+        print 'In FT2 file %s found %d entries' %(ft2file,self.NENTRIES)
         pass
 
     def fov(self,theta_max,zenith_max):
@@ -76,7 +79,7 @@ class FT2:
     def inFovTime(self,ra,dec):
         theta=self.getThetaTime(ra,dec)
         zenith=self.getZenithTime(ra,dec)
-        return sp.logical_and(theta<self.theta_max,zenith<self.zenith_max)
+        return sp.logical_and(sp.logical_and(theta<self.theta_max,zenith<self.zenith_max),self.IN_SAA==0)
 
     def getEntryExitTime(self,ra,dec,t0):
         idx0=self.getIndex(t0)        
@@ -87,12 +90,13 @@ class FT2:
         stop=self.SC_TSTOP-t0
         infov_t0=infov[idx0]
         
-        if infov_t0:
-            t_0 = stop[sp.logical_and(infov==0,stop<0)][-1]
-            t_1 = stop[sp.logical_and(infov==0,stop>0)][0]
-        else:
-            t_0 = stop[sp.logical_and(infov==1,stop>0)][0]
-            t_1 = stop[sp.logical_and(infov==0,stop>t_0)][0]
+        if infov_t0:  t_0 = stop[sp.logical_and(infov==0,stop<0)][-1]
+
+        else:         t_0 = start[sp.logical_and(infov==1,start>0)][0]
+        t_1 = start[sp.logical_and(infov==0,stop>t_0)][0]
+        t_1 = stop[self.getIndex(t0+t_1)]
+        #if stop[ii_1+1] > stop[ii_1]+60: t_1 = stop[ii_1]
+        #print '%10.3f %10.3f %5d %10.3f %10.3f %10.3f %10.3f ' %(ra,dec,ii_1,stop[ii_1],stop[ii_1+1],t_0,t_1)
         return t_0,t_1 
 
     def inFov(self,idx,ra,dec):
