@@ -74,9 +74,12 @@ def fill_maps(**kwargs):
 
     # Now the map of TS
 
-    tss = data['TS']
+    tss = data['TS']    
+    #idx = tss <= 0
+    #tss[idx] = 1e-3
 
     ts_map = np.zeros(hp.nside2npix(nside))
+    ts_map.fill(np.nan)
 
     # Now loop over the input fluxes and assign the corresponding pixels
 
