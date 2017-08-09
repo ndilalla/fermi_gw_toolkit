@@ -54,7 +54,7 @@ if __name__ == "__main__":
                    '--roi %s --tstarts %s --tstops %s --zmax %s --emin %s ' \
                    '--emax %s --irf %s --galactic_model %s ' \
                    '--particle_model "%s" --tsmin %s --strategy %s ' \
-                   '--thetamax %s --datarepository %s --ulphindex %s --flemin 100 --flemax 1000' % \
+                   '--thetamax %s --datarepository %s --ulphindex %s --flemin 100 --flemax 1000 --tsmap_spec 0.5,8' % \
                    (args.triggername, ra, dec, outfile,
                     args.roi, args.tstarts, args.tstops, args.zmax, args.emin,
                     args.emax, args.irf, args.galactic_model,
