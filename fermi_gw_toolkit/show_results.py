@@ -5,6 +5,9 @@ import healpy as hp
 #import webbrowser
 import astropy.io.fits as pyfits
 from contour_finder import  pix_to_sky
+
+from automatic_pipeline.utils import send_email
+
 formatter = argparse.ArgumentDefaultsHelpFormatter
 parser = argparse.ArgumentParser(formatter_class=formatter)
 
@@ -145,8 +148,15 @@ def show_results(**kwargs):
     if outfile is None:
         outfile = triggername + '_results.html'
     write_file(web_page.format(**locals()), outfile)
+
+    return outfile
     #webbrowser.open(outfile)
 
 if __name__ == '__main__':
+
     args = parser.parse_args()
-    show_results(**args.__dict__)
+    outfile = show_results(**args.__dict__)
+
+    text = """ Results here: %s  """ % outfile
+
+    send_email('nicola.omodei@gmail.com', 'Processing of %s completed' % args.triggername, text)
