@@ -40,9 +40,11 @@ if __name__ == "__main__":
         cmd_line = 'doTimeResolvedLike.py %s --ra %s --dec %s ' \
                    '--tstarts %s --tstops %s ' \
                    '--outfile %s_%.3f_%.3f_res.txt ' \
-                   '--flemin 100 --flemax 1000 --tsmap_spec 0.5,8 %s' % (args.triggername, ra, dec, tstarts, tstops,
-                                                                         args.triggername, ra, dec,
-                                                                         everything_else_str)
+                   '--flemin 100 --flemax 1000 ' \
+                   '--tsmap_spec 0.5,8 --fgl_mode complete %s' % (args.triggername, ra, dec,
+                                                                  tstarts, tstops,
+                                                                  args.triggername, ra, dec,
+                                                                  everything_else_str)
                    
         print("\nAbout to execute:\n")
         print cmd_line
