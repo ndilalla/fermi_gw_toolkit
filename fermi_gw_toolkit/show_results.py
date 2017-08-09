@@ -79,8 +79,8 @@ def max_ts(map_path, ts_cut):
     ts_map, header = hp.read_map(map_path, h=True)
     header = dict(header)
     nside = header['NSIDE']
-    ts_max = round(ts_map.max(),2)
-    px_max = numpy.argmax(ts_map)
+    ts_max = round(numpy.nanmax(ts_map),2)
+    px_max = numpy.nanargmax(ts_map)
     ra_max, dec_max = pix_to_sky(px_max,nside)
     # hp.pix2ang(nside, px_max, lonlat=True)
     ra_max = round(ra_max, 2)

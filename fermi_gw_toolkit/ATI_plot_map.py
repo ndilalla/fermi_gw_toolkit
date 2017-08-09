@@ -65,10 +65,10 @@ if __name__=="__main__":
         mmax = hpx_ul[idx].max()
 
     # Now set to nan all negative or zero pixels
-
-
-    idx = hpx_ul <= 0
-    hpx_ul[idx] = np.nan
+    if 'log' in args.zscale:
+        idx = hpx_ul <= 0
+        hpx_ul[idx] = np.nan
+        pass
 
     if args.cmap=='jet':
         background='w'
