@@ -86,7 +86,7 @@ class CustomSimulator(object):
 
         _gtobssim_args = {'emin': self._emin,
                           'emax': self._emax,
-                          'edisp': 'yes',
+                          'edisp': 'no',
                           'infile': sanitize_filename(config.get("SLAC", "SIM_XML")),
                           'srclist': sanitize_filename(config.get("SLAC", "SIM_SRC_LIST")),
                           'scfile': self._ft2,
