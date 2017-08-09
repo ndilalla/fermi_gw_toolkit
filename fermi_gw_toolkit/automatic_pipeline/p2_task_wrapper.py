@@ -93,7 +93,9 @@ if __name__ == "__main__":
     os.makedirs(dir_path)
 
     # Change directory permission to rw-rw-rw-
-    os.chmod(dir_path, 0o666)
+    #os.chmod(dir_path, 0o666)
+    # Make sure all files and directories have the right permissions
+    execute_command(log, "chmod a+rwx --recursive %s" % this_trigger_input_dir)
 
     # Finally run the stream
 

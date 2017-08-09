@@ -195,6 +195,15 @@ class CustomSimulator(object):
     def _fix_galactic_diffuse_path(self, tree):
 
         # Find Galactic template in this system
+        # If we are at slac, force the use of the same templates that have been simulated
+        slac_simulated_templates_path = config.get("SLAC", "SIM_DIFFUSE_PATH")
+
+        if os.path.exists(slac_simulated_templates_path):
+
+            log.info("Forcing the use of templates in directory %s" % slac_simulated_templates_path)
+
+            os.environ['GTBURST_TEMPLATE_PATH'] = config.get("SLAC", "SIM_DIFFUSE_PATH")
+
         templ = findTemplate(IRFS.IRFS[self._irfs].galacticTemplate)
 
         # Now update the XML tree with the new location for the template
@@ -208,6 +217,14 @@ class CustomSimulator(object):
     def _fix_isotropic_diffuse_path(self, tree):
 
         # Find Isotropic template in this system
+        # If we are at slac, force the use of the same templates that have been simulated
+        slac_simulated_templates_path = config.get("SLAC", "SIM_DIFFUSE_PATH")
+
+        if os.path.exists(slac_simulated_templates_path):
+
+            log.info("Forcing the use of templates in directory %s" % slac_simulated_templates_path)
+
+            os.environ['GTBURST_TEMPLATE_PATH'] = config.get("SLAC", "SIM_DIFFUSE_PATH")
 
         templ = findTemplate(IRFS.IRFS[self._irfs].isotropicTemplate)
 
@@ -219,22 +236,22 @@ class CustomSimulator(object):
 
         src.findall("spectrum")[0].set("file", templ)
 
-    def _fix_extended_sources_path(self, tree):
-
-        # Get the data path for GtBurst, which contains the templates for the diffuse sources
-
-        new_path = os.path.join(getDataPath(), "templates")
-
-        # Find all spatialModel tokens for the extended sources
-        ext_sources = tree.findall("source/spatialModel[@file]")
-
-        for spatial_model in ext_sources:
-
-            file_path = spatial_model.get("file")
-
-            if file_path.find("__FIXME__TEMPLATE_PATH") >= 0:
-
-                spatial_model.set("file", file_path.replace("__FIXME__TEMPLATE_PATH", new_path))
+    # def _fix_extended_sources_path(self, tree):
+    #
+    #     # Get the data path for GtBurst, which contains the templates for the diffuse sources
+    #
+    #     new_path = os.path.join(getDataPath(), "templates")
+    #
+    #     # Find all spatialModel tokens for the extended sources
+    #     ext_sources = tree.findall("source/spatialModel[@file]")
+    #
+    #     for spatial_model in ext_sources:
+    #
+    #         file_path = spatial_model.get("file")
+    #
+    #         if file_path.find("__FIXME__TEMPLATE_PATH") >= 0:
+    #
+    #             spatial_model.set("file", file_path.replace("__FIXME__TEMPLATE_PATH", new_path))
 
     def run_gtdiffrsp(self):
 
@@ -250,10 +267,9 @@ class CustomSimulator(object):
 
             tree = ElementTree.parse(f)
 
-        # Fix the path of the Galactic and isotropic template, as well as extended sources with FITS maps
+        # Fix the path of the Galactic and isotropic template
         self._fix_galactic_diffuse_path(tree)
         self._fix_isotropic_diffuse_path(tree)
-        #self._fix_extended_sources_path(tree)
 
         # Write to a temporary file
         xml_file = self._track_temp_file("__gw_toolkit_xml.xml")
