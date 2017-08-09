@@ -95,7 +95,13 @@ if __name__ == "__main__":
     # Change directory permission to rw-rw-rw-
     #os.chmod(dir_path, 0o666)
     # Make sure all files and directories have the right permissions
-    execute_command(log, "chmod a+rwx --recursive %s" % this_trigger_input_dir)
+    try:
+
+        execute_command(log, "chmod a+rwx --recursive %s" % this_trigger_input_dir)
+
+    except:
+
+        log.error("Could not change all permissions")
 
     # Finally run the stream
 
