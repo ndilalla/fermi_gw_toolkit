@@ -76,7 +76,7 @@ if __name__=="__main__":
 
     # Now set to nan all negative or zero pixels
 
-    idx = hpx_ul <= 0
+    idx = hpx_ul < 0
     hpx_ul[idx] = np.nan
     if args.cmap=='jet':
         background='w'
