@@ -138,12 +138,15 @@ if __name__ == "__main__":
 
         outfile = "%s_res.txt" % os.environ['LSB_JOBID']
 
+        # Make sure that gtburst does not use the configuration file from the home
+        os.environ['GTBURSTCONFDIR'] = os.getcwd()
+
         cmd_line = 'doTimeResolvedLike.py %s --outfile %s ' \
                    '--roi %s --tstarts %s --tstops %s --zmax %s --emin %s ' \
                    '--emax %s --irf %s --galactic_model %s ' \
                    '--particle_model "%s" --tsmin %s --strategy %s ' \
                    '--thetamax %s --datarepository %s --ulphindex %s --flemin 100 --flemax 1000 ' \
-                   '--tsmap_spec 0.5,8 --fgl_mode complete' % \
+                   '--tsmap_spec 0.2,8 --fgl_mode complete' % \
                    (package_name, outfile,
                     roi, args.tstarts, args.tstops, zmax, emin,
                     emax, irf, galactic_model,
