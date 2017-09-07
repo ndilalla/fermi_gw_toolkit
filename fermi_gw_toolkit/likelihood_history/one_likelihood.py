@@ -146,7 +146,7 @@ if __name__ == "__main__":
                    '--emax %s --irf %s --galactic_model %s ' \
                    '--particle_model "%s" --tsmin %s --strategy %s ' \
                    '--thetamax %s --datarepository %s --ulphindex %s --flemin 100 --flemax 1000 ' \
-                   '--tsmap_spec 0.2,8 --fgl_mode complete' % \
+                   '--fgl_mode complete' % \
                    (package_name, outfile,
                     roi, args.tstarts, args.tstops, zmax, emin,
                     emax, irf, galactic_model,
