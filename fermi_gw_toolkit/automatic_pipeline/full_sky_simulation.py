@@ -100,7 +100,7 @@ class CustomSimulator(object):
 
             photon_flux = energy_flux / conv * (1 / u.cm**2 / u.s)
 
-            photon_flux_gtobsim = photon_flux.to(1 / u.m**2 / u.s)
+            photon_flux_gtobsim = photon_flux.to(1 / u.m**2 / u.s).value
 
             # Generate the point source XML
             temp_pts_xml = "my_point_source.xml"
