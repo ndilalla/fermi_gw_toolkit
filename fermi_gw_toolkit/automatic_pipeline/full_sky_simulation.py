@@ -98,7 +98,7 @@ class CustomSimulator(object):
 
                 conv = (emin) * (emax) / (emax - emin) * np.log(emax / emin)
 
-            photon_flux = energy_flux / conv * (1 / u.cm**2 / u.s)
+            photon_flux = energy_flux * conv * (1 / u.cm**2 / u.s)
 
             photon_flux_gtobsim = photon_flux.to(1 / u.m**2 / u.s).value
 
