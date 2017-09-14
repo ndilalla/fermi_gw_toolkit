@@ -108,6 +108,7 @@ class CustomSimulator(object):
             with open(temp_pts_xml, "w+") as f:
 
                 src_def = '''
+                            <source_library title="PointSource">
                             <source name="%s" flux="%s">
                                 <spectrum escale="MeV">
                                     <particle name="gamma">
@@ -116,7 +117,9 @@ class CustomSimulator(object):
                                     <celestial_dir ra="%s" dec="%s"/>
                                 </spectrum>
                             </source>
-                          ''' % (pts_source_name, photon_flux_gtobsim, self._emin, self._emax, abs(index), ra, dec)
+                            </source_library>
+                          ''' % (pts_source_name, photon_flux_gtobsim, self._emin, self._emax, float(index) * (-1),
+                                 ra, dec)
 
                 f.write(src_def)
 
