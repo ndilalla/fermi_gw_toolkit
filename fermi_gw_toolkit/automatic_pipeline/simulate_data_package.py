@@ -32,6 +32,18 @@ if __name__ == "__main__":
     parser.add_argument("--emin", required=False, default=100.0, type=float, help="Minimum energy")
     parser.add_argument("--emax", required=False, default=100000.0, type=float, help="Maximum energy")
 
+    parser.add_argument("--flux", required=False, default=None, type=float,
+                        help="Energy flux for the point source (between emin and emax, integrated, in erg/cm2/s)")
+    parser.add_argument("--index", required=False, default=None, type=float,
+                        help="Photon index for the power law spectrum")
+
+    parser.add_argument("--ra", required=False, default=None, type=float,
+                        help="R.A. of point source to simulate. If None, use center of ROI")
+    parser.add_argument("--dec", required=False, default=None, type=float,
+                        help="Dec. of point source to simulate. If None, use center of ROI")
+    parser.add_argument("--src_name", required=False, default=None, type=str,
+                        help="Name for the simulated source. If None, the OBJECT name is used")
+
     args = parser.parse_args()
 
     # Read from the data package the trigger time and trigger name
@@ -67,6 +79,8 @@ if __name__ == "__main__":
         ra_obj = rsp[0].header['RA_OBJ']
         dec_obj = rsp[0].header['DEC_OBJ']
 
+        object_name = rsp[0].header['OBJECT'].replace(" ", "")
+
     # Find FT2 file
     ft2_file_pattern = os.path.join(package_path, "gll_ft2_tr_%s_v*.fit" % trigger_name)
 
@@ -82,7 +96,38 @@ if __name__ == "__main__":
     # Simulate
     simulator = CustomSimulator(ft2_file, trigger_time, args.duration, emin=args.emin, emax=args.emax)
 
-    simulator.run_simulation("__my_sim.fits", seed=args.seed)
+    # See if we need to simulate a point source
+
+    if args.flux is not None:
+
+        assert args.index is not None, \
+            "You need to specify also an index for the source"
+
+        if args.ra is None:
+
+            assert args.dec is None
+
+            ra, dec = ra_obj, dec_obj
+
+        else:
+
+            ra, dec = args.ra, args.dec
+
+        if args.src_name is None:
+
+            src_name = object_name
+
+        else:
+
+            src_name = args.src_name
+
+        point_source = (src_name, ra, dec, args.index, args.flux)
+
+    else:
+
+        point_source = None
+
+    simulator.run_simulation("__my_sim.fits", seed=args.seed, point_source=point_source)
 
     simulator.run_gtdiffrsp()
 

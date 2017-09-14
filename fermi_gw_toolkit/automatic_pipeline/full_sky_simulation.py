@@ -15,6 +15,8 @@ from GtBurst.dataHandling import _makeDatasetsOutOfLATdata
 
 from utils import sanitize_filename, within_directory
 
+import astropy.units as u
+
 try:
 
     import astropy.io.fits as pyfits
@@ -69,13 +71,85 @@ class CustomSimulator(object):
 
         self._simulated_ft1 = None
 
-    def run_simulation(self, outfile='gwt_sim', seed=None):
+    def run_simulation(self, outfile='gwt_sim', seed=None, point_source=None):
         """
 
         :param outfile:
         :param seed:
+        :param point_source: a tuple (name, ra, dec, index, energy_flux), where the energy flux is in erg/cm2/s between
+        100 MeV and 100 GeV
         :return:
         """
+
+        if point_source is not None:
+
+            # Need to add a point source
+
+            pts_source_name, ra, dec, index, energy_flux = point_source
+
+            emin = self._emin
+            emax = self._emax
+
+            if index != -2.0:
+
+                conv = (1.0 + index) / (2.0 + index) * (pow(emax, index + 2) - pow(emin, index + 2)) / (pow(emax, index + 1) - pow(emin, index + 1))
+
+            else:
+
+                conv = (emin) * (emax) / (emax - emin) * np.log(emax / emin)
+
+            photon_flux = energy_flux / conv * (1 / u.cm**2 / u.s)
+
+            photon_flux_gtobsim = photon_flux.to(1 / u.m**2 / u.s)
+
+            # Generate the point source XML
+            temp_pts_xml = "my_point_source.xml"
+
+            with open(temp_pts_xml, "w+") as f:
+
+                src_def = '''
+                            <source name="%s" flux="%s">
+                                <spectrum escale="MeV">
+                                    <particle name="gamma">
+                                        <power_law emin="%s" emax="%s" gamma="%s"/>
+                                    </particle>
+                                    <celestial_dir ra="%s" dec="%s"/>
+                                </spectrum>
+                            </source>
+                          ''' % (pts_source_name, photon_flux_gtobsim, self._emin, self._emax, abs(index), ra, dec)
+
+                f.write(src_def)
+
+            # Now generate a txt file containing the list of XML to use
+            xml_list = "xml_list.txt"
+
+            with open(xml_list, "w+") as f:
+
+                with open(sanitize_filename(config.get("SLAC", "SIM_XML"))) as ff:
+
+                    lines = ff.readlines()
+
+                f.writelines(lines)
+
+                f.write("\n%s\n" % sanitize_filename(temp_pts_xml))
+
+            # Add the new point source to the list of sources to simulate
+            src_list = "srclist.txt"
+
+            with open(src_list, "w+") as f:
+
+                with open(sanitize_filename(config.get("SLAC", "SIM_SRC_LIST"))) as ff:
+
+                    lines = ff.readlines()
+
+                f.writelines(lines)
+
+                f.write("\n%s\n" % pts_source_name)
+
+        else:
+
+            xml_list = sanitize_filename(config.get("SLAC", "SIM_XML"))
+            src_list = sanitize_filename(config.get("SLAC", "SIM_SRC_LIST"))
 
         # We need to setup the environment variable SKYMODEL_DIR before running gtobssim
         os.environ['SKYMODEL_DIR'] = config.get("SLAC", "SKYMODEL_DIR")
@@ -87,8 +161,8 @@ class CustomSimulator(object):
         _gtobssim_args = {'emin': self._emin,
                           'emax': self._emax,
                           'edisp': 'no',
-                          'infile': sanitize_filename(config.get("SLAC", "SIM_XML")),
-                          'srclist': sanitize_filename(config.get("SLAC", "SIM_SRC_LIST")),
+                          'infile': xml_list,
+                          'srclist': src_list,
                           'scfile': self._ft2,
                           'evroot': evroot,
                           'simtime': self._simulation_time,
