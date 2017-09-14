@@ -103,6 +103,7 @@ class CustomSimulator(object):
             photon_flux_gtobsim = photon_flux.to(1 / u.m**2 / u.s).value
 
             log.info("Photon flux for gtobssim: %.2g m^(-2) s^(-1)" % (photon_flux_gtobsim))
+            log.info("Conversion factor: %s" % conv)
 
             # Generate the point source XML
             temp_pts_xml = "my_point_source.xml"
