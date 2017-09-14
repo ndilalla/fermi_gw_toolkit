@@ -87,8 +87,8 @@ class CustomSimulator(object):
 
             pts_source_name, ra, dec, index, energy_flux = point_source
 
-            emin = self._emin
-            emax = self._emax
+            emin = (self._emin * u.MeV).to(u.erg).value
+            emax = (self._emax * u.MeV).to(u.erg).value
 
             if index != -2.0:
 
