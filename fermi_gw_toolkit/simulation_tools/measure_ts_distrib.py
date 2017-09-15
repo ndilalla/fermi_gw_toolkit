@@ -37,6 +37,9 @@ if __name__ == "__main__":
     parser.add_argument("--tsmap_spec", required=False, default=None, type=str,
                         help="Specification for TS map (default: None)")
 
+    parser.add_argument("--srcname", required=False, default='GRB', type=str,
+                        help="Name of target source")
+
     parser.add_argument("--outfile", required=True, type=str,
                         help="Name for the output file which will contain the numpy array of the TS values "
                              "measured on the simulations")
@@ -53,7 +56,8 @@ if __name__ == "__main__":
     # This will process the simulations and compute the TSs
 
     sf = SimulationFeeder(ft1, ft2, expmap, ltcube, xml_file,
-                          path_of_tar_file_with_simulated_ft1_files, args.tsmap_spec)
+                          path_of_tar_file_with_simulated_ft1_files, args.tsmap_spec,
+                          srcname=args.srcname)
 
     # Save TSs into a file
     outfile = sanitize_filename(args.outfile)

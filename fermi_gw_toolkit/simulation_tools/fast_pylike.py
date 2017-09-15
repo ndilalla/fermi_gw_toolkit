@@ -125,7 +125,8 @@ class FastUnbinnedObs(MyUnbinnedObs):
 
 class SimulationFeeder(object):
 
-    def __init__(self, ft1, ft2, expmap, ltcube, xml_file, path_of_tar_file_with_simulated_ft1_files, tsmap_spec=None):
+    def __init__(self, ft1, ft2, expmap, ltcube, xml_file, path_of_tar_file_with_simulated_ft1_files,
+                 tsmap_spec=None, srcname='GRB'):
 
         # Process the simulations applying the same cuts as in the data file
         sp = SimulationProcessor(ft1, ft2, path_of_tar_file_with_simulated_ft1_files)
@@ -136,7 +137,7 @@ class SimulationFeeder(object):
         obs = MyUnbinnedObs(ft1, ft2, expMap=expmap, expCube=ltcube)
         like = UnbinnedAnalysis.UnbinnedAnalysis(obs, xml_file, "MINUIT")
 
-        fast_ts = FastTS(like, ts_map_spec=tsmap_spec)
+        fast_ts = FastTS(like, ts_map_spec=tsmap_spec, target_source=srcname)
 
         # Get the TSs
         self._tss = fast_ts.process_ft1s(sp.processed_ft1s, ra_center=ra_center, dec_center=dec_center)
