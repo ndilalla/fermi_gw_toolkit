@@ -44,6 +44,9 @@ if __name__ == "__main__":
     parser.add_argument("--src_name", required=False, default=None, type=str,
                         help="Name for the simulated source. If None, the OBJECT name is used")
 
+    parser.add_argument("--irf", required=False, default="P8R2_SOURCE_V6", type=str,
+                        help="Instrument response function to be used. Default: P8R2_SOURCE_V6")
+
     args = parser.parse_args()
 
     # Read from the data package the trigger time and trigger name
@@ -94,7 +97,7 @@ if __name__ == "__main__":
     ft2_file = ft2_files[-1]
 
     # Simulate
-    simulator = CustomSimulator(ft2_file, trigger_time, args.duration, emin=args.emin, emax=args.emax)
+    simulator = CustomSimulator(ft2_file, trigger_time, args.duration, emin=args.emin, emax=args.emax, irfs=args.irf)
 
     # See if we need to simulate a point source
 
