@@ -82,7 +82,13 @@ if __name__ == "__main__":
         ra_obj = rsp[0].header['RA_OBJ']
         dec_obj = rsp[0].header['DEC_OBJ']
 
-        object_name = rsp[0].header['OBJECT'].replace(" ", "")
+        object_name = rsp[0].header['OBJECT'].replace(" ", "")  # type: str
+
+        # If the object name contains only digits, we need to add something in front of it or
+        # gtobssim will fail during the simulation stage
+        if object_name.isdigit():
+
+            object_name = "bn%s" % object_name
 
     # Find FT2 file
     ft2_file_pattern = os.path.join(package_path, "gll_ft2_tr_%s_v*.fit" % trigger_name)
