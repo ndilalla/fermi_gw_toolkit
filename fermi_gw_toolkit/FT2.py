@@ -47,7 +47,11 @@ class FT2:
         self.FOV_ARRAY   = sp.zeros(self.NENTRIES)
         self.theta_max=65
         self.zenith_max=90
-        print 'In FT2 file %s found %d entries' %(ft2file,self.NENTRIES)
+        print 'Summary FT2 file: %s ' % ft2file
+        print 'NENTRIES........:%d' %(self.NENTRIES)
+        print 'TMIN............:%s' %(self.SC_TSTART[0])
+        print 'TMAX............:%s' %(self.SC_TSTOP[-1])
+        print 'DELTA T.........:%s' %(self.SC_TSTOP[-1]-self.SC_TSTART[0])
         pass
 
     def fov(self,theta_max,zenith_max):
@@ -89,12 +93,11 @@ class FT2:
         start=self.SC_TSTART-t0
         stop=self.SC_TSTOP-t0
         infov_t0=infov[idx0]
-        
+        print t0,idx0,infov_t0
         if infov_t0:  t_0 = stop[sp.logical_and(infov==0,stop<0)][-1]
-
         else:         t_0 = start[sp.logical_and(infov==1,start>0)][0]
-        t_1 = start[sp.logical_and(infov==0,stop>t_0)][0]
-        t_1 = stop[self.getIndex(t0+t_1)]
+        t1 = start[sp.logical_and(infov==0,stop>t_0)][0]
+        t_1 = stop[self.getIndex(t0+t1)]
         #if stop[ii_1+1] > stop[ii_1]+60: t_1 = stop[ii_1]
         #print '%10.3f %10.3f %5d %10.3f %10.3f %10.3f %10.3f ' %(ra,dec,ii_1,stop[ii_1],stop[ii_1+1],t_0,t_1)
         return t_0,t_1 

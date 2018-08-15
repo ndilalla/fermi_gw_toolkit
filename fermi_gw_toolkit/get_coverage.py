@@ -180,7 +180,6 @@ def compute_coverage(**kwargs):
                         kwargs['stop_time'],
                         kwargs['theta_cut'],
                         kwargs['zenith_cut'])
-
     #with sns.plotting_context("paper", font_scale=3):
     #fig = plt.figure(figsize=(16*3, 16*3 / 1.333), dpi=150)
     fig = plt.figure(figsize=(16, 10))
@@ -219,6 +218,8 @@ def compute_coverage(**kwargs):
     sky_coverage = np.cumsum(c)
 
     dt = (t - kwargs['start_time']) / 1000.0
+    outfile='%s_coverage.npz' % kwargs['outroot']
+    np.savez(outfile, dt=dt, cov=sky_coverage)
 
     fig = plt.figure(figsize=(16, 10))#, dpi=150)
     #fig = plt.figure(figsize=(16*3, 16*3 / 1.333), dpi=150)
