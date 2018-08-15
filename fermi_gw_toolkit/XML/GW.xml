@@ -8,7 +8,7 @@
      2017-03-03 NO: initial import
     -->
   <task name="GWFUP"
-        version="3.4" 
+        version="3.5" 
         type="Data">
     
     <notation>
@@ -33,6 +33,7 @@
       <var name="NUMBER_PIXELS_RUNS">10</var>
       <var name="SIMULATE_MODE">0</var>
       <var name="BAYESIAN_UL">0</var>
+      <var name="SIMULATE_ROI_TARFILE">0</var>
       <var name="GPL_QUEUE">glastdataq</var>
       <var name="GPL_ALLOGRP">glastgrp</var>
       <var name="GPL_BATCHRESOURCES">select[rhel60] rusage[scratch=1]</var>
