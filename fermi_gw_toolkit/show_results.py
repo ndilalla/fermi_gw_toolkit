@@ -6,7 +6,7 @@ import healpy as hp
 import astropy.io.fits as pyfits
 from contour_finder import  pix_to_sky
 
-from automatic_pipeline.utils import send_email
+#from automatic_pipeline.utils import send_email
 
 formatter = argparse.ArgumentDefaultsHelpFormatter
 parser = argparse.ArgumentParser(formatter_class=formatter)
@@ -49,6 +49,8 @@ parser.add_argument('--ligo_map', help='Input HEALPIX LIGO map', type=str,
 parser.add_argument("--fti_ts_map", help="FTI TS map path", type=str,
                     required=True)
 parser.add_argument("--ati_ts_map", help="ATI TS map path", type=str,
+                    required=True)
+parser.add_argument("--lle_ts_map", help="LLE TS map path", type=str,
                     required=True)
 parser.add_argument("--img_folder", help="Image folder", type=str,
                     required=False, default=".")
@@ -135,13 +137,17 @@ def show_results(**kwargs):
     ati_ts_map = fix_path(glob.glob(img_folder + 'ATI_ts_map.png')[0])
     ati_ul_map = fix_path(glob.glob(img_folder + 'ATI_ul_map.png')[0])
     ati_lc     = fix_path(glob.glob(img_folder + 'ATI_compositeLC.png')[0])
-    
+    lle_ts_map = fix_path(glob.glob(img_folder + 'LLE_ts_map.png')[0])
+
     #take the max ts and the ts_list from ati e fti ts maps
     ts_cut = kwargs['ts_cut']
+    sigma_cut=4
     fti_ts_max, fti_ra_max, fti_dec_max, fti_ts_list, nside =\
                                     max_ts(kwargs['fti_ts_map'], ts_cut)
     ati_ts_max, ati_ra_max, ati_dec_max, ati_ts_list, nside =\
                                     max_ts(kwargs['ati_ts_map'], ts_cut)
+    lle_ts_max, lle_ra_max, lle_dec_max, lle_ts_list, nside =\
+                                    max_ts(kwargs['lle_ts_map'], sigma_cut)
     
     #save and show the page
     outfile = kwargs['outfile']
@@ -159,4 +165,4 @@ if __name__ == '__main__':
 
     text = """ Results here: %s  """ % outfile
 
-    send_email('nicola.omodei@gmail.com', 'Processing of %s completed' % args.triggername, text)
+    #send_email('nicola.omodei@gmail.com', 'Processing of %s completed' % args.triggername, text)

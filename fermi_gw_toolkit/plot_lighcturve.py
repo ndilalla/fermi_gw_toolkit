@@ -56,7 +56,8 @@ if __name__=="__main__":
     #parser.add_argument('--ylabel',help='Label of the y axis', type=str, required=False,default="Flux [erg cm$^{-2}$ s$^{-1}$]")
     parser.add_argument('--histo',help='Horizontal Histogram', type=int, required=False,default=1)
     parser.add_argument('--type',help='Energy flux or photon flux? [EFLUX,FLUX]', type=str, required=False,default='FLUX')
-
+    parser.add_argument('--rot', help='rotation to center the map', required=False, type=str, default='180,0')
+    parser.add_argument('--zoom', help='zoom in around rot position', required=False, type=int, default=None)
     args = parser.parse_args()
     xlabel='Seconds from t$_{%s}$' % args.xlabel.replace('bn','')
     ylabel="Flux Upper Bound [erg cm$^{-2}$ s$^{-1}$]"
@@ -217,24 +218,44 @@ if __name__=="__main__":
     #axSM = plt.axes(rect_histx)
     lons=[60,120,180,240,300]
     lats=[-60,-30,30,60]
+    rot=args.rot.split(',')
     if args.nside:
-        hp.mollview(healpix_map, title='',cmap=cmap,norm='lin',min=vmin,max=vmax,rot=(180,0),sub=211,cbar=False)
+        if args.zoom is None:
+            hp.mollview(healpix_map, title='',cmap=cmap,norm='lin',min=vmin,max=vmax,rot=rot,sub=211,cbar=False)
+        else:
+            hp.gnomview(healpix_map, title='',cmap=cmap,norm='lin',min=vmin,max=vmax,rot=rot,xsize=args.zoom, ysize=args.zoom,sub=211,cbar=False,reso=1.0,notext=True,coord='C')
+            pass
+            
         hp.graticule()
         ax = plt.gca()
-        lat=0
-        for lon in lons:  hp.projtext(lon,lat,'%d$^{\circ}$' %(lon),lonlat=True,size=ticks_size,va='bottom')
-        lon=179.9+180
-        for lat in lats:
-            if lat==0:
-                va='center'
-                continue
-            elif lat>0:
-                va='bottom'
-            else:
-                va='top'
+        if args.zoom is None:
+            lat=0
+            for lon in lons:  hp.projtext(lon,lat,'%d$^{\circ}$' %(lon),lonlat=True,size=ticks_size,va='bottom')
+            lon=179.9+180
+            for lat in lats:
+                if lat==0:
+                    va='center'
+                    continue
+                elif lat>0:
+                    va='bottom'
+                else:
+                    va='top'
+                    pass
+                hp.projtext(lon,lat, r'%d$^{\circ}$ ' %(lat),lonlat=True,size=ticks_size,horizontalalignment='right',va=va)
+                
                 pass
-            hp.projtext(lon,lat, r'%d$^{\circ}$ ' %(lat),lonlat=True,size=ticks_size,horizontalalignment='right',va=va)
-
+            pass
+        else:                
+            lon_0=float(rot[0])
+            lat_0=float(rot[1])
+            for lat in np.linspace(lat_0 - args.zoom/120.,lat_0 + args.zoom/120.,5):
+                hp.visufunc.projtext(round(lon_0),round(lat), r'%d$^{\circ}$ ' %(int(round(lat))),lonlat=True,size=15,horizontalalignment='left',va='center')
+                pass
+            for lon in np.linspace(lon_0 - args.zoom/120.,lon_0 + args.zoom/120.,5):
+                hp.visufunc.projtext(round(lon),lat_0, r'%d$^{\circ}$ ' %int(round((lon))),lonlat=True,size=15,horizontalalignment='center',va='bottom')
+                pass
+                #plt.annotate('Dec',xy=(0.0,0.5),rotation=90,size=20,xycoords='figure fraction')
+                #plt.annotate('R.A.',xy=(0.5,0.0),size=20,ha='center',xycoords='figure  fraction')
             pass
         #plt.text(-2.2,0,'Dec',rotation=90,size=ticks_size)
         #plt.text(0,-1.1,'RA',size=ticks_size,ha='center')

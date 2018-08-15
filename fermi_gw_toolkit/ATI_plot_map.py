@@ -9,6 +9,8 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import healpy as hp
 import numpy as np
+from contour_finder import pix_to_sky
+
 #from matplotlib import rc
 #rc('text', usetex=True)
 
@@ -31,7 +33,9 @@ if __name__=="__main__":
                         required=False, type=str, default='jet')
     parser.add_argument('--rot', help='rotation to center the map',
                         required=False, type=str, default='180,0')
-    parser.add_argument('--map_type', help='type of mat to display, EFLUX, FLUX, or TS',
+    parser.add_argument('--zoom', help='zoom in around rot position',
+                        required=False, type=int, default=None)
+    parser.add_argument('--map_type', help='type of mat to display, EFLUX, FLUX, TS or SIG',
                         required=False, type=str, default='EFLUX')
 
     args = parser.parse_args()
@@ -42,13 +46,14 @@ if __name__=="__main__":
     # Get nside
 
     nside = hp.get_nside(hpx_ul)
+    print nside
 
     # Get some meaningful limits for the color bar among the points which are larger than 0 and finite
 
     idx = (hpx_ul > 0) & np.isfinite(hpx_ul)
+    if np.sum(idx)==0: idx = (hpx_ul >= 0) & np.isfinite(hpx_ul)
 
     # Use the provided percentiles
-
     if args.min_percentile != 0:
 
         mmin = np.percentile(hpx_ul[idx],args.min_percentile)
@@ -113,30 +118,52 @@ if __name__=="__main__":
     elif args.map_type == 'TS':
         z_title  =r'TS ' 
         magnitude = 1
+    elif args.map_type == 'SIG':
+        z_title  =r'$\sigma$ ' 
+        magnitude = 1
     else:
         print 'Unrecognized map type %s. Use EFLUX, FLUX or TS' % args.map_type
         exit()
         pass
 
         
+    MAXVALUE= round(np.nanmax(hpx_ul),2)
+    px_max  = np.nanargmax(hpx_ul)
+    ra_max, dec_max = pix_to_sky(px_max,nside)
+
     print 'Minimum Value = ', hpx_ul[idx].min()
-    print 'Maximum Value = ', hpx_ul[idx].max()
+    print 'Maximum Value = ', MAXVALUE
+    print 'RA,DEC=%f %f MAX= %f' %(ra_max, dec_max, MAXVALUE)
+
     norm = args.zscale
     ticks=np.logspace(np.log10(mmin / magnitude), np.log10(mmax / magnitude), 4),
     if norm == 'linear': 
         norm=None
         ticks=np.linspace(mmin / magnitude, mmax / magnitude, 4),
         #mmin=0
+        pass
     print 'Normalization of the axis:',norm
-    projected_map = hp.mollview(hpx_ul / magnitude, rot=rot,
-                                min=mmin / magnitude,
-                                max=mmax / magnitude,
-                                norm=norm,
-                                return_projected_map=True, xsize=1000, coord='C',
-                                title='',
-                                cmap=args.cmap,
-                                fig=1, cbar=None,notext=True)
-
+    if args.zoom is None:
+        projected_map = hp.mollview(hpx_ul / magnitude, rot=rot,
+                                    min=mmin / magnitude,
+                                    max=mmax / magnitude,
+                                    norm=norm,
+                                    return_projected_map=True, xsize=1000, coord='C',
+                                    title='',
+                                    cmap=args.cmap,
+                                    fig=1, cbar=None,notext=True)
+    else:        
+        projected_map=hp.gnomview(hpx_ul / magnitude, rot=rot, xsize=args.zoom, ysize=args.zoom, reso=1.0,
+                                  min=mmin / magnitude,
+                                  max=mmax / magnitude,
+                                  norm=norm,
+                                  return_projected_map=True, coord='C',
+                                  title='',
+                                  cmap=args.cmap,
+                                  fig=1, cbar=None,notext=True)
+        pass
+    
+    ###
     ax = plt.gca()
     image = ax.get_images()[0]
     cmap = fig.colorbar(image, ax=ax, cmap=cmap, orientation='horizontal', shrink=0.5,
@@ -145,28 +172,42 @@ if __name__=="__main__":
                         format='%.2g')
 
     hp.graticule()
-    lat=0
-    for lon in range(60,360,60):
-        hp.visufunc.projtext(lon,lat,'%d$^{\circ}$' %(lon),lonlat=True,size=15,va='bottom')
+    if args.zoom is None:
+        lat=0
+        for lon in range(60,360,60):
+            hp.visufunc.projtext(lon,lat,'%d$^{\circ}$' %(lon),lonlat=True,size=15,va='bottom')
+            pass
+        
+        lon=179.9-float(rot[0])
+        for lat in range(-60,90,30):
+            if lat==0:
+                va='center'
+                continue
+            elif lat>0:va='bottom'
+            else:
+                va='top'
+                hp.visufunc.projtext(lon,lat, r'%d$^{\circ}$ ' %(lat),lonlat=True,size=15,horizontalalignment='right',va=va)
+                pass
+            pass
+        plt.text(-2.2,0,'Dec',rotation=90,size=20)
+        plt.text(0,-1.1,'RA',size=20,ha='center')
         pass
-
-    lon=179.9-float(rot[0])
-    for lat in range(-60,90,30):
-        if lat==0:
-            va='center'
-            continue
-        elif lat>0:va='bottom'
-        else:
-            va='top'
-        hp.visufunc.projtext(lon,lat, r'%d$^{\circ}$ ' %(lat),lonlat=True,size=15,horizontalalignment='right',va=va)
+    else:
+        lon_0=float(rot[0])
+        lat_0=float(rot[1])
+        for lat in np.linspace(lat_0 - args.zoom/120.,lat_0 + args.zoom/120.,5):
+            hp.visufunc.projtext(round(lon_0),round(lat), r'%d$^{\circ}$ ' %(int(round(lat))),lonlat=True,size=15,horizontalalignment='left',va='center')
+            pass
+        for lon in np.linspace(lon_0 - args.zoom/120.,lon_0 + args.zoom/120.,5):
+            hp.visufunc.projtext(round(lon),round(lat_0), r'%d$^{\circ}$ ' %int(round((lon))),lonlat=True,size=15,horizontalalignment='center',va='bottom')
+            pass
+        plt.annotate('Dec',xy=(0.3,0.65),rotation=90,size=20,xycoords='figure fraction')
+        plt.annotate('R.A.',xy=(0.5,0.25),size=20,ha='center',xycoords='figure  fraction')
         pass
-    plt.text(-2.2,0,'Dec',rotation=90,size=20)
-    plt.text(0,-1.1,'RA',size=20,ha='center')
-    
     #for ra in range(-150, 180, 60):
     #    hp.visufunc.projtext(ra + 7.5, -10, '%.0f' % ra, lonlat=True)
 
     #for dec in range(-60, 90, 30):
     #    hp.visufunc.projtext(7.5, dec - 10, '%.0f' % dec, lonlat=True)
-
+    
     fig.savefig(args.out_plot)
