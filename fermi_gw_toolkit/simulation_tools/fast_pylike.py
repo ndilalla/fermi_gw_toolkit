@@ -3,6 +3,7 @@
 # we are simulating
 
 import os
+import math
 import shutil
 import glob
 import logging
@@ -196,7 +197,7 @@ class SimulationProcessor(object):
             log.info("Copying %s to %s..." % (path_of_tar_file_with_simulated_ft1_files, workdir))
             shutil.copy2(path_of_tar_file_with_simulated_ft1_files, ".")
 
-            execute_command(log, "tar zxf %s" % path_of_tar_file_with_simulated_ft1_files)
+            execute_command(log, "tar xvf %s" % path_of_tar_file_with_simulated_ft1_files)
 
             os.remove(os.path.basename(path_of_tar_file_with_simulated_ft1_files))
 
@@ -476,7 +477,7 @@ class FastTS(object):
 
             tss[i] = self.get_TS(ft1, ra_center, dec_center, test_source=test_source)
 
-            if (i+1) % 100 == 0:
+            if (i+1) % int(math.ceil(len(ft1s) / 100.0)) == 0:
 
                 this_time = time.time()
                 elapsed_time = (this_time - start_time)
