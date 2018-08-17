@@ -38,6 +38,10 @@ if __name__ == "__main__":
     parser.add_argument('--sim_ft1_tar', help="Path to .tar file containing simulated FT1 data (full sky)", type=str,
                         required=False, default=None)
 
+    parser.add_argument('--ligo_coverage_cl', help="How much of the LIGO map should we cover? "
+                                                   "Use 0.9 to cover the 90% contour, for example. Default: 0.9",
+                        default=0.9, type=float)
+
     args = parser.parse_args()
 
     if args.simulate:
@@ -129,6 +133,8 @@ if __name__ == "__main__":
     cmd_line += ' --define HEALPIX_PATH=%s' % args.map
 
     cmd_line += ' --define VERSION=%s' % version
+
+    cmd_line += ' --define LIGO_COVERAGE_CL=%s' % args.ligo_coverage_cl
 
     if simulate:
 
