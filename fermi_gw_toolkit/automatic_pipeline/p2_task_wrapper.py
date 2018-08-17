@@ -3,7 +3,7 @@
 # A wrapper to launch the task in the pipeline2 system at SLAC
 
 from configuration import config
-from utils import execute_command, fail_with_error
+from utils import execute_command, fail_with_error, sanitize_filename
 import argparse
 import logging
 import traceback
@@ -110,6 +110,10 @@ if __name__ == "__main__":
 
         log.error("Could not change all permissions")
 
+    map_path = sanitize_filename(args.map)
+
+    assert os.path.exists(map_path), "The map %s does not exist" % map_path
+
     # Finally run the stream
 
     # P2_EXE is the path to the executable, likely /afs/slac.stanford.edu/u/gl/glast/pipeline-II/prod/pipeline
@@ -130,7 +134,7 @@ if __name__ == "__main__":
 
     cmd_line += ' --define EMAX=100000'
 
-    cmd_line += ' --define HEALPIX_PATH=%s' % args.map
+    cmd_line += ' --define HEALPIX_PATH=%s' % map_path
 
     cmd_line += ' --define VERSION=%s' % version
 
@@ -144,7 +148,9 @@ if __name__ == "__main__":
     # the .tar
     if args.sim_ft1_tar is not None and args.sim_ft1_tar is not "none":
 
-        tar_path = os.path.abspath(os.path.expandvars(args.sim_ft1_tar))
+        tar_path = sanitize_filename(args.sim_ft1_tar)
+
+        assert os.path.exists(tar_path), "The tar file %s does not exist" % tar_path
 
         cmd_line += ' --define SIMULATE_ROI_TARFILE=%s' % tar_path
 
