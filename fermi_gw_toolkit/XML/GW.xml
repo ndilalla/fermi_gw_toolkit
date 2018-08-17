@@ -8,7 +8,7 @@
      2017-03-03 NO: initial import
     -->
   <task name="GWFUP"
-        version="3.5" 
+        version="3.6" 
         type="Data">
     
     <notation>
@@ -55,6 +55,7 @@
       <var name="FT2_NAME">FT2.fits</var>
       <var name="FT2_PATH">${DATA_PATH}/${FT2_NAME}</var>
       <var name="NSIDE">128</var>
+      <var name="LIGO_COVERAGE_CL">0.9</var>
       <var name="NSIDE_LLE">32</var>
       <var name="DURATION">10000</var>
       <var name="TSTART">0</var>
