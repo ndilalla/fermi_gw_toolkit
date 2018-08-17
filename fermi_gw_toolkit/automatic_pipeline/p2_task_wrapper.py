@@ -35,6 +35,9 @@ if __name__ == "__main__":
                         type=str, required=True)
     parser.add_argument('--simulate', action='store_true')
 
+    parser.add_argument('--sim_ft1_tar', help="Path to .tar file containing simulated FT1 data (full sky)", type=str,
+                        required=False, default=None)
+
     args = parser.parse_args()
 
     if args.simulate:
@@ -130,6 +133,14 @@ if __name__ == "__main__":
     if simulate:
 
         cmd_line += " --define SIMULATE_MODE=1"
+
+    # If there is a tar file provided, pass it on to the pipeline for analyzing the simulated FT1 files within
+    # the .tar
+    if args.sim_ft1_tar is not None and args.sim_ft1_tar is not "none":
+
+        tar_path = os.path.abspath(os.path.expandvars(args.sim_ft1_tar))
+
+        cmd_line += ' --define SIMULATE_ROI_TARFILE=%s' % tar_path
 
     try:
 
