@@ -125,9 +125,11 @@ if __name__ == "__main__":
 
         # See whether we need to run on simulated data
 
-        if args.sim_ft1_tar is not None:
+        if args.sim_ft1_tar is not None and args.sim_ft1_tar.lower() != 'none':
 
             tar_file_path = os.path.abspath(os.path.expandvars(args.sim_ft1_tar))
+
+            assert os.path.exists(tar_file_path), "Tar file %s does not exist" % tar_file_path
 
             ts_outfile = os.path.join(init_dir, '%s_%.3f_%.3f_sim_TSs' % (args.triggername, ra, dec))
 
