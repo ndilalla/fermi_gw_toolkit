@@ -106,4 +106,7 @@ echo '...GTBURST_TEMPLATE_PATH................:' $GTBURST_TEMPLATE_PATH
 echo '...GALACTIC_DIFFUSE_TEMPLATE............:' $GALACTIC_DIFFUSE_TEMPLATE
 echo '...........................................................................' 
 echo 'Sourcing the virtual environment for gw studies!'
-source /nfs/farm/g/glast/g/grb/fermi_gw_env/bin/activate.csh
+
+
+source /nfs/farm/g/glast/g/grb/gw_environment/setup_gw_conda.csh
+
