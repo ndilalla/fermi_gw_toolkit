@@ -39,7 +39,7 @@ if __name__ == "__main__":
                         required=False, default=None)
 
     parser.add_argument('--ligo_coverage_cl', help="How much of the LIGO map should we cover? "
-                                                   "Use 0.9 to cover the 90% contour, for example. Default: 0.9",
+                                                   "Use 0.9 to cover the 90 percent contour, for example. Default: 0.9",
                         default=0.9, type=float)
 
     parser.add_argument('--irfs', help="IRF to use. Default: p8_transient010e",
