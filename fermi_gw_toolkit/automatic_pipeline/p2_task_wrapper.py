@@ -47,6 +47,9 @@ if __name__ == "__main__":
                                                              'p8_transient010', 'p8_transient010e',
                                                              'p8_source', 'p8_clean', 'p8_ultraclean'])
 
+    parser.add_argument('--pixels_per_job', help="Number of pixels to run in each farm job (default: 10)",
+                        default=10, type=int, required=False)
+
     # Add the --with-ATI and --no-ATI, --with-FTI and --no-FTI and --with-LLE and --no-LLE flags
     for w in ['ATI', 'FTI', 'LLE']:
 
@@ -166,6 +169,8 @@ if __name__ == "__main__":
     cmd_line += ' --define RUN_ATI=%i' % (1 if args.ATI else 0)
 
     cmd_line += ' --define RUN_LLE=%i' % (1 if args.LLE else 0)
+
+    cmd_line += ' --define NUMBER_PIXELS_RUNS=%i' % args.pixels_per_job
 
     if simulate:
 
