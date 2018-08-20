@@ -37,7 +37,7 @@ def prepare_grid(**kwargs):
     indexes = my_finder.find_contour(kwargs['cl'])
 
     # Compute area of the map considered
-    solid_angle = hp.nside2pixarea(kwargs['nside'], degrees=True)
+    solid_angle = hp.nside2pixarea(kwargs['nside'], degrees=True) * indexes.shape[0]
 
     print("Found %s points within the %s percent containment level, "
           "corresponding to an area of %.3f square degrees" % (indexes.shape[0], kwargs['cl'] * 100.0, solid_angle))
