@@ -47,6 +47,20 @@ if __name__ == "__main__":
                                                              'p8_transient010', 'p8_transient010e',
                                                              'p8_source', 'p8_clean', 'p8_ultraclean'])
 
+    # Add the --with-ATI and --no-ATI, --with-FTI and --no-FTI and --with-LLE and --no-LLE flags
+    for w in ['ATI', 'FTI', 'LLE']:
+
+        feature_parser = parser.add_mutually_exclusive_group(required=False)
+        feature_parser.add_argument('--with-%s' % w, dest=w, action='store_true', help='Run the %s analysis' % w)
+        feature_parser.add_argument('--no-%s' % w, dest=w, action='store_false', help='Do not run the %s analysis' % w)
+
+    # Default is to run ATI
+    parser.set_defaults(ATI=True)
+    # Default is to run FTI
+    parser.set_defaults(FTI=True)
+    # Default is to run LLE
+    parser.set_defaults(LLE=True)
+
     args = parser.parse_args()
 
     if args.simulate:
@@ -146,6 +160,12 @@ if __name__ == "__main__":
     cmd_line += ' --define LIGO_COVERAGE_CL=%s' % args.ligo_coverage_cl
 
     cmd_line += ' --define IRFS=%s' % args.irfs
+
+    cmd_line += ' --define RUN_FTI=%i' % (1 if args.FTI else 0)
+
+    cmd_line += ' --define RUN_ATI=%i' % (1 if args.ATI else 0)
+
+    cmd_line += ' --define RUN_LLE=%i' % (1 if args.LLE else 0)
 
     if simulate:
 

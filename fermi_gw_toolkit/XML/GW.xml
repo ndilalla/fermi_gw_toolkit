@@ -40,7 +40,13 @@
       <var name="GPL_BATCHOPTIONS"> -sp 50 </var>
       <var name="GPL_XTRABATCHRESOURCES"></var>         <!-- intentionally left EMPTY - for rollback -->
       <var name="GPL_XTRABATCHOPTIONS"></var>           <!-- intentionally left EMPTY - for rollback -->
-      <var name="WALL_TIME"> 2:0 </var>                 <!-- Two hours by default. Format:       H:M -->    
+      <var name="WALL_TIME"> 2:0 </var>                 <!-- Two hours by default. Format:       H:M -->
+
+      <!-- Control which parts of the analysis to run -->
+      <var name="RUN_ATI">1</var>
+      <var name="RUN_FTI">1</var>
+      <var name="RUN_LLE">1</var>
+
       <!-- Specific Variables -->
       <var name="TRIGGERNAME">bnGW150914</var>
       <var name="TRIGGERTIME">0.0</var>
@@ -146,6 +152,13 @@
     <process name="submit_FTI_jobs">
       <script><![CDATA[
          import os
+         import sys
+
+         if os.environ['RUN_FTI']=='0':
+
+             print("RUN_FTI is zero, not running FTI analysis")
+             sys.exit(0)
+
          print 'Opening file %s...' %(OUTLIST)
          if os.path.exists(OUTLIST):
              roi_list = open(OUTLIST, 'r')
@@ -250,6 +263,13 @@
     <process name="submit_LLE_jobs">
       <script><![CDATA[
          import os
+         import sys
+
+         if os.environ['RUN_LLE']=='0':
+
+             print("RUN_LLE is zero, not running LLE analysis")
+             sys.exit(0)
+
          print 'Opening file %s...' %(OUTLLEINTERVALS)
          if os.path.exists(OUTLLEINTERVALS):
              roi_list = open(OUTLLEINTERVALS, 'r')
@@ -283,6 +303,13 @@
     <process name="submit_ATI_jobs">
       <script><![CDATA[
          import os
+         import sys
+
+         if os.environ['RUN_ATI']=='0':
+
+             print("RUN_ATI is zero, not running ATI analysis")
+             sys.exit(0)
+
          print 'Opening file %s...' %(OUTADAPTIVEINTERVALS)
          if os.path.exists(OUTADAPTIVEINTERVALS):
              roi_list = open(OUTADAPTIVEINTERVALS, 'r')
