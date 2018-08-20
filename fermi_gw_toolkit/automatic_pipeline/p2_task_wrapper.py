@@ -50,6 +50,9 @@ if __name__ == "__main__":
     parser.add_argument('--pixels_per_job', help="Number of pixels to run in each farm job (default: 10)",
                         default=10, type=int, required=False)
 
+    parser.add_argument('--extra_config', help='Additional variables to pass to the Pipeline II task',
+                        nargs='+', type=str, required=False, default=None)
+
     # Add the --with-ATI and --no-ATI, --with-FTI and --no-FTI and --with-LLE and --no-LLE flags
     for w in ['ATI', 'FTI', 'LLE']:
 
@@ -186,6 +189,14 @@ if __name__ == "__main__":
 
         cmd_line += ' --define SIMULATE_ROI_TARFILE=%s' % tar_path
 
+    # Add extra config if needed
+    if args.extra_config is not None:
+
+        for c in args.extra_config:
+
+            cmd_line += ' --define %s' % c
+
+    # Execute command
     try:
 
         execute_command(log, cmd_line)
