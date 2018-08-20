@@ -61,10 +61,10 @@ else
     echo "No bayesian ul results file found!"
 endif
 
-set nonomatch z=(${TRIGGERNAME}_*_sim*.txt)
+set nonomatch z=(${TRIGGERNAME}_*_sim*)
 if ( -e $z[1] ) then
-    ls ${TRIGGERNAME}_*_sim*.txt
-    mv ${TRIGGERNAME}_*_sim*.txt $OUTPUT_FILE_PATH/FIXEDINTERVAL/.
+    ls ${TRIGGERNAME}_*_sim*
+    mv ${TRIGGERNAME}_*_sim* $OUTPUT_FILE_PATH/FIXEDINTERVAL/.
 else
     echo "No simulation file found!"
 endif
