@@ -42,6 +42,11 @@ if __name__ == "__main__":
                                                    "Use 0.9 to cover the 90% contour, for example. Default: 0.9",
                         default=0.9, type=float)
 
+    parser.add_argument('--irfs', help="IRF to use. Default: p8_transient010e",
+                        default="p8_transient010e", choices=['p8_transient020', 'p8_transient020e',
+                                                             'p8_transient010', 'p8_transient010e',
+                                                             'p8_source', 'p8_clean', 'p8_ultraclean'])
+
     args = parser.parse_args()
 
     if args.simulate:
@@ -139,6 +144,8 @@ if __name__ == "__main__":
     cmd_line += ' --define VERSION=%s' % version
 
     cmd_line += ' --define LIGO_COVERAGE_CL=%s' % args.ligo_coverage_cl
+
+    cmd_line += ' --define IRFS=%s' % args.irfs
 
     if simulate:
 
