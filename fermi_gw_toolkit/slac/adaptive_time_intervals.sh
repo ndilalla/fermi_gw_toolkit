@@ -10,3 +10,6 @@ if ($SIMULATE_MODE == 2) then
 exit 1
 endif 
 
+if ($RUN_ATI == 0) then
+exit 2
+endif

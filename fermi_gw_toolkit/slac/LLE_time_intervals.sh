@@ -1,4 +1,10 @@
-#!/bin/tcsh 
+#!/bin/tcsh
+
+# If we do not need to run the LLE analysis, make this fail
+if ($RUN_LLE == 0) then
+exit 1
+endif
+
 echo 'sourcing the setup script!'
 source $GPL_TASKROOT/config/DEV/setup_gw_giacomvst.csh
 rm -rf ${OUTPUT_FILE_PATH}/LLE/*
