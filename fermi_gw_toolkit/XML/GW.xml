@@ -106,6 +106,9 @@
       <var name="ATI_COMPOSITELC_PLOT">${OUTPUT_FILE_PATH}/images/ATI_compositeLC.png</var>
       <var name="LLE_OUTULMAP_PLOT">${OUTPUT_FILE_PATH}/images/LLE_ul_map.png</var>
       <var name="LLE_OUTTSMAP_PLOT">${OUTPUT_FILE_PATH}/images/LLE_ts_map.png</var>
+
+      <!-- gtburst configuration -->
+      <var name="GTBURST_NCPUS">1</var>
     </variables>
     
     <process name="get_fitsfiles">
