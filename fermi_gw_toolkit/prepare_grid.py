@@ -3,7 +3,7 @@
 __author__ = 'giacomov'
 
 import argparse
-import os
+import healpy as hp
 
 from fermi_gw_toolkit import contour_finder
 from fermi_gw_toolkit.check_file_exists import check_file_exists
@@ -36,7 +36,11 @@ def prepare_grid(**kwargs):
 
     indexes = my_finder.find_contour(kwargs['cl'])
 
-    print("Found %s points within the %s percent containment level" % (indexes.shape[0], kwargs['cl'] * 100.0))
+    # Compute area of the map considered
+    solid_angle = hp.nside2pixarea(kwargs['nside'], degrees=True)
+
+    print("Found %s points within the %s percent containment level, "
+          "corresponding to an area of %.3f square degrees" % (indexes.shape[0], kwargs['cl'] * 100.0, solid_angle))
 
     # Get R.A. and Dec for the pixels within the contour
     ra, dec = my_finder.get_sky_coordinates(indexes)
