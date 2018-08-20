@@ -2,7 +2,8 @@
 
 # If we do not need to run the LLE analysis, make this fail
 if ($RUN_LLE == 0) then
-exit 1
+    echo "RUN_LLE = 0, not running LLE analysis, exiting"
+    exit 1
 endif
 
 echo 'sourcing the setup script!'
