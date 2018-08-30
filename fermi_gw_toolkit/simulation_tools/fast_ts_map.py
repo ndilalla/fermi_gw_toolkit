@@ -87,11 +87,22 @@ class FastTSMap(object):
         max_ts_position = (ra_center, dec_center)
         ang_sep = []
 
+        pts = []
+
+        for i in range(n_side):
+            for j in range(n_side):
+                pts.append((i, j))
+
+        res = wcs.wcs_pix2world(pts, 0)
+
+        coords = {pt: pos for pt, pos in zip(pts, res)}
+
         for i in range(n_side):
 
             for j in range(n_side):
 
-                this_ra, this_dec = wcs.wcs_pix2world(i, j, 0)
+                this_ra = coords[(i, j)][0]
+                this_dec = coords[(i, j)][1]
 
                 this_TS = self._calc_one_TS(float(this_ra), float(this_dec))
 
@@ -129,8 +140,8 @@ class FastTSMap(object):
         logLike.addSource(self._test_source)
 
         # This is the fastest way to minimize -logL if we don't care about errors
-
-        self._pylike_object.optObject.find_min_only(0, 1e-5)
+        # NOTE: the last 0 parameter means RELATIVE tolerance
+        self._pylike_object.optObject.find_min_only(0, 1e-2, pyLikelihood.RELATIVE)
 
         logLike1 = logLike.value()
         TS = 2.0 * (logLike1 - self._logLike0)

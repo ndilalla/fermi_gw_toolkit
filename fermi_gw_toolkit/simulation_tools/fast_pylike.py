@@ -10,6 +10,7 @@ import logging
 import subprocess
 import time, datetime
 import numpy as np
+import collections
 
 import astropy.io.fits as pyfits
 from fermi_gw_toolkit.automatic_pipeline.utils import within_directory, execute_command, sanitize_filename
@@ -19,6 +20,7 @@ from setup_ftools import setup_ftools_non_interactive
 import UnbinnedAnalysis
 import pyLikelihood as pyLike
 from GtApp import GtApp
+from GtBurst import dataHandling
 
 
 
@@ -138,6 +140,9 @@ class SimulationFeeder(object):
         obs = MyUnbinnedObs(ft1, ft2, expMap=expmap, expCube=ltcube)
         like = UnbinnedAnalysis.UnbinnedAnalysis(obs, xml_file, "MINUIT")
 
+        # Apply the default setup
+        dataHandling.LATData.setup_likelihood_object(like, xml_file)
+
         fast_ts = FastTS(like, ts_map_spec=tsmap_spec, target_source=srcname)
 
         # Get the TSs
@@ -197,7 +202,7 @@ class SimulationProcessor(object):
             log.info("Copying %s to %s..." % (path_of_tar_file_with_simulated_ft1_files, workdir))
             shutil.copy2(path_of_tar_file_with_simulated_ft1_files, ".")
 
-            execute_command(log, "tar xvf %s" % path_of_tar_file_with_simulated_ft1_files)
+            execute_command(log, "tar xf %s" % path_of_tar_file_with_simulated_ft1_files)
 
             os.remove(os.path.basename(path_of_tar_file_with_simulated_ft1_files))
 
@@ -393,6 +398,52 @@ class FastTS(object):
         # Store optimizer
         self._optimizer = optimizer
 
+        # Prepare the list of sources to keep. This is a trick to speed up things:
+        # sources that contribute too little to the Npred total are ignored
+        sources_npreds = collections.OrderedDict()
+
+        for source_name in self._orig_log_like.sourceNames():
+
+            # Do not consider extended sources (if they are not the templates) as they have not been simulated
+            if source_name[-1] == 'e' and source_name.lower().find("template") < 0:
+
+                continue
+
+            Npred = self._orig_log_like[source_name].Npred()
+
+            sources_npreds[Npred] = source_name
+
+        # Now order by decreasing Npred
+        ordered = sorted(sources_npreds.keys())[::-1]
+
+        self._sources_to_keep = []
+
+        obs_npred = sum(sources_npreds.keys())
+
+        n_pred = 0.0
+
+        # We keep as many sources as in order to account for at least 99% of the counts
+        # (but never less than 10, unless there are less than 10 to begin with)
+        for i, this_n_pred in enumerate(ordered):
+
+            self._sources_to_keep.append(sources_npreds[this_n_pred])
+
+            n_pred += this_n_pred
+
+            if obs_npred - n_pred < obs_npred / 100.0 and i > 10:
+
+                break
+
+        # Make sure Galactic and Isotropic template are in the list of sources
+        for template in ['GalacticTemplate', 'IsotropicTemplate']:
+
+            if template not in self._sources_to_keep:
+
+                self._sources_to_keep.append(template)
+
+        print("Keeping %s sources. Obs Npred: %s, this N pred: %s" % (len(self._sources_to_keep), obs_npred, n_pred))
+
+
     def _new_log_like(self, event_file):
 
         new_obs = FastUnbinnedObs(event_file, self._orig_log_like.observation)
@@ -403,18 +454,14 @@ class FastTS(object):
         with open("__empty_xml.xml", "w+") as f:
             f.write('<source_library title="source library"></source_library>')
 
-        # Load pyLike (we use DRMNFB because it is fast, much faster than Minuit, and we do not care about the errors)
+        # Load pyLike
         new_like = UnbinnedAnalysis.UnbinnedAnalysis(new_obs, "__empty_xml.xml",
-                                                     optimizer=self._optimizer)
+                                                     optimizer="MINUIT")
 
         # Now load the sources from the other object
-        for source_name in self._orig_log_like.sourceNames():
+        for source_name in self._sources_to_keep:
 
-            if source_name[-1] == 'e' and source_name.find("Template") < 0:
-
-                # Extended source, jump it (we didn't compute gtdiffrsp because it crashes)
-                continue
-
+            #print("Adding %s" % source_name)
             new_like.addSource(self._orig_log_like.logLike.source(source_name))
 
         return new_like
@@ -472,6 +519,8 @@ class FastTS(object):
         test_source = pyLike.PointSource(ra_center, dec_center, self._orig_log_like.logLike.observation())
         test_source.setSpectrum(self._orig_log_like[self._target].spectrum().clone())
         test_source.setName("_test_source")
+
+        # import pdb;pdb.set_trace()
 
         for i, ft1 in enumerate(ft1s):
 
