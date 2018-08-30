@@ -3,15 +3,15 @@
   <head>
     <meta charset="utf-8">
     <title>Analysis report for {triggername}</title>
-    <!--<link rel="stylesheet" href="styles.css">-->
+    <link rel="stylesheet" href="styles.css">
   </head>
   <body>
     <table align="center" >
       <tr>
         <td colspan="2">
-          <table style="border-collapse:collapse;width:100%;border: 1px solid red;">
+          <table class="customers_disclaimer">
             <tr>
-              <td>
+              <td class="disclaimer">
                 <p align="center"><font color="red">
                 <b><u>CONFIDENTIAL</u></b><br>
                 THIS ANALYSIS IS SUBJECT TO THE LAT-LIGO MOU <br>
@@ -23,9 +23,12 @@
           </table>
       </tr>
       <tr>
-        <td valign="top">
-          <table style="border-collapse:collapse;width:300px;border: 1px solid black;" border="1">
-            <tr><td style="color:blue;text-align:center;font-weight:bold;border: 1px solid black;" colspan="2">SUMMARY</td></tr>
+      
+      
+      
+        <td valign="top" >
+          <table class="customers">
+            <tr><td >SUMMARY</td><td ></td></tr>
             <tr><td>Name</td><td>{triggername}</td></tr>
             <tr><td>Trigger MET</td><td>{triggertime}</td></tr>
             <tr><td>Date</td><td>{date}</td></tr>
@@ -45,8 +48,8 @@
           </table>
         </td>
         <td valign="top">
-          <table table style="border-collapse:collapse;width:100%;max-width:1000px;border: 1px solid black;" border="1">
-            <tr><td style="color:blue;text-align:center;font-weight:bold;border: 1px solid black;">FIXED TIME ANALYSIS</td></tr>
+          <table class="customers">
+            <tr><td >FIXED TIME ANALYSIS</td></tr>
             <tr>
               <td align="center">
                 <b>Coverage plot</b>
@@ -58,8 +61,8 @@
       </tr>
       <tr>
         <td valign="top" rowspan="2">
-          <table style="border-collapse:collapse;width:300px;border: 1px solid black;" border="1">
-            <tr><td style="color:blue;text-align:center;font-weight:bold;border: 1px solid black;" colspan="3">TS MAXIMUM</td></tr>
+          <table class="customers" >
+            <tr><td >TS MAXIMUM</td><td ></td><td ></td></tr>
             <tr>
               <td rowspan="2" align="center">
                 TS<br>{fti_ts_max}</td>
@@ -67,12 +70,12 @@
             </tr>
             <tr><td>Dec</td><td>{fti_dec_max}&deg</td></tr>
             <tr><td colspan="3"></td></tr>
-            <tr><td style="color:blue;text-align:center;font-weight:bold;border: 1px solid black;" colspan="3">LIST OF TS &gt {ts_cut} </td></tr>
+            <tr><td >LIST OF TS &gt {ts_cut} </td></tr>
             {fti_ts_list}
           </table>
         </td>
         <td>
-          <table table style="border-collapse:collapse;width:100%;max-width:1000px;border: 1px solid black;" border="1">
+          <table class="customers">
             <tr>
               <td align="center">
                 <b>TS map</b>
@@ -84,7 +87,7 @@
       </tr>
       <tr>
         <td>
-          <table table style="border-collapse:collapse;width:100%;max-width:1000px;border: 1px solid black;" border="1">
+          <table class="customers">
             <tr>
               <td align="center">
                 <b>Upper limits map</b>
@@ -98,8 +101,8 @@
       <tr>
         <td></td>
         <td>
-          <table table style="border-collapse:collapse;width:100%;max-width:1000px;border: 1px solid black;" border="1">
-            <tr><td style="color:blue;text-align:center;font-weight:bold;border: 1px solid black;">ADAPTIVE TIME ANALYSIS</td></tr>
+          <table class="customers" >
+            <tr><td >ADAPTIVE TIME ANALYSIS</td></tr>
             <tr>
               <td align="center">
                 <b>Temporal and spatial distribution of the Upper Bounds</b>
@@ -111,8 +114,8 @@
       </tr>
       <tr>
         <td valign="top" rowspan="2">
-          <table style="border-collapse:collapse;width:300px;border: 1px solid black;" border="1">
-            <tr><td style="color:blue;text-align:center;font-weight:bold;border: 1px solid black;" colspan="3">TS MAXIMUM</td></tr>
+          <table class="customers">
+            <tr><td >TS MAXIMUM<td ></td><td ></td></td></tr>
             <tr>
               <td rowspan="2" align="center">
                 TS<br>{ati_ts_max}</td>
@@ -120,12 +123,12 @@
             </tr>
             <tr><td>Dec</td><td>{ati_dec_max}&deg</td></tr>
             <tr><td></td></tr>
-            <tr><td style="color:blue;text-align:center;font-weight:bold;border: 1px solid black;" colspan="3">LIST OF TS &gt {ts_cut} </td></tr>
+            <tr><td >LIST OF TS &gt {ts_cut} </td></tr>
             {ati_ts_list}
           </table>
         </td>
         <td>
-          <table table style="border-collapse:collapse;width:100%;max-width:1000px;border: 1px solid black;" border="1">
+          <table class="customers">
             <tr>
               <td align="center">
                 <b>TS map</b>
@@ -137,7 +140,7 @@
       </tr>
       <tr>
         <td>
-          <table table style="border-collapse:collapse;width:100%;max-width:1000px;border: 1px solid black;" border="1">
+          <table class="customers">
             <tr>
               <td align="center">
                 <b>Upper limits map</b>
@@ -150,8 +153,8 @@
 
       <tr>
         <td valign="top" rowspan="2">
-          <table style="border-collapse:collapse;width:300px;border: 1px solid black;" border="1">
-            <tr><td style="color:blue;text-align:center;font-weight:bold;border: 1px solid black;" colspan="3">SIGMA MAXIMUM</td></tr>
+          <table class="customers">
+            <tr><td >SIGMA MAXIMUM<td ></td><td ></td></td></tr>
             <tr>
               <td rowspan="2" align="center">
                 TS<br>{lle_ts_max}</td>
@@ -159,12 +162,12 @@
             </tr>
             <tr><td>Dec</td><td>{lle_dec_max}&deg</td></tr>
             <tr><td></td></tr>
-            <tr><td style="color:blue;text-align:center;font-weight:bold;border: 1px solid black;" colspan="3">LIST OF SIGMA &gt {sigma_cut} </td></tr>
+            <tr><td >LIST OF SIGMA &gt {sigma_cut} </td></tr>
             {lle_ts_list}
           </table>
         </td>
         <td>
-          <table table style="border-collapse:collapse;width:100%;max-width:1000px;border: 1px solid black;" border="1">
+          <table class="customers">
             <tr>
               <td align="center">
                 <b>Sigma map</b>
