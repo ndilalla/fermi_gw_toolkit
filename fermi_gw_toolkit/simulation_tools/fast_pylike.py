@@ -441,6 +441,11 @@ class FastTS(object):
 
                 self._sources_to_keep.append(template)
 
+        # Also always add the GRB source
+        if 'GRB' not in self._sources_to_keep:
+
+            self._sources_to_keep.append("GRB")
+
         print("Keeping %s sources. Obs Npred: %s, this N pred: %s" % (len(self._sources_to_keep), obs_npred, n_pred))
 
 
