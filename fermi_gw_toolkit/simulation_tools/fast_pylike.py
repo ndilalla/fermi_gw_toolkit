@@ -207,7 +207,7 @@ class SimulationProcessor(object):
             os.remove(os.path.basename(path_of_tar_file_with_simulated_ft1_files))
 
             # Now get the names of all ft1s
-            all_ft1s_raw = glob.glob("gll_ft1_tr_bn*_v*.fit")
+            all_ft1s_raw = sorted(glob.glob("gll_ft1_tr_bn*_v*.fit"))
 
             log.info("Found %s simulated FT1 files in archive %s" % (len(all_ft1s_raw),
                                                                      path_of_tar_file_with_simulated_ft1_files))
