@@ -1,4 +1,4 @@
-#!/bin/tcsh -fe
+#!/bin/tcsh -f
 # THIS SHOULD SOURCE THE APPROPRIATE FILES TO SET UP THE ENVIRONMENT AND EXCECUTE THE PYTHON SCRIPT
 echo 'sourcing the setup script!'
 source $GPL_TASKROOT/config/DEV/setup_mpl.csh

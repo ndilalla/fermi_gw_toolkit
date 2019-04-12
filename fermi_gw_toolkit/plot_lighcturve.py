@@ -64,6 +64,8 @@ if __name__=="__main__":
     if args.type=='EFLUX':
         ylabel = "Upper Bound (0.1 - 1 GeV) [erg cm$^{-2}$ s$^{-1}$]"
         ylabel = "Upper Bound [erg cm$^{-2}$ s$^{-1}$]"
+        ymin=9.0e-11
+        ymax=1.1e-9
     else:
         ylabel = "Upper Bound (0.1 - 1 GeV) [cm$^{-2}$ s$^{-1}$]"
         ylabel = "Upper Bound [cm$^{-2}$ s$^{-1}$]"
@@ -115,8 +117,8 @@ if __name__=="__main__":
             pass
         pass
     Npoints=len(start)
-    ymin=0.9*flux[flux>0].min()
-    ymax=1.1*flux.max()
+    ymin=min(ymin,0.9*flux[flux>0].min())
+    ymax=max(ymax,1.1*flux.max())
     tmin=start.min()
     tmax=end.max()
     vmax=start.max()

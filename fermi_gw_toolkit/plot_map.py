@@ -53,6 +53,7 @@ if __name__=="__main__":
     if args.min_percentile != 0:
 
         mmin = np.percentile(hpx_ul[idx],args.min_percentile)
+        print("%s percentile is %s" % (args.min_percentile, mmin))
 
     else:
 
@@ -64,11 +65,11 @@ if __name__=="__main__":
 
         mmax_idx = (hpx_ul == mmax).nonzero()[0][0]
 
-        print mmax_idx
+        #print mmax_idx
 
         ra, dec = pix_to_sky(mmax_idx, nside)
 
-        print("\n\n%s percentile is %s, at %s, %s" % (args.max_percentile, mmax, ra, dec))
+        print("%s percentile is %s, at %s, %s" % (args.max_percentile, mmax, ra, dec))
 
     else:
 

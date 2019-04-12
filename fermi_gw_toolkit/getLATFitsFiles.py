@@ -2,32 +2,48 @@
 import os, subprocess
 import socket
 import sys
+from astropy.io import fits as pyfits
 
 from GtBurst.dataHandling import runShellCommand
 
 classname={'P8R2_TRANSIENT100E_V6':'Transient100E',
-		   'P8R2_TRANSIENT100_V6':'Transient100',
-		   'P8R2_TRANSIENT020E_V6':'Transient020E',
-		   'P8R2_TRANSIENT020_V6':'Transient020',
-		   'P8R2_TRANSIENT010E_V6':'Transient010E',
-		   'P8R2_TRANSIENT010_V6':'Transient010',
-		   'P8R2_SOURCE_V6':'Source',
-		   'P8R2_CLEAN_V6':'Clean',
-		   'P8R2_ULTRACLEAN_V6':'UltraClean',
-		   'P8R2_ULTRACLEANVETO_V6':'UltraCleanVeto',
-		   'P8R2_TRANSIENT100S_V6':'Transient100S',
-		   'P8R2_TRANSIENT015S_V6':'Transient015S',
-		   'P7REP_TRANSIENT_V15':'Transient',
-		   'P7REP_SOURCE_V15':'Source',
-		   'P7REP_CLEAN_V15':'Clean',
-		   'P7REP_ULTRACLEAN_V15':'UltraClean'
-		   }
+	   'P8R2_TRANSIENT100_V6':'Transient100',
+	   'P8R2_TRANSIENT020E_V6':'Transient020E',
+	   'P8R2_TRANSIENT020_V6':'Transient020',
+	   'P8R2_TRANSIENT010E_V6':'Transient010E',
+	   'P8R2_TRANSIENT010_V6':'Transient010',
+	   'P8R2_SOURCE_V6':'Source',
+	   'P8R2_CLEAN_V6':'Clean',
+	   'P8R2_ULTRACLEAN_V6':'UltraClean',
+	   'P8R2_ULTRACLEANVETO_V6':'UltraCleanVeto',
+	   'P8R2_TRANSIENT100S_V6':'Transient100S',
+	   'P8R2_TRANSIENT015S_V6':'Transient015S',
+	   'P7REP_TRANSIENT_V15':'Transient',
+	   'P7REP_SOURCE_V15':'Source',
+	   'P7REP_CLEAN_V15':'Clean',
+	   'P7REP_ULTRACLEAN_V15':'UltraClean'
+	   }
 
+
+def checkFILES(ft1,ft2,tstart, tend):
+	print("Checking FT1 file...")
+	ft1_data = pyfits.open(ft1)[1].data
+	TIME     = ft1_data.TIME
+	DT=tend-TIME.max()
+	if DT>60.: print("====> FT1 file probably incomplete. %.1f" % DT)
+	else: print("====> FT1 file complete. %.1f" % DT)
+	print("Checking FT2 file...")
+	ft2_data = pyfits.open(ft2)[1].data
+	STOP     = ft2_data.STOP
+	DT=tend-STOP.max()
+	if DT>60.: print("====> FT2 file probably incomplete. %.1f" % DT)
+	else: print("====> FT2 file complete. %.1f" % DT)
+	pass
 
 def getFilesAstroServer(name, tstart, tend, outdir, emin, emax, sample,
-						ResponseFunction, chatter=1, OneSec=True, Type=3,
-						**kwargs):
-
+			ResponseFunction, chatter=1, OneSec=True, Type=3,
+			**kwargs):
+	
 	sampleFT1 = sample
 	sampleFT2 = sample
 	OneSec = int(OneSec)

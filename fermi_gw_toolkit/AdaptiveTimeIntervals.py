@@ -82,7 +82,8 @@ def adaptive_time(**kwargs):
     ligo_entry    = np.zeros(len(ligo_map))
     ligo_expo     = np.zeros(len(ligo_map))
 
-    # Get R.A. and Dec for the pixels within the contour                                                                                                                                                                                                                    
+    # Get R.A. and Dec for the pixels within the contour                               
+
     masked_ra, masked_dec = my_finder.get_sky_coordinates(indexes)
 
     masked_radius = my_finder.pixel_size
@@ -90,7 +91,7 @@ def adaptive_time(**kwargs):
     if roi: masked_radius=roi
     
     print 'Number of selected pixels:',Nselected
-    myFT2=FT2(ft2,triggertime-11000,triggertime+11000)
+    myFT2=FT2(ft2)    
     myFT2.fov(theta_max-masked_radius,zenith_max-masked_radius)
     times_t0=[]
     times_t1=[]

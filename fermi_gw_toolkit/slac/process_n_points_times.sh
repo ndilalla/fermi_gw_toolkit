@@ -1,4 +1,4 @@
-#!/bin/tcsh -fe
+#!/bin/tcsh -f
 # THIS SHOULD SOURCE THE APPROPRIATE FILES TO SET UP THE ENVIRONMENT AND EXCECUTE THE PYTHON SCRIPT
 echo 'Create a staging directory:'
 setenv stage /scratch/${PIPELINE_TASKPATH}_${LSB_BATCH_JID}

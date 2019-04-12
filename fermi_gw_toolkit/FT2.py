@@ -24,12 +24,16 @@ def angsep(x1,y1,x2,y2):
     return sp.degrees(c)
 
 class FT2:
-    def __init__(self,ft2file,tmin,tmax):
+    def __init__(self,ft2file,tmin=None,tmax=None):
         hdulist=fits.open(ft2file)    
         SC_data=hdulist['SC_DATA'].data
         SC_data=hdulist['SC_DATA'].data
         # TIME
         TIME_ALL=SC_data.field('START')
+
+        if tmin is  None: tmin=TIME_ALL.min()
+        if tmax is  None: tmax=TIME_ALL.max()
+
         FILTER  =sp.logical_and(TIME_ALL>tmin,TIME_ALL<tmax)
         self.SC_TSTART     = SC_data.field('START')[FILTER]
         self.SC_TSTOP      = SC_data.field('STOP')[FILTER]
@@ -93,9 +97,14 @@ class FT2:
         start=self.SC_TSTART-t0
         stop=self.SC_TSTOP-t0
         infov_t0=infov[idx0]
-        print t0,idx0,infov_t0
-        if infov_t0:  t_0 = stop[sp.logical_and(infov==0,stop<0)][-1]
-        else:         t_0 = start[sp.logical_and(infov==1,start>0)][0]
+        print("FT2::getEntryExitTime:",t0,idx0,infov_t0)
+        if infov_t0:  
+            stop_sel=stop[sp.logical_and(infov==0,stop<0)]
+            if len(stop_sel)>0: t_0 = stop[sp.logical_and(infov==0,stop<0)][-1]
+            else:               t_0 = start[0]
+            
+        else: t_0 = start[sp.logical_and(infov==1,start>0)][0]
+
         t1 = start[sp.logical_and(infov==0,stop>t_0)][0]
         t_1 = stop[self.getIndex(t0+t1)]
         #if stop[ii_1+1] > stop[ii_1]+60: t_1 = stop[ii_1]

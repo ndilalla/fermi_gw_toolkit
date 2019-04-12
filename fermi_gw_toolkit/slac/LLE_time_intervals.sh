@@ -1,4 +1,4 @@
-#!/bin/tcsh
+#!/bin/tcsh -f
 
 # If we do not need to run the LLE analysis, make this fail
 if ($RUN_LLE == 0) then
