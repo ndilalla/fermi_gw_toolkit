@@ -98,7 +98,7 @@ if __name__=="__main__":
     flux_err=[]
     for i,f in enumerate(flux_c):
         if '<' in f: flux.append(float(f.replace('<','')))
-        else: flux[i]=f.append(float(f))
+        else: flux.append(float(f))
         pass
     for i,ef in enumerate(flux_err_c):
         if 'n.a.' in ef: flux_err.append(0.0)

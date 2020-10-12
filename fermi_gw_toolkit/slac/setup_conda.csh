@@ -4,8 +4,34 @@ echo 'Setting up conda!'
 # HEADAS Distribution
 setenv BASEDIR /nfs/farm/g/glast/u26/GWPIPELINE/
 setenv PFILES ''
-setenv HOME $BASEDIR
-source /afs/slac/g/glast/groups/grb/gw_environment/setup_gw_conda.csh
+setenv HOME $PWD 
+#BASEDIR
+
+################################################## source /afs/slac/g/glast/groups/grb/gw_environment/setup_gw_conda.csh
+unset LD_LIBRARY_PATH
+unset PYTHONPATH
+
+setenv GWENV /nfs/farm/g/glast/g/grb/gw_environment
+
+setenv PATH ${GWENV}/miniconda3/bin:/usr/lib64/qt-3.3/bin:/opt/lsf-openmpi/1.8.1/bin/:/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin
+
+setenv GTBURST_PATH ${GWENV}/miniconda3/envs/fermi_st/lib/python2.7/site-packages/fermitools/GtBurst
+setenv PATH ${PATH}:${GTBURST_PATH}/scripts:${GTBURST_PATH}/commands
+
+
+setenv HEADAS /afs/slac/g/ki/software/heasoft/6.24/amd64_rhel60/heasoft/x86_64-pc-linux-gnu-libc2.12
+source $HEADAS/headas-init.csh
+echo 'activating the environment fermi_st'
+source $GWENV/miniconda3/etc/profile.d/conda.csh
+conda activate fermi_st
+echo 'done!'
+setenv PFILES ".;/afs/slac/g/ki/software/heasoft/6.24/amd64_rhel60/heasoft/x86_64-pc-linux-gnu-libc2.12/syspfiles:${GWENV}/miniconda3/envs/fermi_st/share/fermitools/syspfiles"
+
+setenv PYTHONPATH ${GTBURST_PATH}/scripts:${BASEDIR}/fermi_gw_toolkit
+
+unset GTBURST_TEMPLATE_PATH
+unset GALACTIC_DIFFUSE_TEMPLATE
+##################################################
 echo 'source done!'
 #setenv HEADAS /afs/slac/g/ki/software/heasoft/6.16/amd64_rhel60/heasoft/x86_64-unknown-linux-gnu-libc2.12
 #source ${HEADAS}/headas-init.sh

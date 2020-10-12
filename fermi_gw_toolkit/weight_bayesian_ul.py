@@ -6,6 +6,7 @@ import matplotlib as mpl
 mpl.use('agg')
 
 import matplotlib.pyplot as plt
+from local_database import gw_local_database
 
 import argparse
 import glob
@@ -324,6 +325,18 @@ def go(args):
     print("-----------------------------------------------------------------------\n")
     print("* Photon flux < %s ph/cm2/s\n" % (ul))
     print("* Energy flux < %s erg/cm2/s\n" % (ene_ul))
+    
+    # Load the events database and add the relevant info
+    db_file = args.db_file
+    if db_file is not None:
+        db = gw_local_database.load(db_file)
+        triggername = args.ul_directory.split('/')[-4]
+        version = args.ul_directory.split('/')[-3]
+        event_dict = {'Ph_ul'  : ul,
+                      'Ene_ul' : ene_ul,
+                      'CL'     : args.cl}
+        db.update(triggername, version, event_dict)
+        db.save(db_file)
 
     # Make plots of the integral distributions
 
@@ -381,7 +394,8 @@ if __name__=="__main__":
     parser.add_argument('--outroot', help='Root for the name for the output plots of the weighted '
                                           'integral distributions', type=str,
                         required=False, default='weighted_integral_distribution')
-
+    parser.add_argument("--db_file", help="File used for database", type=str,
+                        required=False, default=None)
     args = parser.parse_args()
 
     assert args.cl < 1, "Confidence level must be 0 < cl < 1"

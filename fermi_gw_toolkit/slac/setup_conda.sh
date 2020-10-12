@@ -1,14 +1,37 @@
 #! /bin/bash
 echo 'Setting up conda!'
-#export TMPDIR=$HOME/tmp/pip
-# HEADAS Distribution
+
+unset LD_LIBRARY_PATH
+unset PYTHONPATH
+
 export BASEDIR=/nfs/farm/g/glast/u26/GWPIPELINE/
+
 export PFILES=''
 # HOME MUST POINT TO A WRITABLE DIRECTORY!
 export HOME=$BASEDIR
-source /afs/slac/g/glast/groups/grb/gw_environment/setup_gw_conda.sh
-echo 'source done!'
-export TMPDIR=''
+
+#source $BASEDIR/setup_gw_conda.sh
+
+export GWENV=/nfs/farm/g/glast/g/grb/gw_environment
+export PATH=${GWENV}/miniconda3/bin:/usr/lib64/qt-3.3/bin:/opt/lsf-openmpi/1.8.1/bin/:/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin
+
+# Add gtburst executables to the path
+GTBURST_PATH=${GWENV}/miniconda3/envs/fermi_st/lib/python2.7/site-packages/fermitools/GtBurst
+export PATH=${PATH}:${GTBURST_PATH}/scripts:${GTBURST_PATH}/commands
+
+export HEADAS=/afs/slac/g/ki/software/heasoft/6.24/amd64_rhel60/heasoft/x86_64-pc-linux-gnu-libc2.12
+source $HEADAS/headas-init.sh
+
+source activate fermi_st
+
+export PFILES=".;/afs/slac/g/ki/software/heasoft/6.24/amd64_rhel60/heasoft/x86_64-pc-linux-gnu-libc2.12/syspfiles:${GWENV}/miniconda3/envs/fermi_st/share/fermitools/syspfiles"
+#export PYTHONPATH=${GTBURST_PATH}/scripts:${PYTHONPATHH}/commands
+export PYTHONPATH=${GTBURST_PATH}/scripts:${BASEDIR}/fermi_gw_toolkit
+
+unset GTBURST_TEMPLATE_PATH
+unset GALACTIC_DIFFUSE_TEMPLATE
+
+export TMPDIR='/tmp/'
 export GRBANALYSIS_DIR=${BASEDIR}/GRBAnalysis_ScienceTools
 export LLE_DIR=${GRBANALYSIS_DIR}/LLE
 export GTGRB_DIR=${GRBANALYSIS_DIR}/GtGRB

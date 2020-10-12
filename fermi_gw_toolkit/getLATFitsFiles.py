@@ -25,18 +25,18 @@ classname={'P8R2_TRANSIENT100E_V6':'Transient100E',
 	   }
 
 
-def checkFILES(ft1,ft2,tstart, tend):
+def checkFILES(ft1,ft2,tstart, tend,patch=600):
 	print("Checking FT1 file...")
 	ft1_data = pyfits.open(ft1)[1].data
 	TIME     = ft1_data.TIME
 	DT=tend-TIME.max()
-	if DT>60.: print("====> FT1 file probably incomplete. %.1f" % DT)
+	if DT>patch: print("====> FT1 file probably incomplete. %.1f" % DT)
 	else: print("====> FT1 file complete. %.1f" % DT)
 	print("Checking FT2 file...")
 	ft2_data = pyfits.open(ft2)[1].data
 	STOP     = ft2_data.STOP
 	DT=tend-STOP.max()
-	if DT>60.: print("====> FT2 file probably incomplete. %.1f" % DT)
+	if DT>patch: print("====> FT2 file probably incomplete. %.1f" % DT)
 	else: print("====> FT2 file complete. %.1f" % DT)
 	pass
 

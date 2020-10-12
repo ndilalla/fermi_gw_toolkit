@@ -28,11 +28,21 @@ parser.add_argument('--out_ts_map', help='Name for the output TS map',
 
 def fill_maps(**kwargs):
     
-    data = np.recfromtxt(kwargs['text_file'], names=True)
-
+    try:    
+        data = np.recfromtxt(kwargs['text_file'], names=True)
+    except: 
+        print 'WARNING!!! %s file probably empty, skipping...' % kwargs['text_file']
+        return
     # Check that the fluxes are upper limits
-
     fluxes = data['flux']
+    if fluxes.size==1: fluxes=np.array([fluxes])
+    ra     = data['ra']
+    if ra.size==1: ra=np.array([ra])
+    dec    = data['dec']
+    if dec.size==1: dec=np.array([dec])
+    tss = data['TS']    
+    if tss.size==1: tss=np.array([tss])
+
 
     non_uls = filter(lambda x:x.find('<')<0, fluxes)
 
@@ -44,9 +54,7 @@ def fill_maps(**kwargs):
 
     upper_limits = np.array(map(lambda x:float(x.replace('<','')),fluxes))
 
-    ra = data['ra']
-    dec = data['dec']
-
+    
     # Get the NSIDE from the input healpix map
     nside=kwargs['nside']
     if nside==0:
@@ -63,18 +71,17 @@ def fill_maps(**kwargs):
     # Now loop over the input fluxes and assign the corresponding pixels
 
     for this_ra, this_dec, this_upper_limit in zip(ra,dec,upper_limits):
-
+        #print this_ra, this_dec, this_upper_limit
         id = sky_to_healpix_id(nside, this_ra, this_dec)
 
         upper_limits_map[id] = this_upper_limit
 
     # Write the upper limit map
 
-    hp.write_map(kwargs['out_uls_map'], upper_limits_map, coord='C')
+    hp.write_map(kwargs['out_uls_map'], upper_limits_map, coord='C', overwrite=True)
 
     # Now the map of TS
 
-    tss = data['TS']    
     #idx = tss <= 0
     #tss[idx] = 1e-3
 
@@ -87,11 +94,11 @@ def fill_maps(**kwargs):
 
         id = sky_to_healpix_id(nside, this_ra, this_dec)
 
-        ts_map[id] = this_ts
+        ts_map[id] = max(0,this_ts)
 
     # Write the upper limit map
 
-    hp.write_map(kwargs['out_ts_map'], ts_map, coord='C')
+    hp.write_map(kwargs['out_ts_map'], ts_map, coord='C', overwrite=True)
 
 if __name__=="__main__":
     args = parser.parse_args()

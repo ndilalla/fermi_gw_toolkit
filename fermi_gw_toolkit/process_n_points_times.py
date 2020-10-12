@@ -50,5 +50,11 @@ if __name__ == "__main__":
         print cmd_line
         print("")
 
-        subprocess.check_call(cmd_line, shell=True)
+        try:
+            subprocess.check_call(cmd_line, shell=True)
+        except subprocess.CalledProcessError as err:
+            print('ERROR: doTimeResolvedLike.py skipped for RA=%.3f, DEC=%.3f'%\
+                (ra, dec))
+            print(err)
+            continue
 

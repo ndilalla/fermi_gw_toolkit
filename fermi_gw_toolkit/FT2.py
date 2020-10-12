@@ -64,10 +64,10 @@ class FT2:
         pass
     
     def getIndex(self,time):
-        if (self.SC_TSTOP[0]>time):
+        if (self.SC_TSTART[0]>time or self.SC_TSTOP[-1]<time):
             print 'FT2 does not cover the trigger time!'
             return 0
-        return sp.argmax(self.SC_TSTOP[self.SC_TSTOP<time])
+        return sp.argmax(self.SC_TSTART[self.SC_TSTART<time])
 
     def getTime(self,idx):
         return self.SC_TSTART[idx],self.SC_TSTOP[idx]
@@ -90,26 +90,44 @@ class FT2:
         return sp.logical_and(sp.logical_and(theta<self.theta_max,zenith<self.zenith_max),self.IN_SAA==0)
 
     def getEntryExitTime(self,ra,dec,t0):
-        idx0=self.getIndex(t0)        
-        infov=self.inFovTime(ra,dec)
-        theta=self.getThetaTime(ra,dec)
-        zenith=self.getZenithTime(ra,dec)        
-        start=self.SC_TSTART-t0
-        stop=self.SC_TSTOP-t0
-        infov_t0=infov[idx0]
-        print("FT2::getEntryExitTime:",t0,idx0,infov_t0)
-        if infov_t0:  
+        idx0   = self.getIndex(t0)        
+        infov  = self.inFovTime(ra,dec)
+        theta  = self.getThetaTime(ra,dec)
+        zenith = self.getZenithTime(ra,dec)        
+        start  = self.SC_TSTART-t0
+        stop   = self.SC_TSTOP-t0
+        print ("FT2::getEntryExitTime FT2 range: START: %.1f -- %.1f, STOP: %.1f -- %.1f" %(start[0],start[-1],stop[0],stop[-1]))
+        insaa_t0 = (stop[idx0]<0)
+        infov_t0 = infov[idx0]
+        if insaa_t0: print ("FT2::getEntryExitTime : LAT was in the SAA: from %.1f to %.1f seconds from t0" %(stop[idx0],start[idx0+1]))
+        #print("FT2::getEntryExitTime :",t0,idx0,infov_t0,start[idx0],stop[idx0],start[idx0+1],stop[idx0+1])
+        if infov_t0 and not insaa_t0:  
             stop_sel=stop[sp.logical_and(infov==0,stop<0)]
             if len(stop_sel)>0: t_0 = stop[sp.logical_and(infov==0,stop<0)][-1]
             else:               t_0 = start[0]
-            
-        else: t_0 = start[sp.logical_and(infov==1,start>0)][0]
-
-        t1 = start[sp.logical_and(infov==0,stop>t_0)][0]
-        t_1 = stop[self.getIndex(t0+t1)]
+            #if len(start[sp.logical_and(infov==0,stop>t_0)])>0:
+            #    t_1  = start[sp.logical_and(infov==0,stop>t_0)][0]
+            #else:
+            #    t_1 = stop[-1]
+        else: 
+            if len(start[sp.logical_and(infov==1,start>0)])>0:
+                t_0 = start[sp.logical_and(infov==1,start>0)][0]
+            else:
+                t_0 = stop[-1]
+                pass
+            pass
+        if len(start[sp.logical_and(infov==0,stop>t_0)])>0:
+            t_1  = start[sp.logical_and(infov==0,stop>t_0)][0]
+        else:
+            t_1 = stop[-1]
+            pass
+        #t1  = start[sp.logical_and(infov==0,stop>t_0)][0]
+        #t_1 = stop[self.getIndex(t0+t1)]
         #if stop[ii_1+1] > stop[ii_1]+60: t_1 = stop[ii_1]
         #print '%10.3f %10.3f %5d %10.3f %10.3f %10.3f %10.3f ' %(ra,dec,ii_1,stop[ii_1],stop[ii_1+1],t_0,t_1)
-        return t_0,t_1 
+        #met0=t_0+t0
+        #met1=t_1+t0
+        return t_0,t_1
 
     def inFov(self,idx,ra,dec):
         theta=self.getTheta(idx,ra,dec)

@@ -46,13 +46,16 @@ if __name__=="__main__":
     # Get nside
 
     nside = hp.get_nside(hpx_ul)
-    print nside
+
+    norm = args.zscale
 
     # Get some meaningful limits for the color bar among the points which are larger than 0 and finite
-
+    
     idx = (hpx_ul > 0) & np.isfinite(hpx_ul)
-    if np.sum(idx)==0: idx = (hpx_ul >= 0) & np.isfinite(hpx_ul)
-
+    if np.sum(idx)==0: 
+        idx = (hpx_ul >= 0) & np.isfinite(hpx_ul)
+        norm = 'linear'
+        pass
     # Use the provided percentiles
     if args.min_percentile != 0:
 
@@ -70,7 +73,7 @@ if __name__=="__main__":
         mmax = hpx_ul[idx].max()
 
     # Now set to nan all negative or zero pixels
-    if 'log' in args.zscale:
+    if 'log' in norm:
         idx = hpx_ul <= 0
         hpx_ul[idx] = np.nan
         pass
@@ -135,7 +138,7 @@ if __name__=="__main__":
     print 'Maximum Value = ', MAXVALUE
     print 'RA,DEC=%f %f MAX= %f' %(ra_max, dec_max, MAXVALUE)
 
-    norm = args.zscale
+
     ticks=np.logspace(np.log10(mmin / magnitude), np.log10(mmax / magnitude), 4),
     if norm == 'linear': 
         norm=None

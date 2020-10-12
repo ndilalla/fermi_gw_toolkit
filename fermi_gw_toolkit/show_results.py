@@ -4,16 +4,19 @@ import numpy
 import healpy as hp
 #import webbrowser
 import astropy.io.fits as pyfits
-from contour_finder import  pix_to_sky
+from contour_finder import pix_to_sky
+from local_database import gw_local_database
+from html_lib import *
 
 #from automatic_pipeline.utils import send_email
 
 formatter = argparse.ArgumentDefaultsHelpFormatter
 parser = argparse.ArgumentParser(formatter_class=formatter)
 
+_nfs_home='/nfs/farm/g/glast/u26/GWPIPELINE'
+_db_file = os.path.join(_nfs_home, 'output', 'db_gw_events.pkl')
 def fix_path(local_path):
     _html_home='http://glast-ground.slac.stanford.edu/Decorator/exp/Fermi/Decorate/groups/grb/GWPIPELINE/'
-    _nfs_home='/nfs/farm/g/glast/u26/GWPIPELINE'
     return local_path.replace(_nfs_home,_html_home)
 
 parser.add_argument("--triggername", help="Trigger name", type=str,
@@ -58,11 +61,8 @@ parser.add_argument("--template", help="Template", type=str, required=False,
                     default='results_template.html')
 parser.add_argument("--styles", help="Css file for style", type=str,
                     required=False, default='styles.css')
-
-content = '''
-<tr><td rowspan="2" align="center">TS<br>{}</td><td>Ra</td><td>{}&deg</td></tr>
-<tr><td>Dec</td><td>{}&deg</td></tr>
-'''
+parser.add_argument("--db_file", help="File used for database", type=str,
+                    required=False, default=_db_file)
 
 def get_date(ligo_map):
     hdulist = pyfits.open(ligo_map)
@@ -70,9 +70,8 @@ def get_date(ligo_map):
     return date_obs[:10], date_obs[11:19]
 
 def load_file(file_path):
-    f = open(file_path)
-    page = f.read()
-    f.close()
+    with open(file_path, 'r') as f: 
+        page = f.read()
     return page
 
 def write_file(text, outfile):
@@ -80,7 +79,9 @@ def write_file(text, outfile):
     output.write(text)
     output.close()
     
-def max_ts(map_path, ts_cut):
+def max_ts(map_path, ts_cut, text='TS'):
+    if not os.path.exists(map_path):
+        return 0, 0, 0, "", 0
     ts_map, header = hp.read_map(map_path, h=True)
     header = dict(header)
     nside = header['NSIDE']
@@ -90,10 +91,10 @@ def max_ts(map_path, ts_cut):
     # hp.pix2ang(nside, px_max, lonlat=True)
     ra_max = round(ra_max, 2)
     dec_max = round(dec_max, 2)
-    ts_list = insert_ts_list(ts_map, ts_cut, nside)
+    ts_list = insert_ts_list(ts_map, ts_cut, nside, text)
     return ts_max, ra_max, dec_max, ts_list, nside
 
-def insert_ts_list(ts_map, ts_cut, nside):
+def insert_ts_list(ts_map, ts_cut, nside, text):
     ts_px = numpy.argwhere(ts_map>ts_cut)
     table = ""
     for px in ts_px.T[0]:
@@ -102,8 +103,48 @@ def insert_ts_list(ts_map, ts_cut, nside):
         #ra, dec = hp.pix2ang(nside, px, lonlat=True)
         ra = round(ra, 2)
         dec = round(dec, 2)
-        table += content.format(ts, ra, dec)
+        table += list_content.format(text, ts, ra, dec)
     return table
+
+def min_max_ul(map_path):
+    ul_map, header = hp.read_map(map_path, h=True)
+    ul_max = round(numpy.nanmax(ul_map[numpy.nonzero(ul_map)]) / 1e-9, 1)
+    ul_min = round(numpy.nanmin(ul_map[numpy.nonzero(ul_map)]) / 1e-10, 2)
+    return ul_min, ul_max
+
+def proc_pgwave(file_list):
+    if len(file_list) == 0:
+        print 'PGWAVE map not found.'
+        return ''
+    pgwave = ''
+    for file_coords in file_list:
+        with open(file_coords, 'r') as f:
+            f.readline()
+            ra_max, dec_max, ts_max = f.readline().split()
+        ra_max = round(float(ra_max), 2)
+        dec_max = round(float(dec_max), 2)
+        ts_max = round(float(ts_max), 2)
+        ts_map = fix_path(file_coords.replace('_coords.txt', '_tsmap.png'))
+        c_map = fix_path(ts_map.replace('_tsmap', '_cmap'))
+        pgwave += pgw_content.format(**locals())
+    return pgwave
+
+def proc_coverage(cov_path):
+    npzfile = numpy.load(cov_path)
+    dt = npzfile['dt']
+    cov = npzfile['cov']
+    cov0 = round(cov[0]*100, 1)
+    t0 = round(dt[0], 1)
+    ssa = False
+    if t0 > 0.01:
+        ssa = True
+        t0 = '(%s ks)' % t0
+    else:
+        t0 = ''
+    index = numpy.argmax(cov)
+    tmax = round(dt[index], 1)
+    covmax = round(cov[index]*100, 2)
+    return cov0, t0, ssa, tmax, covmax
     
 def show_results(**kwargs):
     web_page = load_file(kwargs['template'])
@@ -127,27 +168,74 @@ def show_results(**kwargs):
     
     #get all the plot from the image folder
     img_folder = kwargs['img_folder']
-    coverage_name = 'bn'+triggername +'_prob_coverage.png'
-    print img_folder + coverage_name
+    coverage_name = '/bn' + triggername +'_prob_coverage.png'
     coverage = fix_path(glob.glob(img_folder + coverage_name)[0])
-    
-    fti_ts_map = fix_path(glob.glob(img_folder + 'FTI_ts_map.png')[0])
-    fti_ul_map = fix_path(glob.glob(img_folder + 'FTI_ul_map.png')[0])
+    fti_ts_map = fix_path(glob.glob(img_folder + '/FTI_ts_map.png')[0])
+    fti_ul_map = fix_path(glob.glob(img_folder + '/FTI_ul_map.png')[0])
     #ati_ub     = fix_path(glob.glob(img_folder + 'ad_ub.png')[0])
-    ati_ts_map = fix_path(glob.glob(img_folder + 'ATI_ts_map.png')[0])
-    ati_ul_map = fix_path(glob.glob(img_folder + 'ATI_ul_map.png')[0])
-    ati_lc     = fix_path(glob.glob(img_folder + 'ATI_compositeLC.png')[0])
-    lle_ts_map = fix_path(glob.glob(img_folder + 'LLE_ts_map.png')[0])
+    ati_ts_map = fix_path(glob.glob(img_folder + '/ATI_ts_map.png')[0])
+    ati_ul_map = fix_path(glob.glob(img_folder + '/ATI_ul_map.png')[0])
+    ati_lc = fix_path(glob.glob(img_folder + '/ATI_compositeLC.png')[0])
+    pgw_cmap = fix_path(glob.glob(img_folder + '/PGW_countmap.png')[0])
+    try:
+        lle_ts_map = fix_path(glob.glob(img_folder + '/LLE_ts_map.png')[0])
+    except IndexError:
+        lle_ts_map = None
+        print 'LLE map not found.'
 
     #take the max ts and the ts_list from ati e fti ts maps
     ts_cut = kwargs['ts_cut']
-    sigma_cut=4
+    sigma_cut = 4
     fti_ts_max, fti_ra_max, fti_dec_max, fti_ts_list, nside =\
                                     max_ts(kwargs['fti_ts_map'], ts_cut)
     ati_ts_max, ati_ra_max, ati_dec_max, ati_ts_list, nside =\
                                     max_ts(kwargs['ati_ts_map'], ts_cut)
-    lle_ts_max, lle_ra_max, lle_dec_max, lle_ts_list, nside =\
-                                    max_ts(kwargs['lle_ts_map'], sigma_cut)
+    
+    #take the max/min UL from ati e fti ul maps
+    outdir = os.path.dirname(kwargs['fti_ts_map'])
+    fti_ul_path = os.path.join(outdir, 'FTI_ul_map.fits')
+    fti_ul_min, fti_ul_max = min_max_ul(fti_ul_path)
+    ati_ul_path = os.path.join(outdir, 'ATI_ul_map.fits')
+    ati_ul_min, ati_ul_max = min_max_ul(ati_ul_path)
+    
+    #LLE
+    lle = ''
+    if lle_ts_map is not None: 
+        lle_ts_max, lle_ra_max, lle_dec_max, lle_ts_list, nside =\
+                                    max_ts(kwargs['lle_ts_map'], sigma_cut, 
+                                    'SIGMA')
+        lle = lle_content.format(**locals())
+    
+    #PGWAVE
+    pgwave = proc_pgwave(glob.glob(outdir + '/PGWAVE/%s_*_coords.txt' %\
+                                   kwargs['triggername']))
+
+    #process the coverage file to recover some useful info to display
+    cov_file_path = os.path.join(outdir, 'bn%s_coverage.npz' % triggername)
+    cov0, t0, ssa, tmax, covmax = proc_coverage(cov_file_path)
+    
+    #load the events database and add the relevant info
+    db_file = kwargs['db_file']
+    db = gw_local_database.load(db_file)
+    event_dict = {'Date'   : date,
+                  'Time'   : time,
+                  'Fti_ts' : fti_ts_max,
+                  'Ati_ts' : ati_ts_max}
+    version = img_folder.split('/')[-3]
+    db.update(kwargs['triggername'], version, event_dict)
+    db.save(db_file)
+    
+    #take Bayesian UL from database (if available)
+    ph_ul = db.get(kwargs['triggername'], version, 'Ph_ul')
+    ene_ul = db.get(kwargs['triggername'], version, 'Ene_ul')
+    if ene_ul is not None:
+        cl = int(db.get(kwargs['triggername'], version, 'CL') * 100)
+        ph_ul = round(ph_ul / 1e-7, 2)
+        ene_ul = round(ene_ul / 1e-10, 2)
+        bayesian_ul = bayesian_ul_content.format(**locals())
+    else:
+        bayesian_ul = ''
+        print 'Bayesian UL not found.'
     
     #save and show the page
     outfile = kwargs['outfile']

@@ -1,4 +1,4 @@
-#!/bin/tcsh -f
+#!/bin/tcsh -fe
 # THIS SHOULD SOURCE THE APPROPRIATE FILES TO SET UP THE ENVIRONMENT AND EXCECUTE THE PYTHON SCRIPT
 echo 'Create a staging directory:'
 setenv stage /scratch/${PIPELINE_TASKPATH}_${LSB_BATCH_JID}
@@ -15,7 +15,7 @@ else
 endif
 
 cp $FT2_PATH $FT2_PATH_STAGE
-cp -r $OUTPUT_FILE_PATH/* $stage/.
+cp -r $OUTPUT_FILE_PATH/$TRIGGERNAME $stage/.
 setenv OUTPUT_FILE_PATH_STAGE $stage
 
 #cp -r $GTBURST_TEMPLATE_PATH/*.txt $stage/diffuse/.
@@ -36,16 +36,16 @@ echo 'About run the process_n_points.py script...'
 
 #python ${GPL_TASKROOT}/fermi_gw_toolkit/fermi_gw_toolkit/process_n_points.py $TRIGGERNAME --ra $OBJ_RA --dec $OBJ_DEC --roi $ROI --tstarts ${MET_TSTART} --tstops ${MET_TSTOP} --irf $IRFS --galactic_model $GAL_MODEL --particle_model "$PART_MODEL" --tsmin $TSMIN --emin $EMIN --emax $EMAX --zmax $ZMAX --strategy $STRATEGY --datarepository $OUTPUT_FILE_PATH --ulphindex $UL_INDEX
 
-echo python ${GPL_TASKROOT}/fermi_gw_toolkit/fermi_gw_toolkit/process_n_points.py $TRIGGERNAME --ra $OBJ_RA --dec $OBJ_DEC --roi $ROI --tstarts ${MET_TSTART} --tstops ${MET_TSTOP} --irf $IRFS --galactic_model $GAL_MODEL --particle_model "$PART_MODEL" --tsmin $TSMIN --emin $EMIN --emax $EMAX --zmax $ZMAX --strategy $STRATEGY --thetamax $THETAMAX --datarepository $OUTPUT_FILE_PATH_STAGE --ulphindex $UL_INDEX --ft2 $FT2_PATH_STAGE --src $SRC --burn_in $BURN_IN --n_samples $N_SAMPLES --bayesian_ul $BAYESIAN_UL --sim_ft1_tar $TAR_STAGE
+echo python ${GPL_TASKROOT}/fermi_gw_toolkit/fermi_gw_toolkit/process_n_points.py $TRIGGERNAME --ra $OBJ_RA --dec $OBJ_DEC --roi $ROI --tstarts ${MET_TSTART} --tstops ${MET_TSTOP} --irf $IRFS --galactic_model $GAL_MODEL --particle_model "$PART_MODEL" --tsmin $TSMIN --emin $EMIN --emax $EMAX --zmax $ZMAX --strategy $STRATEGY --thetamax $THETAMAX --datarepository $OUTPUT_FILE_PATH_STAGE --ulphindex $UL_INDEX --ft2 $FT2_PATH_STAGE --src $SRC --burn_in $BURN_IN --n_samples $N_SAMPLES --bayesian_ul $BAYESIAN_UL --sim_ft1_tar $TAR_STAGE --do_tsmap $DO_TSMAP
 
-python ${GPL_TASKROOT}/fermi_gw_toolkit/fermi_gw_toolkit/process_n_points.py $TRIGGERNAME --ra $OBJ_RA --dec $OBJ_DEC --roi $ROI --tstarts ${MET_TSTART} --tstops ${MET_TSTOP} --irf $IRFS --galactic_model $GAL_MODEL --particle_model "$PART_MODEL" --tsmin $TSMIN --emin $EMIN --emax $EMAX --zmax $ZMAX --strategy $STRATEGY --thetamax $THETAMAX --datarepository $OUTPUT_FILE_PATH_STAGE --ulphindex $UL_INDEX --ft2 $FT2_PATH_STAGE --src $SRC --burn_in $BURN_IN --n_samples $N_SAMPLES --bayesian_ul $BAYESIAN_UL --sim_ft1_tar $TAR_STAGE
+python ${GPL_TASKROOT}/fermi_gw_toolkit/fermi_gw_toolkit/process_n_points.py $TRIGGERNAME --ra $OBJ_RA --dec $OBJ_DEC --roi $ROI --tstarts ${MET_TSTART} --tstops ${MET_TSTOP} --irf $IRFS --galactic_model $GAL_MODEL --particle_model "$PART_MODEL" --tsmin $TSMIN --emin $EMIN --emax $EMAX --zmax $ZMAX --strategy $STRATEGY --thetamax $THETAMAX --datarepository $OUTPUT_FILE_PATH_STAGE --ulphindex $UL_INDEX --ft2 $FT2_PATH_STAGE --src $SRC --burn_in $BURN_IN --n_samples $N_SAMPLES --bayesian_ul $BAYESIAN_UL --sim_ft1_tar $TAR_STAGE --do_tsmap $DO_TSMAP
 
 
-mkdir -p $OUTPUT_FILE_PATH/FIXEDINTERVAL
+mkdir -p $OUTPUT_FILE_PATH/$SUBDIR
 set nonomatch x=(${TRIGGERNAME}_*_res.txt)
 if ( -e $x[1] ) then
     ls ${TRIGGERNAME}_*_res.txt 
-    mv ${TRIGGERNAME}_*_res.txt $OUTPUT_FILE_PATH/FIXEDINTERVAL/.
+    mv ${TRIGGERNAME}_*_res.txt $OUTPUT_FILE_PATH/$SUBDIR/.
 else
     echo "No results file found!"
 endif
@@ -54,9 +54,9 @@ endif
 set nonomatch y=(${TRIGGERNAME}_*_bayesian_ul*.npz)
 if ( -e $y[1] ) then
     ls ${TRIGGERNAME}_*_bayesian_ul*.npz
-    mv ${TRIGGERNAME}_*_bayesian_ul*.npz $OUTPUT_FILE_PATH/FIXEDINTERVAL/.
+    mv ${TRIGGERNAME}_*_bayesian_ul*.npz $OUTPUT_FILE_PATH/$SUBDIR/.
     ls ${TRIGGERNAME}_*_corner_plot.png
-    mv ${TRIGGERNAME}_*_corner_plot.png $OUTPUT_FILE_PATH/FIXEDINTERVAL/.
+    mv ${TRIGGERNAME}_*_corner_plot.png $OUTPUT_FILE_PATH/$SUBDIR/.
 else
     echo "No bayesian ul results file found!"
 endif
@@ -64,9 +64,21 @@ endif
 set nonomatch z=(${TRIGGERNAME}_*_sim*)
 if ( -e $z[1] ) then
     ls ${TRIGGERNAME}_*_sim*
-    mv ${TRIGGERNAME}_*_sim* $OUTPUT_FILE_PATH/FIXEDINTERVAL/.
+    mv ${TRIGGERNAME}_*_sim* $OUTPUT_FILE_PATH/$SUBDIR/.
 else
     echo "No simulation file found!"
+endif
+
+set nonomatch k=(${TRIGGERNAME}_*_cmap*)
+if ( -e $k[1] ) then
+    ls ${TRIGGERNAME}_*_cmap*
+    mv ${TRIGGERNAME}_*_cmap* $OUTPUT_FILE_PATH/$SUBDIR/.
+    ls ${TRIGGERNAME}_*_tsmap*
+    mv ${TRIGGERNAME}_*_tsmap* $OUTPUT_FILE_PATH/$SUBDIR/.
+    ls ${TRIGGERNAME}_*_coords.txt 
+    mv ${TRIGGERNAME}_*_coords.txt $OUTPUT_FILE_PATH/$SUBDIR/.
+else
+    echo "No TSMAP and CMAP found!"
 endif
 
 echo "Removing staging directory"

@@ -4,7 +4,9 @@ import argparse
 import subprocess
 import os
 import glob
-
+from get_sources import getSourcesInTheROI
+from GtBurst.commands import fits2png
+from GtBurst.commands.gtdotsmap import thisCommand as gtdotsmap
 
 def _execute_command(cmd_line):
 
@@ -12,8 +14,14 @@ def _execute_command(cmd_line):
     print(cmd_line)
     print("")
 
-    subprocess.check_call(cmd_line, shell=True)
+    output = subprocess.check_output(cmd_line, stderr=subprocess.STDOUT, shell=True)
+    print output
 
+def _chdir_rmdir(init_dir, subfolder_dir):
+    print "Returning to: %s" % init_dir
+    os.chdir(init_dir)
+    print "Removing: %s" % subfolder_dir
+    os.system('rm -rf %s' % subfolder_dir)
 
 if __name__ == "__main__":
 
@@ -44,6 +52,9 @@ if __name__ == "__main__":
     parser.add_argument('--src', type=str, required=True)
     parser.add_argument('--burn_in', type=int, required=True)
     parser.add_argument('--n_samples', type=int, required=True)
+    
+    # args for ts map
+    parser.add_argument('--do_tsmap', type=int, required=False, choices=[0, 1], default=0)
 
     # args for simulation
     parser.add_argument('--sim_ft1_tar', help="Path to .tar file containing simulated FT1 data (full sky)", type=str,
@@ -67,6 +78,10 @@ if __name__ == "__main__":
     assert os.path.exists(ft2), "FT2 %s does not exist" % ft2
 
     tsmap_spec = "0.5,8"
+    if args.bayesian_ul is 0 or args.do_tsmap is 1:
+        fgl_mode = 'complete'
+    else:
+        fgl_mode = 'fast'
 
     for ra, dec in zip(args.ra, args.dec):
 
@@ -77,28 +92,45 @@ if __name__ == "__main__":
                    '--emax %s --irf %s --galactic_model %s ' \
                    '--particle_model "%s" --tsmin %s --strategy %s ' \
                    '--thetamax %s --datarepository %s --ulphindex %s --flemin 100 --flemax 1000 ' \
-                   '--tsmap_spec %s --fgl_mode complete' % \
+                   '--tsmap_spec %s --fgl_mode %s' % \
                    (args.triggername, ra, dec, outfile,
                     args.roi, args.tstarts, args.tstops, args.zmax, args.emin,
                     args.emax, args.irf, args.galactic_model,
                     args.particle_model, args.tsmin, args.strategy,
-                    args.thetamax, args.datarepository, args.ulphindex, tsmap_spec)
+                    args.thetamax, args.datarepository, args.ulphindex, 
+                    tsmap_spec, fgl_mode)
 
-        _execute_command(cmd_line)
+        try:
+            pass
+            _execute_command(cmd_line)
+        except subprocess.CalledProcessError as err:
+            print('ERROR: doTimeResolvedLike.py skipped for RA=%.3f, DEC=%.3f'%\
+                (ra, dec))
+            print(err)
+            print(err.output)
+            if "ModuleNotFoundError" in err.output:
+                raise RuntimeError
+            else:
+                continue
 
         # Figure out path of output files for the Bayesian upper limit and/or the simulation step below
         init_dir = os.getcwd()
         subfolder_dir = os.path.abspath("interval%s-%s" % \
                                         (float(args.tstarts), float(args.tstops)))
-        xml = glob.glob(subfolder_dir + '/*filt_likeRes.xml')[0]
-        expomap = glob.glob(subfolder_dir + '/*filt_expomap.fit')[0]
-        new_ft1 = glob.glob(subfolder_dir + '/*filt.fit')[0]
-        ltcube = glob.glob(subfolder_dir + '/*filt_ltcube.fit')[0]
+        try:
+            xml = glob.glob(subfolder_dir + '/*filt_likeRes.xml')[0]
+            expomap = glob.glob(subfolder_dir + '/*filt_expomap.fit')[0]
+            new_ft1 = glob.glob(subfolder_dir + '/*filt.fit')[0]
+            ltcube = glob.glob(subfolder_dir + '/*filt_ltcube.fit')[0]
+        except IndexError:
+            print 'Data are not available for pixel at RA=%.3f, DEC=%.3f' %\
+                (ra, dec)
+            print 'Skipping this one...'
+            #_chdir_rmdir(init_dir, subfolder_dir)
+            continue
 
-        if args.bayesian_ul is 0:
-
+        if args.bayesian_ul is 0 or args.do_tsmap is 1:
             print('Bayesian UL not executed.')
-
         else:
 
             print 'Using:\n %s,\n %s,\n %s,\n %s' % (xml, expomap, new_ft1,
@@ -118,11 +150,66 @@ if __name__ == "__main__":
                         args.emax, outul, outplot, args.n_samples, args.src,
                         args.burn_in)
 
+            try:
+                _execute_command(cmd_line)
+            except subprocess.CalledProcessError as err:
+                print('ERROR: bayesian_ul.py skipped for RA=%.3f, DEC=%.3f'%\
+                    (ra, dec))
+                print(err)
+                print(err.output)
+                _chdir_rmdir(init_dir, subfolder_dir)
+                continue
+            pass
+        
+        # If do_tsmap option is 1 run the gtdotsmap script
+        
+        if args.do_tsmap is 1:
+            #ts map
+            rsp = glob.glob(args.datarepository + '/%s/*.rsp' % args.triggername)[0]
+            expomap = os.path.basename(expomap)
+            ltcube = os.path.basename(ltcube)
+            #print 'Using:\n %s,\n %s,\n %s,\n %s,\n %s' %\
+            #    (xml, expomap, new_ft1, ltcube, rsp)
+            outfits = os.path.join(init_dir, '%s_%.3f_%.3f_tsmap.fits' % \
+                                 (args.triggername, ra, dec))
+            print "Changing working directory to: %s" % subfolder_dir
+            os.chdir(subfolder_dir)
+            
+            ramax, decmax, tsmax = gtdotsmap.run(filteredeventfile=new_ft1, 
+                ft2file=ft2, tsexpomap=expomap, tsltcube=ltcube, xmlmodel=xml, 
+                rspfile=rsp, tsmap=outfits, step=0.8, side='auto', 
+                clobber='yes', verbose='yes')[3:8:2]
+            
+            #save coordinates and ts value
+            outfile = os.path.join(init_dir, '%s_%.3f_%.3f_coords.txt' % \
+                                 (args.triggername, ra, dec))
+            with open(outfile, 'w+') as f:
+                f.write("#ra dec ts\n")
+                f.write("%f %f %f\n" % (ramax, decmax, tsmax))
+            
+            #fits2png
+            sources = [['Maximum TS', float(ramax), float(decmax)]]
+            fits2png.fitsToPNG(outfits, outfits.replace('.fits', '.png'), 0.0,
+                               tsmax, sources=sources)
+            
+            #count map
+            outfits = os.path.join(init_dir, '%s_%.3f_%.3f_cmap.fits' % \
+                                 (args.triggername, ra, dec))
+            cmd_line = 'gtdocountsmap.py ' \
+                       'eventfile=%s rspfile=%s ft2file=%s ra=%s dec=%s '\
+                       'rad=%s irf=%s zmax=%s tstart=%s tstop=%s emin=%s '\
+                       'emax=%s skymap=%s thetamax=%s strategy=%s' % \
+                       (new_ft1, rsp, ft2, ra, dec, args.roi, args.irf, 
+                        args.zmax, args.tstarts, args.tstops, args.emin, 
+                        args.emax, outfits, args.thetamax, args.strategy)
             _execute_command(cmd_line)
-
-            print "Returning to: %s" % init_dir
-            os.chdir(init_dir)
-
+            
+            #fits2png with sources
+            sources = getSourcesInTheROI(ra, dec, args.roi, float(args.tstarts))
+            fits2png.fitsToPNG(outfits, outfits.replace('.fits', '.png'), 
+                               sources=sources)
+            pass
+        
         # See whether we need to run on simulated data
 
         if args.sim_ft1_tar is not None and args.sim_ft1_tar.lower() != 'none':
@@ -145,8 +232,7 @@ if __name__ == "__main__":
             os.chdir(subfolder_dir)
 
             _execute_command(cmd_line)
-
-
-
-            print "Returning to: %s" % init_dir
-            os.chdir(init_dir)
+            pass
+        _chdir_rmdir(init_dir, subfolder_dir)
+        print 'Done!'
+        

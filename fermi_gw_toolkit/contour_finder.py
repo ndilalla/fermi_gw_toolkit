@@ -15,6 +15,14 @@ def pix_to_sky(idx, nside):
 
     return ra, dec
 
+def sky_to_pix(ra,dec, nside):
+    """Convert the pixels corresponding to the input indexes to sky coordinates (RA, Dec)"""
+    phi    = np.deg2rad(ra)
+    theta  = 0.5 * np.pi - np.deg2rad(dec)
+
+    idx = hp.ang2pix(nside, theta, phi)
+
+    return idx
 
 def check_power_of_two(num):
     """Check that the given number is a power of 2"""
@@ -81,14 +89,16 @@ class ContourFinder(object):
         cumsum = np.cumsum(self._ligo_map[index_revsort])
 
         # Find out which pixels are within the containment level requested in the ordered "space"
-
+        
         idx_prime = (cumsum <= containment_level)
 
         # Convert back to the "unordered space"
 
         idx = index_revsort[idx_prime]
-
-        assert abs(np.sum(self._ligo_map[idx]) - containment_level) < 1e-2, "Total prob. within containment is too far from requested value"
+        
+        cum_tot = np.sum(self._ligo_map[idx])
+        if abs(cum_tot - containment_level) > 1e-2:
+            print "WARNING: Total prob. within containment (%.3f) is too far from requested value (%.3f)" % (cum_tot, containment_level)
 
         return idx
 
