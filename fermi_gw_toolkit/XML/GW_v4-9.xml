@@ -1,0 +1,647 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pipeline
+   xmlns="http://glast-ground.slac.stanford.edu/pipeline"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://glast-ground.slac.stanford.edu/pipeline https://glast-ground.slac.stanford.edu/Pipeline-II/schemas/2.0/pipeline.xsd">
+  <!--
+     Changes:
+     2017-03-03 NO: initial import
+    -->
+  <task name="GWFUP"
+        version="4.9"
+        type="Data">
+    
+    <notation>
+      Follow up GW events
+    </notation>
+    
+    <variables>
+      <!-- Location-specific variables -->
+      <var name="GPL_SITE">SLAC</var>
+      <var name="GLASTROOT">/afs/slac.stanford.edu/g/glast</var>
+      <var name="GPL_SCRIPTS">${GLASTROOT}/ground/PipelineConfig/GPL/python</var>
+      <var name="GPL2">${GLASTROOT}/ground/PipelineConfig/GPLtools/GPLtools-02-00-01/</var>
+      <var name="GPL2_MESSAGELVL">DEBUG</var>
+      <var name="PIPELINE_LOGFILE">logFile.txt</var>
+      <!-- Job control variables -->
+      <var name="GPL_TASKROOT">/nfs/farm/g/glast/u26/GWPIPELINE</var>
+      <!--var name="GPL_TASKCATEGORY">ServiceChallenge</var-->
+      <var name="GPL_SIXDIGSTREAM">${format(pipeline.stream,&quot;%06d&quot;)}</var>
+      <var name="GPL_CONFIGDIR">${GPL_TASKROOT}/config/DEV</var>
+      <var name="GPL_logRoot">${GPL_TASKROOT}/logs</var>
+      <var name="logRoot">${GPL_logRoot}</var>
+      <var name="NUMBER_PIXELS_RUNS">10</var>
+      <var name="SIMULATE_MODE">0</var>
+      <var name="BAYESIAN_UL">0</var>
+      <var name="SIMULATE_ROI_TARFILE">0</var>
+      <var name="GPL_QUEUE">glastdataq</var>
+      <var name="GPL_ALLOGRP">glastgrp</var>
+      <var name="GPL_BATCHRESOURCES">select[rhel60] rusage[scratch=1]</var>
+      <var name="GPL_BATCHOPTIONS"> -sp 50 </var>
+      <var name="GPL_XTRABATCHRESOURCES"></var>         <!-- intentionally left EMPTY - for rollback -->
+      <var name="GPL_XTRABATCHOPTIONS"></var>           <!-- intentionally left EMPTY - for rollback -->
+      <var name="WALL_TIME"> 2:0 </var>                 <!-- Two hours by default. Format:       H:M -->
+
+      <!-- Control which parts of the analysis to run -->
+      <var name="RUN_ATI">1</var>
+      <var name="RUN_FTI">1</var>
+      <var name="RUN_LLE">1</var>
+      <var name="RUN_PGW">1</var>
+
+      <!-- Specific Variables -->
+      <var name="TRIGGERNAME">bnGW150914</var>
+      <var name="TRIGGERTIME">0.0</var>
+      <var name="VERSION">v00</var>
+      <var name="DATA_PATH">${GPL_TASKROOT}/input/${TRIGGERNAME}/${VERSION}</var>          <!-- this could be useful to keep different versions of the analysis -->
+      <var name="OUTPUT_FILE_PATH">${GPL_TASKROOT}/output/${TRIGGERNAME}/${VERSION}</var> <!-- this could be useful to keep different versions of the analysis -->
+      <var name="HEALPIX_NAME_MAP">HEALPIX.fits</var>
+      <var name="HEALPIX_PATH">${GPL_TASKROOT}/input/${HEALPIX_NAME_MAP}</var>
+      <var name="HEALPIX_PATH_MAP">${DATA_PATH}/${HEALPIX_NAME_MAP}</var>	    
+      <var name="FT1_NAME">FT1.fits</var>
+      <var name="FT1_PATH">${DATA_PATH}/${FT1_NAME}</var>
+      <var name="FT2_NAME">FT2.fits</var>
+      <var name="FT2_PATH">${DATA_PATH}/${FT2_NAME}</var>
+      <var name="NSIDE">128</var>
+      <var name="LIGO_COVERAGE_CL">0.9</var>
+      <var name="NSIDE_LLE">32</var>
+      <var name="DURATION">10000</var>
+      <var name="TSTART">0</var>
+      <var name="TSTOP">10000</var>
+      <var name="FT2TSTART">-10000</var>
+      <var name="FT2TSTOP">10000</var>
+      <var name="MET_TSTART">0</var>
+      <var name="MET_TSTOP">10000</var>
+      <var name="MET_FT2TSTART">-10000</var>
+      <var name="MET_FT2TSTOP">10000</var>
+      <var name="EMIN">100</var>
+      <var name="EMAX">100000</var>
+      <var name="TSMIN">30</var>
+      <var name="IRFS">p8_transient010e</var>
+      <var name="GAL_MODEL">template</var>
+      <var name="PART_MODEL">isotr template</var>
+      <var name="UL_INDEX">-2</var>
+      <var name="STRATEGY">events</var>
+      <var name="ZMAX">100</var>
+      <var name="THETAMAX">73</var>
+      <var name="ROI">8</var>
+      <var name="SRC">GRB</var>
+      <var name="N_SAMPLES">500</var>
+      <var name="BURN_IN">200</var>
+      <var name="OUTADAPTIVEINTERVALS">${OUTPUT_FILE_PATH}/adaptive.txt</var>
+      <var name="OUTLLEINTERVALS">${OUTPUT_FILE_PATH}/lle_adaptive.txt</var>
+      <var name="OUTLIST">${OUTPUT_FILE_PATH}/roi_list.txt</var>
+      <var name="OUTMAP">${OUTPUT_FILE_PATH}/new_map.fits</var>
+      <var name="OUTCOV">${OUTPUT_FILE_PATH}/${TRIGGERNAME}</var>
+
+      <var name="FTI_OUTULMAP">${OUTPUT_FILE_PATH}/FTI_ul_map.fits</var>
+      <var name="FTI_OUTTSMAP">${OUTPUT_FILE_PATH}/FTI_ts_map.fits</var>
+
+      <var name="ATI_OUTULMAP">${OUTPUT_FILE_PATH}/ATI_ul_map.fits</var>
+      <var name="ATI_OUTTSMAP">${OUTPUT_FILE_PATH}/ATI_ts_map.fits</var>
+
+      <var name="LLE_OUTULMAP">${OUTPUT_FILE_PATH}/LLE_ul_map.fits</var>
+      <var name="LLE_OUTTSMAP">${OUTPUT_FILE_PATH}/LLE_ts_map.fits</var>
+
+      <var name="FTI_OUTULMAP_PLOT">${OUTPUT_FILE_PATH}/images/FTI_ul_map.png</var>
+      <var name="FTI_OUTTSMAP_PLOT">${OUTPUT_FILE_PATH}/images/FTI_ts_map.png</var>
+
+      <var name="ATI_OUTULMAP_PLOT">${OUTPUT_FILE_PATH}/images/ATI_ul_map.png</var>
+      <var name="ATI_OUTTSMAP_PLOT">${OUTPUT_FILE_PATH}/images/ATI_ts_map.png</var>
+      <var name="ATI_COMPOSITELC_PLOT">${OUTPUT_FILE_PATH}/images/ATI_compositeLC.png</var>
+
+      <var name="LLE_OUTULMAP_PLOT">${OUTPUT_FILE_PATH}/images/LLE_ul_map.png</var>
+      <var name="LLE_OUTTSMAP_PLOT">${OUTPUT_FILE_PATH}/images/LLE_ts_map.png</var>
+      
+      <var name="PGW_FT1">${OUTPUT_FILE_PATH}/PGW_ft1_selected.fits</var>
+
+      <var name="PGW_OUTCMAP">${OUTPUT_FILE_PATH}/PGW_countmap</var>
+      <var name="PGW_OUTCMAP_PLOT">${OUTPUT_FILE_PATH}/images/PGW_countmap.png</var>
+      <var name="PGW_OUTLIST">${OUTPUT_FILE_PATH}/PGW_outlist.list</var>
+
+      <var name="PGW_OUTULMAP">${OUTPUT_FILE_PATH}/PGW_ul_map.fits</var>
+      <var name="PGW_OUTTSMAP">${OUTPUT_FILE_PATH}/PGW_ts_map.fits</var>
+      <var name="PGW_OUTULMAP_PLOT">${OUTPUT_FILE_PATH}/images/PGW_ul_map.png</var>
+      <var name="PGW_OUTTSMAP_PLOT">${OUTPUT_FILE_PATH}/images/PGW_ts_map.png</var>
+      
+      <var name="OUT_BAYUL">${OUTPUT_FILE_PATH}/images/weighted_integral_distribution</var>
+
+      <!-- gtburst configuration -->
+      <var name="GTBURST_NCPUS">1</var>
+    </variables>
+    
+    <process name="get_fitsfiles">
+      <job 
+         executable="${GPL_CONFIGDIR}/get_fitsfiles.sh" 
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />
+    </process>
+    
+    <process name="rawdata2package">
+      <job 
+         executable="${GPL_CONFIGDIR}/rawdata2package.sh" 
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />
+      <depends>
+        <after process="get_fitsfiles"></after>
+      </depends>
+    </process>
+
+    <process name="countmap">
+      <job
+         executable="${GPL_CONFIGDIR}/countmap.sh"
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />
+      <depends>
+        <after process="rawdata2package"></after>
+      </depends>
+    </process>
+
+    <process name="pgwave">
+      <job
+         executable="${GPL_CONFIGDIR}/pgwave.sh"
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />
+      <depends>
+        <after process="countmap"></after>
+      </depends>
+    </process>
+
+    <process name="plot_cmap">
+      <job
+         executable="${GPL_CONFIGDIR}/plot_cmap.sh"
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />
+      <depends>
+        <after process="pgwave"></after>
+      </depends>
+    </process>
+
+    <process name="submit_PGW_jobs">
+      <script><![CDATA[
+         import os
+         print 'Opening file %s...' %(PGW_OUTLIST)
+         if os.path.exists(PGW_OUTLIST):
+             roi_list = open(PGW_OUTLIST, 'r')
+             rois=roi_list.readlines()
+             n_rois=len(rois)
+             print 'Number of ROI....:',n_rois-1
+             iStream=0
+             while iStream < n_rois:
+                 if '#' in rois[iStream]: 
+                     iStream+=1
+                     continue
+                 ras=''
+                 decs=''
+                 for ipixel in range(1): # NUMBER_PIXELS_RUNS):
+                     if iStream < n_rois:
+                         ra,dec,l,b,sn,ksig,counts,gw=rois[iStream].split()
+                         ras+='%s ' % ra
+                         decs+='%s ' % dec
+                         iStream+=1
+                     if iStream == n_rois: continue
+                 args='OBJ_RA="%s",OBJ_DEC="%s",SUBDIR="PGWAVE",DO_TSMAP="1"' %(ras,decs)
+                 print 'args=',args
+                 pipeline.createSubstream("PGW_Likelihood",iStream+1,args)
+	 else:       
+             print 'File %s does not exists!' % (PGW_OUTLIST)
+      ]]></script>
+      <depends>
+        <after process="plot_cmap"></after>
+      </depends>
+      
+      <createsSubtasks>
+        <subtask>PGW_Likelihood</subtask>
+      </createsSubtasks>
+    </process>
+
+    <process name="PGW_merge_results">
+      <job
+         executable="${GPL_CONFIGDIR}/PGW_merge_results.sh"
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />
+      <depends>
+        <after process="PGW_Likelihood.process_n_points" status="DONE"></after>
+      </depends>
+    </process>
+    
+    <process name="get_coverage">
+      <job
+         executable="${GPL_CONFIGDIR}/get_coverage.sh"
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />
+      <depends>
+        <after process="rawdata2package"></after>
+      </depends>
+    </process>
+    
+    <process name="prepare_grid">
+      <job
+         executable="${GPL_CONFIGDIR}/prepare_grid.sh"
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />
+      <depends>
+        <after process="get_coverage"></after>
+      </depends>
+    </process>
+    
+    <process name="submit_FTI_jobs">
+      <script><![CDATA[
+         import os
+         print 'Opening file %s...' %(OUTLIST)
+         if os.path.exists(OUTLIST):
+             roi_list = open(OUTLIST, 'r')
+             rois=roi_list.readlines()
+             n_rois=len(rois)
+             print 'Number of ROI....:',n_rois
+             #n_rois=50
+             iStream=0
+             while iStream < n_rois:
+                 if '#' in rois[iStream]: 
+                     iStream+=1
+                     continue
+                 ras=''
+                 decs=''
+                 for ipixel in range(NUMBER_PIXELS_RUNS):
+                     if iStream < n_rois:
+                         ra,dec=rois[iStream].split()
+                         ras+='%s ' % ra
+                         decs+='%s ' % dec
+                         iStream+=1
+                     if iStream == n_rois: continue
+                 args='OBJ_RA="%s",OBJ_DEC="%s",SUBDIR="FIXEDINTERVAL",DO_TSMAP="0"' %(ras,decs)
+                 #print 'args=',args
+                 pipeline.createSubstream("FTI_Likelihood",iStream+1,args)
+	 else:       
+             print 'File %s does not exists!' % (OUTLIST)
+      ]]></script>
+      <depends>
+        <after process="prepare_grid"></after>
+      </depends>
+      
+      <createsSubtasks>
+        <subtask>FTI_Likelihood</subtask>
+      </createsSubtasks>
+    </process>
+    
+    <process name="FTI_merge_results">
+      <job
+         executable="${GPL_CONFIGDIR}/FTI_merge_results.sh"
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />
+      <depends>
+        <after process="FTI_Likelihood.process_n_points" status="DONE"></after>
+      </depends>
+    </process>
+    
+    <process name="FTI_fill_maps">
+      <job
+         executable="${GPL_CONFIGDIR}/FTI_fill_maps.sh"
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />   
+      <depends>
+        <after process="FTI_merge_results"></after>
+      </depends>
+    </process>
+
+    <process name="FTI_plot_ULmap">
+      <job
+         executable="${GPL_CONFIGDIR}/FTI_plot_ULmap.sh"
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />   
+      <depends>
+        <after process="FTI_fill_maps"></after>
+      </depends>
+    </process>
+    
+    <process name="FTI_plot_TSmap">
+      <job
+         executable="${GPL_CONFIGDIR}/FTI_plot_TSmap.sh"
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />   
+      <depends>
+        <after process="FTI_fill_maps"></after>
+      </depends>
+    </process>
+    
+    <process name="weight_bayesian_ul">
+      <job
+         executable="${GPL_CONFIGDIR}/weight_bayesian_ul.sh"
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />   
+      <depends>
+        <after process="FTI_fill_maps"></after>
+      </depends>
+    </process>
+    
+    <process name="adaptive_time_intervals">
+      <job 
+         executable="${GPL_CONFIGDIR}/adaptive_time_intervals.sh" 
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />
+      <depends>
+	<after process="rawdata2package"></after>
+      </depends>
+    </process>
+    
+    <process name="LLE_time_intervals">
+      <job 
+         executable="${GPL_CONFIGDIR}/LLE_time_intervals.sh" 
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />
+      <depends>
+	<after process="rawdata2package"></after>
+      </depends>
+    </process>
+    
+    <process name="submit_LLE_jobs">
+      <script><![CDATA[
+         import os
+         print 'Opening file %s...' %(OUTLLEINTERVALS)
+         if os.path.exists(OUTLLEINTERVALS):
+             roi_list = open(OUTLLEINTERVALS, 'r')
+             rois=roi_list.readlines()
+             n_rois=len(rois)
+             print 'Number of ROI....:',n_rois
+             #n_rois=50
+             iStream=0
+             while iStream < n_rois:
+                 if '#' in rois[iStream]: 
+                     iStream+=1
+                     continue
+                 ra,dec,t0,t1,dt = rois[iStream].split()
+                 if float(t0) > 0 or float(t1) < 0:
+                     iStream+=1
+                     continue
+                 args='OBJ_RA="%s",OBJ_DEC="%s",TSTART="%s",TSTOP="%s"' %(ra,dec,t0,t1)
+                 # print 'args=',args
+                 pipeline.createSubstream("LLE_Analysis",iStream+1,args)                 
+                 iStream+=1
+                 pass
+	 else: 
+             print 'File %s does not exists!' % (OUTLLEINTERVALS)
+      ]]></script>
+      <depends>
+        <after process="LLE_time_intervals"></after>
+      </depends>
+      
+      <createsSubtasks>
+	<subtask>LLE_Analysis</subtask>
+      </createsSubtasks>
+    </process>
+
+    <process name="submit_ATI_jobs">
+      <script><![CDATA[
+         import os
+         print 'Opening file %s...' %(OUTADAPTIVEINTERVALS)
+         if os.path.exists(OUTADAPTIVEINTERVALS):
+             roi_list = open(OUTADAPTIVEINTERVALS, 'r')
+             rois=roi_list.readlines()
+             n_rois=len(rois)
+             print 'Number of ROI....:',n_rois
+             #n_rois=50
+             iStream=0
+             while iStream < n_rois:
+                 if '#' in rois[iStream]: 
+                     iStream+=1
+                     continue
+                 ras=''
+                 decs=''
+                 tstarts=''
+                 tstops=''
+                 for ipixel in range(NUMBER_PIXELS_RUNS):
+                     if iStream < n_rois:
+                         ra,dec,t0,t1,dt = rois[iStream].split()
+                         met_tstart=float(t0)+float(TRIGGERTIME)
+                         met_tstop =float(t1)+float(TRIGGERTIME)
+                         ras+='%s ' % ra
+                         decs+='%s ' % dec
+                         tstarts+='%s ' %  met_tstart
+                         tstops+='%s ' % met_tstop
+                         iStream+=1
+                     if iStream == n_rois: continue
+                 args='OBJ_RA="%s",OBJ_DEC="%s",TSTARTS="%s",TSTOPS="%s",SUBDIR="ADAPTIVEINTERVAL"' %(ras,decs,tstarts,tstops)
+                 # print 'args=',args
+                 pipeline.createSubstream("ATI_Likelihood",iStream+1,args)                 
+	 else: 
+             print 'File %s does not exists!' % (OUTADAPTIVEINTERVALS)
+      ]]></script>
+      <depends>
+        <after process="adaptive_time_intervals"></after>
+      </depends>
+      
+      <createsSubtasks>
+	<subtask>ATI_Likelihood</subtask>
+      </createsSubtasks>
+    </process>
+    
+    <process name="ATI_merge_results">
+      <job
+         executable="${GPL_CONFIGDIR}/ATI_merge_results.sh"
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />
+      <depends>
+        <after process="ATI_Likelihood.process_n_points_times" status="DONE"></after>
+      </depends>
+    </process>
+    
+    <process name="LLE_merge_results">
+      <job
+         executable="${GPL_CONFIGDIR}/LLE_merge_results.sh"
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />
+      <depends>
+        <after process="LLE_Analysis.makeLLE" status="DONE"></after>
+      </depends>
+    </process>
+    
+    <process name="ATI_fill_maps">
+      <job
+         executable="${GPL_CONFIGDIR}/ATI_fill_maps.sh"
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />   
+      <depends>
+        <after process="ATI_merge_results"></after>
+      </depends>
+    </process>
+
+    <process name="LLE_fill_maps">
+      <job
+         executable="${GPL_CONFIGDIR}/LLE_fill_maps.sh"
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />   
+      <depends>
+        <after process="LLE_merge_results"></after>
+      </depends>
+    </process>
+    
+    <process name="ATI_plot_ULmap">
+      <job
+         executable="${GPL_CONFIGDIR}/ATI_plot_ULmap.sh"
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />   
+      <depends>
+        <after process="ATI_fill_maps"></after>
+      </depends>
+    </process>
+    
+    <process name="ATI_plot_TSmap">
+      <job
+         executable="${GPL_CONFIGDIR}/ATI_plot_TSmap.sh"
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />   
+      <depends>
+        <after process="ATI_fill_maps"></after>
+      </depends>
+    </process>
+
+    <process name="LLE_plot_TSmap">
+      <job
+         executable="${GPL_CONFIGDIR}/LLE_plot_TSmap.sh"
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />   
+      <depends>
+        <after process="LLE_fill_maps"></after>
+      </depends>
+    </process>
+
+    <process name="ATI_plot_compositeLC">
+      <job
+         executable="${GPL_CONFIGDIR}/ATI_plot_compositeLC.sh"
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />   
+      <depends>
+        <after process="ATI_fill_maps"></after>
+      </depends>
+    </process>
+    <process name="show_results">
+      <job
+         executable="${GPL_CONFIGDIR}/show_results.sh"
+         queue="${GPL_QUEUE}"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+         />  
+      <depends>
+	<after process="ATI_plot_compositeLC" status="SUCCESS" />
+	<after process="ATI_plot_TSmap" status="SUCCESS" />
+	<after process="ATI_plot_ULmap" status="SUCCESS" />
+	<after process="FTI_plot_TSmap" status="SUCCESS" />
+	<after process="FTI_plot_ULmap" status="SUCCESS" />
+	<after process="weight_bayesian_ul" status="SUCCESS" />
+	<after process="LLE_plot_TSmap" status="SUCCESS" />
+  <after process="PGW_merge_results" status="SUCCESS" ></after>
+      </depends>
+    </process>
+    
+    <task name="FTI_Likelihood"
+          version="1.6" 
+          type="Data">
+      <notation>
+        Perform a likelihood analysis and compute bayesian upper limits
+      </notation>
+      <prerequisites>
+        <prerequisite name="OBJ_RA" type="string"/>
+        <prerequisite name="OBJ_DEC" type="string"/>
+	    <prerequisite name="SUBDIR" type="string"/>
+	    <prerequisite name="DO_TSMAP" type="string"/>
+      </prerequisites>
+      
+      <process name="process_n_points" autoRetryMaxAttempts="2">
+        <job 
+           executable="${GPL_CONFIGDIR}/process_n_points.sh"
+           queue="${GPL_QUEUE}"
+           batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -W ${WALL_TIME} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+           />
+      </process>
+    </task>
+    
+    <task name="ATI_Likelihood"
+          version="1.5" 
+          type="Data">
+      <notation>
+	Perform a likelihood analysis for Adaptive Time Intervals
+      </notation>
+      <prerequisites>
+	<prerequisite name="OBJ_RA" type="string"/>
+	<prerequisite name="OBJ_DEC" type="string"/>
+	<prerequisite name="TSTARTS" type="string"/>
+	<prerequisite name="TSTOPS" type="string"/>
+	<prerequisite name="SUBDIR" type="string"/>
+      </prerequisites>
+      
+      <process name="process_n_points_times" autoRetryMaxAttempts="2">
+	<job 
+           executable="${GPL_CONFIGDIR}/process_n_points_times.sh"
+           queue="${GPL_QUEUE}"
+           batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -W ${WALL_TIME} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+           />
+      </process>
+    </task>
+
+    <task name="LLE_Analysis"
+          version="0.1" 
+          type="Data">
+      <notation>
+	LLE analysis
+      </notation>
+      <prerequisites>
+	<prerequisite name="OBJ_RA" type="string"/>
+	<prerequisite name="OBJ_DEC" type="string"/>
+	<prerequisite name="TSTARTS" type="string"/>
+	<prerequisite name="TSTOPS" type="string"/>
+      </prerequisites>
+      
+      <process name="makeLLE">
+	<job 
+           executable="${GPL_CONFIGDIR}/makeLLE.sh"
+           queue="${GPL_QUEUE}"
+           batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -W ${WALL_TIME} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+           />
+      </process>
+    </task>
+
+    <task name="PGW_Likelihood"
+          version="1.1" 
+          type="Data">
+      <notation>
+        Perform a likelihood analysis
+      </notation>
+      <prerequisites>
+        <prerequisite name="OBJ_RA" type="string"/>
+        <prerequisite name="OBJ_DEC" type="string"/>
+	    <prerequisite name="SUBDIR" type="string"/>
+	    <prerequisite name="DO_TSMAP" type="string"/>
+      </prerequisites>
+      
+      <process name="process_n_points" autoRetryMaxAttempts="2">
+        <job 
+           executable="${GPL_CONFIGDIR}/process_n_points.sh"
+           queue="${GPL_QUEUE}"
+           batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS} -W ${WALL_TIME} -R  &quot;${GPL_BATCHRESOURCES} ${GPL_XTRABATCHRESOURCES}&quot;"
+           />
+      </process>
+    </task>    
+
+  </task>
+</pipeline>
