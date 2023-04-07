@@ -22,17 +22,20 @@
             </tr>
           </table>
       </tr>
+                        
+      <!-- SUMMARY -->
+      
       <tr>
-      
-      
-      
         <td valign="top" >
           <table class="customers">
-            <tr><td >SUMMARY</td><td ></td></tr>
+            <tr><td ><b>SUMMARY</b></td><td></td></tr>
             <tr><td>Name</td><td>{triggername}</td></tr>
             <tr><td>Trigger MET</td><td>{triggertime}</td></tr>
             <tr><td>Date</td><td>{date}</td></tr>
             <tr><td>Time</td><td>{time}</td></tr>
+            <tr><td>In SSA?</td><td>{ssa}</td></tr>
+            <tr><td>Inst Coverage</td><td>{cov0}% {t0}</td></tr>
+            <tr><td>T Max Coverage</td><td>{tmax} ks ({covmax}%)</td></tr>
             <tr><td>E Min</td><td>{emin} MeV</td></tr>
             <tr><td>E Max</td><td>{emax} MeV</td></tr>
             <tr><td>T Start</td><td>{tstart} s</td></tr>
@@ -49,20 +52,31 @@
         </td>
         <td valign="top">
           <table class="customers">
-            <tr><td >FIXED TIME ANALYSIS</td></tr>
+            <tr><td ><b>COVERAGE</b></td></tr>
             <tr>
               <td align="center">
-                <b>Coverage plot</b>
                 <img src={coverage} alt="coverage" width="100%">
               </td>
             </tr>
           </table>
         </td>
       </tr>
+                  
+      <!-- FTI -->
+      
       <tr>
-        <td valign="top" rowspan="2">
+        <td colspan="2">
+          <table class="td_title">
+            <tr>
+              <td>FIXED TIME ANALYSIS</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top" rowspan="1">
           <table class="customers" >
-            <tr><td >TS MAXIMUM</td><td ></td><td ></td></tr>
+            <tr><td ><b>TS MAXIMUM</b></td><td ></td><td ></td></tr>
             <tr>
               <td rowspan="2" align="center">
                 TS<br>{fti_ts_max}</td>
@@ -73,12 +87,13 @@
             <tr><td >LIST OF TS &gt {ts_cut} </td></tr>
             {fti_ts_list}
           </table>
+
         </td>
         <td>
           <table class="customers">
+            <tr><td align="center"><b>TS MAP</b></td></tr>
             <tr>
-              <td align="center">
-                <b>TS map</b>
+              <td>
                 <img src={fti_ts_map} alt="ts" width="100%">
               </td>
             </tr>
@@ -86,26 +101,49 @@
         </td>
       </tr>
       <tr>
-        <td>
+        <td valign="top" rowspan="1">
+           <table class="customers" >
+            <tr><td colspan="3"><b>UL EXTREMES</b></td></tr>
+            <tr><td>UL min</td><td colspan="2">{fti_ul_min} e-10 erg cm<sup>-2</sup> s<sup>-1</sup></td></tr>
+            <tr><td>UL max</td><td colspan="2">{fti_ul_max} e-9 erg cm<sup>-2</sup> s<sup>-1</sup></td></tr>
+          </table>
+        </td>
+        <td rowspan="2">
           <table class="customers">
+            <tr><td align="center"><b>UL MAP</b></td></tr>
             <tr>
-              <td align="center">
-                <b>Upper limits map</b>
+              <td>
                 <img src={fti_ul_map} alt="ul" width="100%">
               </td>
             </tr>
           </table>
         </td>
       </tr>
+      <tr>
+        <td valign="top" rowspan="1">{bayesian_ul}</td>
+      </tr>
       <tr><td colspan="3"><p></p></td></tr>
+            
+      <!-- ATI -->
+      
+      <tr>
+        <td colspan="2">
+          <table class="td_title">
+            <tr>
+              <td>ADAPTIVE TIME ANALYSIS</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
       <tr>
         <td></td>
         <td>
           <table class="customers" >
-            <tr><td >ADAPTIVE TIME ANALYSIS</td></tr>
             <tr>
               <td align="center">
-                <b>Temporal and spatial distribution of the Upper Bounds</b>
+                <b>DISTRIBUTION OF THE UPPER BOUNDS</b></td></tr>
+            <tr>
+              <td>
                 <img src={ati_lc} alt="upper bound" width="100%">
               </td>
             </tr>
@@ -113,16 +151,16 @@
         </td>
       </tr>
       <tr>
-        <td valign="top" rowspan="2">
+        <td valign="top" rowspan="1">
           <table class="customers">
-            <tr><td >TS MAXIMUM<td ></td><td ></td></td></tr>
+            <tr><td><b>TS MAXIMUM</b><td></td><td ></td></td></tr>
             <tr>
               <td rowspan="2" align="center">
                 TS<br>{ati_ts_max}</td>
               <td>Ra</td><td>{ati_ra_max}&deg</td>
             </tr>
             <tr><td>Dec</td><td>{ati_dec_max}&deg</td></tr>
-            <tr><td></td></tr>
+            <tr><td colspan="3"></td></tr>
             <tr><td >LIST OF TS &gt {ts_cut} </td></tr>
             {ati_ts_list}
           </table>
@@ -131,7 +169,9 @@
           <table class="customers">
             <tr>
               <td align="center">
-                <b>TS map</b>
+                <b>TS MAP</b></td></tr>
+            <tr>
+              <td>
                 <img src={ati_ts_map} alt="adaptive ts map" width="100%">
               </td>
             </tr>
@@ -139,44 +179,59 @@
         </td>
       </tr>
       <tr>
+        <td valign="top" rowspan="1">
+          <table class="customers" >
+            <tr><td colspan="3"><b>UL EXTREMES</b></td></tr>
+            <tr><td>UL min</td><td colspan="2">{ati_ul_min} e-10 erg cm<sup>-2</sup> s<sup>-1</sup></td></tr>
+            <tr><td>UL max</td><td colspan="2">{ati_ul_max} e-9 erg cm<sup>-2</sup> s<sup>-1</sup></td></tr>
+          </table>
+        </td>
         <td>
           <table class="customers">
             <tr>
               <td align="center">
-                <b>Upper limits map</b>
+                <b>UL MAP</b></td></tr>
+            <tr>
+              <td>
                 <img src={ati_ul_map} alt="adaptive ul" width="100%">
               </td>
             </tr>
           </table>
         </td>
       </tr>
-
+      
+      <!-- LLE -->
+      
+      {lle}
+            
+      <!-- PGWAVE -->
+      
       <tr>
-        <td valign="top" rowspan="2">
-          <table class="customers">
-            <tr><td >SIGMA MAXIMUM<td ></td><td ></td></td></tr>
+        <td colspan="2">
+          <table class="td_title">
             <tr>
-              <td rowspan="2" align="center">
-                TS<br>{lle_ts_max}</td>
-              <td>Ra</td><td>{lle_ra_max}&deg</td>
-            </tr>
-            <tr><td>Dec</td><td>{lle_dec_max}&deg</td></tr>
-            <tr><td></td></tr>
-            <tr><td >LIST OF SIGMA &gt {sigma_cut} </td></tr>
-            {lle_ts_list}
-          </table>
-        </td>
-        <td>
-          <table class="customers">
-            <tr>
-              <td align="center">
-                <b>Sigma map</b>
-                <img src={lle_ts_map} alt="adaptive ts map" width="100%">
-              </td>
+              <td>PGWAVE ANALYSIS</td>
             </tr>
           </table>
         </td>
       </tr>
+      <tr>
+        <td></td>
+        <td>
+          <table class="customers">
+            <tr>
+              <td align="center">
+                <b>COUNT MAP</b></td></tr>
+            <tr>
+              <td>
+                <img src={pgw_cmap} alt="pgw cmap" width="100%">
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr> 
+      {pgwave}
+    
     </table>
     <small>
       <p id="date" align="center"></p>
