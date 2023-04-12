@@ -5,8 +5,8 @@ __author__ = 'giacomov'
 import argparse
 import healpy as hp
 
-from fermi_gw_toolkit import contour_finder
-from fermi_gw_toolkit.check_file_exists import check_file_exists
+from fermi_gw_toolkit.lib import contour_finder
+from fermi_gw_toolkit.utils.check_file_exists import check_file_exists
 
 __description__ = '''Generate a grid to be used for the TS map and the UL map,
                      based on the contour of an input probability map in

@@ -2,10 +2,10 @@
 
 __description__ = 'Download LAT data from the Astro Server'
 
-from fermi_gw_toolkit.check_file_exists import check_file_exists
+from fermi_gw_toolkit.utils.check_file_exists import check_file_exists
 from GtBurst import IRFS
 #from scripts.getLATFitsFiles import getFilesAstroServer
-from fermi_gw_toolkit.getLATFitsFiles import getFilesAstroServer
+#from fermi_gw_toolkit.lib.getLATFitsFiles import getFilesAstroServer
 
 import sys
 import os, shutil
@@ -64,10 +64,10 @@ def download_LAT_data(**kwargs):
     else:
         Astroserver = ASTROSERVER_REPOSITORY + '_BASE'
 
-    print 'USING THE ASTROSERVER:'
-    print triggername
-    print Astroserver
-    print 'One second: %s' %one_sec
+    print('USING THE ASTROSERVER:')
+    print(triggername)
+    print(Astroserver)
+    print('One second: %s' %one_sec)
 
     return getFilesAstroServer(triggername, METStart-padding, METStop+padding,
                                outdir, OneSec=one_sec, emin=kwargs['emin'],

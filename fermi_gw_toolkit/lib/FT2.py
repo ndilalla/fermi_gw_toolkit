@@ -18,7 +18,7 @@ def angsep(x1,y1,x2,y2):
     try:
         c  = 2*sp.arctan2(sp.sqrt(a), sp.sqrt(1.-a))
     except:
-        print '!!!:',a,x1,y1,x2,y2,dlat,dlon,'!!!!!'
+        print('!!!:',a,x1,y1,x2,y2,dlat,dlon,'!!!!!')
         c=0
         pass
     return sp.degrees(c)
@@ -51,11 +51,11 @@ class FT2:
         self.FOV_ARRAY   = sp.zeros(self.NENTRIES)
         self.theta_max=65
         self.zenith_max=90
-        print 'Summary FT2 file: %s ' % ft2file
-        print 'NENTRIES........:%d' %(self.NENTRIES)
-        print 'TMIN............:%s' %(self.SC_TSTART[0])
-        print 'TMAX............:%s' %(self.SC_TSTOP[-1])
-        print 'DELTA T.........:%s' %(self.SC_TSTOP[-1]-self.SC_TSTART[0])
+        print('Summary FT2 file: %s ' % ft2file)
+        print('NENTRIES........:%d' %(self.NENTRIES))
+        print('TMIN............:%s' %(self.SC_TSTART[0]))
+        print('TMAX............:%s' %(self.SC_TSTOP[-1]))
+        print('DELTA T.........:%s' %(self.SC_TSTOP[-1]-self.SC_TSTART[0]))
         pass
 
     def fov(self,theta_max,zenith_max):
@@ -65,7 +65,7 @@ class FT2:
     
     def getIndex(self,time):
         if (self.SC_TSTART[0]>time or self.SC_TSTOP[-1]<time):
-            print 'FT2 does not cover the trigger time!'
+            print('FT2 does not cover the trigger time!')
             return 0
         return sp.argmax(self.SC_TSTART[self.SC_TSTART<time])
 
@@ -96,10 +96,10 @@ class FT2:
         zenith = self.getZenithTime(ra,dec)        
         start  = self.SC_TSTART-t0
         stop   = self.SC_TSTOP-t0
-        print ("FT2::getEntryExitTime FT2 range: START: %.1f -- %.1f, STOP: %.1f -- %.1f" %(start[0],start[-1],stop[0],stop[-1]))
+        print("FT2::getEntryExitTime FT2 range: START: %.1f -- %.1f, STOP: %.1f -- %.1f" %(start[0],start[-1],stop[0],stop[-1]))
         insaa_t0 = (stop[idx0]<0)
         infov_t0 = infov[idx0]
-        if insaa_t0: print ("FT2::getEntryExitTime : LAT was in the SAA: from %.1f to %.1f seconds from t0" %(stop[idx0],start[idx0+1]))
+        if insaa_t0: print("FT2::getEntryExitTime : LAT was in the SAA: from %.1f to %.1f seconds from t0" %(stop[idx0],start[idx0+1]))
         #print("FT2::getEntryExitTime :",t0,idx0,infov_t0,start[idx0],stop[idx0],start[idx0+1],stop[idx0+1])
         if infov_t0 and not insaa_t0:  
             stop_sel=stop[sp.logical_and(infov==0,stop<0)]
@@ -124,7 +124,7 @@ class FT2:
         #t1  = start[sp.logical_and(infov==0,stop>t_0)][0]
         #t_1 = stop[self.getIndex(t0+t1)]
         #if stop[ii_1+1] > stop[ii_1]+60: t_1 = stop[ii_1]
-        #print '%10.3f %10.3f %5d %10.3f %10.3f %10.3f %10.3f ' %(ra,dec,ii_1,stop[ii_1],stop[ii_1+1],t_0,t_1)
+        #print('%10.3f %10.3f %5d %10.3f %10.3f %10.3f %10.3f ' %(ra,dec,ii_1,stop[ii_1],stop[ii_1+1],t_0,t_1))
         #met0=t_0+t0
         #met1=t_1+t0
         return t_0,t_1
@@ -139,19 +139,19 @@ class FT2:
         Npoints=len(ra)
         self.FOV_ARRAY=[]
         for i in self.IDX_ARRAY:
-            #print i,self.getTime(i)
+            #print(i,self.getTime(i))
             self.FOV_ARRAY.append(self.inFov(i,ra,dec))
             pass
         self.FOV_ARRAY=sp.array(self.FOV_ARRAY)
         pass
     
     def condition1(self,t0):
-        print self.FOV_ARRAY.shape
-        print (self.FOV_ARRAY<0).shape
-        print self.SC_TSTOP.shape
-        print (self.SC_TSTOP>t0).shape
+        print(self.FOV_ARRAY.shape)
+        print((self.FOV_ARRAY<0).shape)
+        print(self.SC_TSTOP.shape)
+        print((self.SC_TSTOP>t0).shape)
         
-        print sp.logical_and(self.FOV_ARRAY<0,self.SC_TSTOP>t0)[0]
+        print(sp.logical_and(self.FOV_ARRAY<0,self.SC_TSTOP>t0)[0])
                 
     def getTimeInterval(self, idx, ra1, dec1):
         idx0=0
@@ -181,7 +181,7 @@ class FT2:
         i=0
         for ra1,dec1 in zip(ra,dec):
             i+=1
-            print i
+            print(i)
             entry_exits.append(self.getTimeInterval(idx, ra1, dec1))
             pass
         return entry_exits

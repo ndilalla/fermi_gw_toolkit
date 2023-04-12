@@ -30,10 +30,10 @@ def merge_results(**kwargs):
         out_txt = kwargs['outfile']
     txtdir = '%s/%s_*_%s.txt' % (kwargs['txtdir'], triggername, keyword)
     txt_list = glob.glob(txtdir)
-    #print "Txt-files to merge:\n%s" %txt_list
-    print "Preparing to merge %d text files..." %len(txt_list)
+    print("Files to merge:\n%s" % txt_list)
+    print("Preparing to merge %d text files..." %len(txt_list))
     
-    print "Merging..."    
+    print("Merging...")   
     outfile=open(out_txt, 'w')
     for i,txt in enumerate(txt_list):
         lines=open(txt).readlines()
@@ -52,7 +52,7 @@ def merge_results(**kwargs):
     #                infile.next()
     #            for line in infile:
     #                outfile.write(line)
-    print "Done."
+    print("Done.")
     return out_txt
     
 if __name__=="__main__":

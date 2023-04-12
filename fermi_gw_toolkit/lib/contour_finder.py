@@ -40,7 +40,7 @@ class ContourFinder(object):
 
             raise RuntimeError("nside must be a power of 2.")
 
-        hpx_orig, header = hp.read_map(healpix_map, h=True, verbose=False)
+        hpx_orig, header = hp.read_map(healpix_map, h=True)
 
         # Use power=-2 so the sum is still 1
 
@@ -98,7 +98,7 @@ class ContourFinder(object):
         
         cum_tot = np.sum(self._ligo_map[idx])
         if abs(cum_tot - containment_level) > 1e-2:
-            print "WARNING: Total prob. within containment (%.3f) is too far from requested value (%.3f)" % (cum_tot, containment_level)
+            print("WARNING: Total prob. within containment (%.3f) is too far from requested value (%.3f)" % (cum_tot, containment_level))
 
         return idx
 

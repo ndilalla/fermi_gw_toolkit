@@ -7,8 +7,8 @@ import numpy as np
 import healpy as hp
 import warnings
 
-from fermi_gw_toolkit.check_file_exists import check_file_exists
-from fermi_gw_toolkit.sky_to_healpix_id import sky_to_healpix_id
+from fermi_gw_toolkit.utils.check_file_exists import check_file_exists
+from fermi_gw_toolkit.utils.sky_to_healpix_id import sky_to_healpix_id
 
 desc = '''Fill the input HEALPIX map with the values taken from the input text file'''
 
@@ -29,9 +29,9 @@ parser.add_argument('--out_ts_map', help='Name for the output TS map',
 def fill_maps(**kwargs):
     
     try:    
-        data = np.recfromtxt(kwargs['text_file'], names=True)
+        data = np.recfromtxt(kwargs['text_file'], names=True, encoding=None)
     except: 
-        print 'WARNING!!! %s file probably empty, skipping...' % kwargs['text_file']
+        print('WARNING!!! %s file probably empty, skipping...' % kwargs['text_file'])
         return
     # Check that the fluxes are upper limits
     fluxes = data['flux']
@@ -43,8 +43,7 @@ def fill_maps(**kwargs):
     tss = data['TS']    
     if tss.size==1: tss=np.array([tss])
 
-
-    non_uls = filter(lambda x:x.find('<')<0, fluxes)
+    non_uls = list(filter(lambda x:x.find('<')<0, fluxes))
 
     if len(non_uls) > 0:
 
@@ -52,17 +51,16 @@ def fill_maps(**kwargs):
 
     # Convert to float
 
-    upper_limits = np.array(map(lambda x:float(x.replace('<','')),fluxes))
-
+    upper_limits = np.array(list(map(lambda x:float(x.replace('<','')),fluxes)))
     
     # Get the NSIDE from the input healpix map
     nside=kwargs['nside']
     if nside==0:
         try:
-            hpx_orig, header = hp.read_map(kwargs['in_map'], h=True, verbose=False)
+            hpx_orig, header = hp.read_map(kwargs['in_map'], h=True)
             nside = hp.npix2nside(hpx_orig.shape[0])
         except:
-            raise IOError("Either provide NSIDE or an hHelPic Map!")
+            raise IOError("Either provide NSIDE or an Healpix Map!")
 
     # Generate a new empty map
 
@@ -71,7 +69,7 @@ def fill_maps(**kwargs):
     # Now loop over the input fluxes and assign the corresponding pixels
 
     for this_ra, this_dec, this_upper_limit in zip(ra,dec,upper_limits):
-        #print this_ra, this_dec, this_upper_limit
+        #print(this_ra, this_dec, this_upper_limit)
         id = sky_to_healpix_id(nside, this_ra, this_dec)
 
         upper_limits_map[id] = this_upper_limit

@@ -1,30 +1,30 @@
 #!/usr/bin/env python
 
-from fermi_gw_toolkit.download_LAT_data import download_LAT_data, parser as\
+from fermi_gw_toolkit.bin.download_LAT_data import download_LAT_data, parser as\
                                                         download_LAT_data_parser
-from fermi_gw_toolkit.rawdata2package import rawdata2package, parser as\
-                                                        rawdata2package_parser
-from fermi_gw_toolkit.prepare_grid import prepare_grid, parser as\
+from fermi_gw_toolkit.bin.prepare_grid import prepare_grid, parser as\
                                                         prepare_grid_parser
-from fermi_gw_toolkit.AdaptiveTimeIntervals import adaptive_time, parser as\
+from fermi_gw_toolkit.bin.AdaptiveTimeIntervals import adaptive_time, parser as\
                                                         adaptive_time_parser
-from fermi_gw_toolkit.bayesian_ul import bayesian_ul, parser as\
+from fermi_gw_toolkit.bin.bayesian_ul import bayesian_ul, parser as\
                                                         bayesian_ul_parser
-from fermi_gw_toolkit.get_coverage import compute_coverage, parser as\
+from fermi_gw_toolkit.bin.get_coverage import compute_coverage, parser as\
                                                         get_coverage_parser
-from fermi_gw_toolkit.merge_results import merge_results, parser as\
+from fermi_gw_toolkit.bin.merge_results import merge_results, parser as\
                                                         merge_results_parser
-from fermi_gw_toolkit.fill_maps import fill_maps, parser as\
+from fermi_gw_toolkit.bin.fill_maps import fill_maps, parser as\
                                                         fill_maps_parser
+from fermi_gw_toolkit import GTBURST_PATH
 
 import os, socket
+import glob
 
 def run_at_slac():
     """Decide if we are running locally at SLAC or not
     """
     hostname = socket.getfqdn()
     run_at_slac = True
-    if hostname.find("slac.stanford.edu") is -1:
+    if hostname.find("slac.stanford.edu") == -1:
         run_at_slac = False
     return run_at_slac
 
@@ -64,15 +64,23 @@ class gwPipeline:
         kwargs = download_LAT_data_parser.parse_args(switches).__dict__
         return download_LAT_data(**kwargs)
     
-    def rawdata2package(self, **kwargs):
+    def rawdata2package(self, ft1, ft2, triggertime, triggername, ra=0, dec=0, 
+                        out_dir='.'):
         """Transform an FT1 and an FT2 into a package for gtburst.
-        
-        All command-line switches accepted by rawdata2package can be passed as
-        keyword arguments here.
         """
-        switches = self.command_line(**kwargs).split()
-        kwargs = rawdata2package_parser.parse_args(switches).__dict__
-        return rawdata2package(**kwargs)
+        cwd = os.getcwd()
+        print("Changing working directory to: %s" % out_dir)
+        os.chdir(out_dir)
+        cmd = 'python %s/scripts/rawdata2package.py' % GTBURST_PATH
+        cmd += f' {ft1} {ft2} {triggertime} {triggername} {ra} {dec}' % locals()
+        os.system(cmd)
+        ft1 = glob.glob(out_dir + '/gll_ft1_tr_%s_*.fit' % triggername)[0]
+        rsp = glob.glob(out_dir + '/gll_cspec_tr_%s_*.rsp' % triggername)[0]
+        ft2 = glob.glob(out_dir + '/gll_ft2_tr_%s_*.fit' % triggername)[0]
+        pha = glob.glob(out_dir + '/gll_cspec_tr_%s_*.pha' % triggername)[0]
+        print("Returning to: %s" % cwd)
+        os.chdir(cwd)
+        return ft1, rsp, ft2, pha
     
     def get_coverage(self, **kwargs):
         """Compute the LAT coverage of the LIGO map.
@@ -112,16 +120,30 @@ class gwPipeline:
         All command-line switches accepted by doTimeResolvedLike can be passed
         as keyword arguments here.
         """
-        cmd = 'python $FERMI_DIR/'
-        if not self.run_at_slac:
-            cmd += 'lib/'
-        cmd += 'python/GtBurst/scripts/doTimeResolvedLike.py %s' %triggername
-        for key, value in kwargs.iteritems():
-            if key is 'particle_model':
+        cwd = os.getcwd()
+        out_dir = os.path.dirname(kwargs.get('outfile', cwd))
+        print("Changing working directory to: %s" % out_dir)
+        os.chdir(out_dir)
+        cmd = 'python %s/scripts/doTimeResolvedLike.py %s' %\
+            (GTBURST_PATH, triggername)
+        for key, value in kwargs.items():
+            if key == 'particle_model':
                 cmd += (' --%s "%s"') % (str(key), str(value))
             else:
                 cmd += (' --%s %s') % (str(key), str(value))
-        os.system(cmd)
+        try:
+            os.system(cmd)
+        except:
+            pass
+        subfolder_dir = os.path.join(out_dir, "interval%s-%s" %\
+                        (kwargs.get('tstarts'), kwargs.get('tstops')))
+        xml = glob.glob(subfolder_dir + '/*filt_likeRes.xml')[0]
+        expomap = glob.glob(subfolder_dir + '/*filt_expomap.fit')[0]
+        new_ft1 = glob.glob(subfolder_dir + '/*filt.fit')[0]
+        ltcube = glob.glob(subfolder_dir + '/*filt_ltcube.fit')[0]
+        print("Returning to: %s" % cwd)
+        os.chdir(cwd)
+        return subfolder_dir, xml, expomap, new_ft1, ltcube
     
     def bayesian_ul(self, subfolder_dir, **kwargs):
         """Compute a fully-Bayesian upper limit by sampling the posterior
@@ -130,14 +152,14 @@ class gwPipeline:
         All command-line switches accepted by bayesian_ul can be passed as
         keyword arguments here.
         """
-        init_dir = os.getcwd()
-        print "Changing working directory to: %s" % subfolder_dir
+        cwd = os.getcwd()
+        print("Changing working directory to: %s" % subfolder_dir)
         os.chdir(subfolder_dir)
         switches = self.command_line(**kwargs).split()
         kwargs = bayesian_ul_parser.parse_args(switches).__dict__
         bayesian_ul(**kwargs)
-        print "Returning to: %s" % init_dir
-        os.chdir(init_dir)
+        print("Returning to: %s" % cwd)
+        os.chdir(cwd)
         pass
         
     def merge_results(self, triggername, **kwargs):

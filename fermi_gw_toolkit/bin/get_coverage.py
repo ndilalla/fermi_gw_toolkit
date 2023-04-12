@@ -18,8 +18,8 @@ import numpy as np
 
 from GtBurst.angularDistance import getAngularDistance
 
-from check_file_exists import check_file_exists
-from contour_finder import pix_to_sky
+from fermi_gw_toolkit.utils.check_file_exists import check_file_exists
+from fermi_gw_toolkit.lib.contour_finder import pix_to_sky
 
 __description__ = '''Compute the LAT coverage of the LIGO map'''
 
@@ -203,7 +203,7 @@ def compute_coverage(**kwargs):
 
     fig.tight_layout()
 
-    print 'Saving plot to: %s_coverage.png' % kwargs['outroot']
+    print('Saving plot to: %s_coverage.png' % kwargs['outroot'])
     fig.savefig('%s_coverage.png' % kwargs['outroot'])
 
     # Make cumulative probability plot
@@ -240,8 +240,8 @@ def compute_coverage(**kwargs):
             plt.text(p / 1000.0, 1.11, '%.1f ks' % (p / 1000.0), horizontalalignment='center')
 
     fig.tight_layout()
-    print 'Saving plot to: %s_prob_coverage.png' % kwargs['outroot']
-    plt.savefig('%s_prob_coverage.png' % kwargs['outroot'], tight_layout=True)
+    print('Saving plot to: %s_prob_coverage.png' % kwargs['outroot'])
+    plt.savefig('%s_prob_coverage.png' % kwargs['outroot'], bbox_inches='tight')
 
 
 if __name__ == "__main__":

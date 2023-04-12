@@ -12,9 +12,9 @@ import UnbinnedAnalysis
 import collections
 import UpperLimits
 
-from bayesian_analysis import *
+from fermi_gw_toolkit.lib.bayesian_analysis import *
 
-from check_file_exists import check_file_exists
+from fermi_gw_toolkit.utils.check_file_exists import check_file_exists
 
 __description__ = '''Compute a fully-Bayesian upper limit by sampling the posterior probability'''
 
@@ -224,7 +224,7 @@ def bayesian_ul(**kwargs):
     print("\nFree parameters:")
     print("----------------\n")
 
-    for k, v in free_parameters.iteritems():
+    for k, v in free_parameters.items():
         print("* %s of %s (%s)" % (k[1], k[0], v.prior.name))
 
     print("")
@@ -233,7 +233,7 @@ def bayesian_ul(**kwargs):
 
     ndim, nwalkers = len(free_parameters), kwargs['n_walkers']
 
-    p0 = [map(lambda p: p.get_random_init(0.1), free_parameters.values()) for i in range(nwalkers)]
+    p0 = [list(map(lambda p: p.get_random_init(0.1), free_parameters.values())) for i in range(nwalkers)]
 
     # Instance the sampler
     posterior = Posterior(free_parameters.values(), pylike_instance)
@@ -270,7 +270,7 @@ def bayesian_ul(**kwargs):
 
     samples = sampler.flatchain
 
-    labels = map(lambda x:"%s" % (x[1]),free_parameters.keys())
+    labels = list(map(lambda x:"%s" % (x[1]),free_parameters.keys()))
 
     print("Producing corner plot...")
 
@@ -287,10 +287,10 @@ def bayesian_ul(**kwargs):
 
     # Find index of normalization
 
-    norm_index = free_parameters.keys().index( (kwargs['src'], 'Integral') )
+    norm_index = list(free_parameters.keys()).index( (kwargs['src'], 'Integral') )
 
     # Find index of photon index
-    ph_index_index = free_parameters.keys().index((kwargs['src'], 'Index'))
+    ph_index_index = list(free_parameters.keys()).index((kwargs['src'], 'Index'))
 
     photon_fluxes = np.zeros(samples.shape[0])
     energy_fluxes = np.zeros(samples.shape[0])

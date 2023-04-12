@@ -139,7 +139,9 @@ class MyParameter(object):
     log_scale = property(_get_log_scale, _set_log_scale, doc="Sets or gets whether the "
                                                              "parameter should be log-scaled")
 
-    def _set_bounds(self, (new_min, new_max)):
+    def _set_bounds(self, bounds):
+        
+        new_min, new_max = bounds
 
         self._pylike_parameter.setBounds(new_min, new_max)
 

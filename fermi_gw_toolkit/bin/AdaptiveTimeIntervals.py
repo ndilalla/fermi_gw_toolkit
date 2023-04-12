@@ -12,9 +12,9 @@ from matplotlib import cm
 import healpy as hp
 import scipy as sp
 import numpy as np
-from fermi_gw_toolkit.FT2 import FT2
-from fermi_gw_toolkit import contour_finder
-from fermi_gw_toolkit.check_file_exists import check_file_exists
+from fermi_gw_toolkit.lib.FT2 import FT2
+from fermi_gw_toolkit.lib import contour_finder
+from fermi_gw_toolkit.utils.check_file_exists import check_file_exists
 
 __description__  = '''Create a text file with start and stop times for time adaptive interval'''
 
@@ -77,7 +77,7 @@ def adaptive_time(**kwargs):
     print("Found %s points within the %s percent containment level" % (Nselected, kwargs['cl'] * 100.0))
     
     ligo_map=my_finder.map
-    print Nselected, len(ligo_map)
+    print(Nselected, len(ligo_map))
     ligo_selected = np.zeros(len(ligo_map))
     ligo_entry    = np.zeros(len(ligo_map))
     ligo_expo     = np.zeros(len(ligo_map))
@@ -90,7 +90,7 @@ def adaptive_time(**kwargs):
 
     if roi: masked_radius=roi
     
-    print 'Number of selected pixels:',Nselected
+    print('Number of selected pixels:', Nselected)
     myFT2=FT2(ft2)    
     myFT2.fov(theta_max-masked_radius,zenith_max-masked_radius)
     times_t0=[]
@@ -101,13 +101,13 @@ def adaptive_time(**kwargs):
         entry_time,exit_time=myFT2.getEntryExitTime(masked_ra[i],masked_dec[i],triggertime)
         pix=indexes[i]
         expo_time=exit_time-entry_time
-        #print i,pix,masked_ra[i],masked_dec[i],entry_time,expo_time
+        #print(i,pix,masked_ra[i],masked_dec[i],entry_time,expo_time)
         ligo_entry[pix]=entry_time
         ligo_expo[pix]=expo_time
         ligo_selected[pix]=1
         times_t0.append(entry_time)
         times_t1.append(exit_time)
-        #print 'i/N:%7d/%7d pix:%7d ra:%10.3f dec:%10.3f entry:%10.3f exit:%10.3f exposure:%10.3f' %(i,Nselected,pix,masked_ra[i],masked_dec[i],entry_time,exit_time,expo_time)
+        #print('i/N:%7d/%7d pix:%7d ra:%10.3f dec:%10.3f entry:%10.3f exit:%10.3f exposure:%10.3f' %(i,Nselected,pix,masked_ra[i],masked_dec[i],entry_time,exit_time,expo_time))
         txt+='%10.3f %10.3f %10.3f %10.3f %10.3f\n' %(masked_ra[i],masked_dec[i],entry_time,exit_time,exit_time-entry_time)
         # a=raw_input('')
         pass
@@ -147,7 +147,7 @@ def adaptive_time(**kwargs):
         hp.graticule()
         ax = plt.gca()
         plot_file=output.replace('.txt','_coverage_map.png')
-        print 'Saving plot to: %s' % plot_file
+        print('Saving plot to: %s' % plot_file)
         fig.savefig(plot_file)
         #plt.show()
         pass
