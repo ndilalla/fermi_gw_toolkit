@@ -34,24 +34,13 @@ def merge_results(**kwargs):
     print("Preparing to merge %d text files..." %len(txt_list))
     
     print("Merging...")   
-    outfile=open(out_txt, 'w')
-    for i,txt in enumerate(txt_list):
-        lines=open(txt).readlines()
-        for line in lines:
-            if '#' in line and i>0: continue
-            outfile.write(line)
-            pass
-        pass
-    #first_txt = True
-    #with open(out_txt, 'w') as outfile:
-    #    for txt in txt_list:
-    #        with open(txt) as infile:
-    #            if first_txt:
-    #                first_txt = False
-    #            else:
-    #                infile.next()
-    #            for line in infile:
-    #                outfile.write(line)
+    with open(out_txt, 'w') as outfile:
+        for i,txt in enumerate(txt_list):
+            with open(txt) as infile:
+                lines = infile.readlines()
+                for line in lines:
+                    if '#' in line and i>0: continue
+                    outfile.write(line)
     print("Done.")
     return out_txt
     

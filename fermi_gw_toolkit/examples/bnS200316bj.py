@@ -54,7 +54,7 @@ PIPELINE = gwPipeline()
 def run():
     ft1, rsp, ft2, pha = PIPELINE.rawdata2package(ft1=FT1, ft2=FT2,
                             triggertime=TRIGGERTIME, triggername=TRIGGERNAME,
-                            out_dir=DATA_PATH)
+                            outdir=DATA_PATH)
 
     PIPELINE.get_coverage(in_map=LIGO_MAP, ft2=ft2, start_time=TRIGGERTIME,
                             stop_time=TRIGGERTIME+10000., theta_cut=THETAMAX,

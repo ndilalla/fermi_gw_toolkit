@@ -71,11 +71,12 @@ class ContourFinder(object):
 
         return np.sqrt( 3.0 / np.pi) * 3600.0 / self.nside * arcmin_to_degree
 
-    def write_map(self, outfile, coordinate_type='C'):
+    def write_map(self, outfile, coordinate_type='C', overwrite=False):
         """Write map to disk. By default the coordinate system is Celestial (equatorial).
         See healpix documentation for the accepted formats"""
 
-        hp.write_map(outfile, self.map, coord=coordinate_type)
+        hp.write_map(outfile, self.map, coord=coordinate_type,
+                     overwrite=overwrite)
 
     def find_contour(self, containment_level=0.9):
         """Return the *indexes* of the pixels in the map within the given containment level"""

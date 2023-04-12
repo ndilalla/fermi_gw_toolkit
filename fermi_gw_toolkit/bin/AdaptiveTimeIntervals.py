@@ -82,8 +82,7 @@ def adaptive_time(**kwargs):
     ligo_entry    = np.zeros(len(ligo_map))
     ligo_expo     = np.zeros(len(ligo_map))
 
-    # Get R.A. and Dec for the pixels within the contour                               
-
+    # Get R.A. and Dec for the pixels within the contour
     masked_ra, masked_dec = my_finder.get_sky_coordinates(indexes)
 
     masked_radius = my_finder.pixel_size
@@ -114,9 +113,8 @@ def adaptive_time(**kwargs):
     times_t0=np.array(times_t0)
     times_t1=np.array(times_t1)
     
-    fout = file(output,'w')
-    fout.writelines(txt)
-    fout.close()
+    with open(output, 'w') as outfile:
+        outfile.writelines(txt)
     
     if plot:
         p_max=ligo_map.max()

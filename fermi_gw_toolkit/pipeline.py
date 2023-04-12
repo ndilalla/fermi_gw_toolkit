@@ -65,19 +65,19 @@ class gwPipeline:
         return download_LAT_data(**kwargs)
     
     def rawdata2package(self, ft1, ft2, triggertime, triggername, ra=0, dec=0, 
-                        out_dir='.'):
+                        outdir='.'):
         """Transform an FT1 and an FT2 into a package for gtburst.
         """
         cwd = os.getcwd()
-        print("Changing working directory to: %s" % out_dir)
-        os.chdir(out_dir)
+        print("Changing working directory to: %s" % outdir)
+        os.chdir(outdir)
         cmd = 'python %s/scripts/rawdata2package.py' % GTBURST_PATH
         cmd += f' {ft1} {ft2} {triggertime} {triggername} {ra} {dec}' % locals()
         os.system(cmd)
-        ft1 = glob.glob(out_dir + '/gll_ft1_tr_%s_*.fit' % triggername)[0]
-        rsp = glob.glob(out_dir + '/gll_cspec_tr_%s_*.rsp' % triggername)[0]
-        ft2 = glob.glob(out_dir + '/gll_ft2_tr_%s_*.fit' % triggername)[0]
-        pha = glob.glob(out_dir + '/gll_cspec_tr_%s_*.pha' % triggername)[0]
+        ft1 = glob.glob(outdir + '/gll_ft1_tr_%s_*.fit' % triggername)[0]
+        rsp = glob.glob(outdir + '/gll_cspec_tr_%s_*.rsp' % triggername)[0]
+        ft2 = glob.glob(outdir + '/gll_ft2_tr_%s_*.fit' % triggername)[0]
+        pha = glob.glob(outdir + '/gll_cspec_tr_%s_*.pha' % triggername)[0]
         print("Returning to: %s" % cwd)
         os.chdir(cwd)
         return ft1, rsp, ft2, pha

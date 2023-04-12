@@ -51,7 +51,7 @@ def prepare_grid(**kwargs):
         for r,d in zip(ra,dec):
             f.write("%s %s\n" % (r,d))
 
-    my_finder.write_map(kwargs['out_map'])
+    my_finder.write_map(kwargs['out_map'], overwrite=True)
     
     return kwargs['out_list']
 
