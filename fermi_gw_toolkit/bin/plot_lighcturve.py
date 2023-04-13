@@ -9,7 +9,7 @@ from matplotlib.ticker import NullFormatter
 import matplotlib.colors as colors
 import matplotlib.cm as cmx
 
-from check_file_exists import check_file_exists
+from fermi_gw_toolkit.utils.check_file_exists import check_file_exists
 import glob
 #from matplotlib import rc
 #rc('text', usetex=True)
@@ -34,8 +34,8 @@ def plotOneFile(ax,text_file_name):
     f=np.logical_and(dy>0,dy<y)
     if x[f].min()<1000:
         ax.errorbar(x[f],y[f],xerr=(dx0[f],dx1[f]),yerr=dy[f],ls='None',capsize=0,linewidth=3,alpha=1)
-    print '---->',text_file_name
-    print x[f].min(),x[f].max(),y[f]
+    print('---->',text_file_name)
+    print(x[f].min(),x[f].max(),y[f])
 
 if __name__=="__main__":
     desc = '''Plot a healpix map in Mollweide projection'''
@@ -107,7 +107,7 @@ if __name__=="__main__":
     flux=np.array(flux)
     flux_err=np.array(flux_err)
 
-    print flux,flux_err
+    print(flux,flux_err)
 
     if args.nside:
         healpix_map = np.zeros(hp.nside2npix(args.nside))*np.nan
@@ -125,15 +125,15 @@ if __name__=="__main__":
     if args.tmin is not None: tmin=float(args.tmin)
     if args.tmax is not None: tmax=float(args.tmax)
 
-    print ' YMIN,YMAX=',ymin,ymax
-    print ' TMIN,TMAX=',tmin,tmax
+    print(' YMIN,YMAX=',ymin,ymax)
+    print(' TMIN,TMAX=',tmin,tmax)
 
     ##################################################
     fig = plt.figure(figsize=(15, 15),facecolor='w')
     # definitions for the axes
     
     if args.histo:
-        print 'displaying the horizontal histogram'
+        print('displaying the horizontal histogram')
         left, width = 0.1, 0.65
         bottom, height = 0.1, 0.3
         bottom_h = left_h = left + width + 0.02
@@ -173,7 +173,7 @@ if __name__=="__main__":
     cNorm  = colors.Normalize(vmin=vmin, vmax=vmax)
     scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cmap)
     colors=scalarMap.to_rgba(start)
-    print len(flux),len(flux_err)
+    print(len(flux),len(flux_err))
     axLC.errorbar(center,flux,xerr=(duration/2.,duration/2.),yerr=flux_err,ls='None',capsize=0,color=colors,linewidth=3,alpha=1)
     axLC.set_ylim((ymin, ymax))
     axLC.set_xlim((tmin, tmax))
@@ -189,7 +189,7 @@ if __name__=="__main__":
     cb1.ax.tick_params(labelsize=25)
     if args.lc is not None:
         file_list=glob.glob('%s/*' %args.lc)
-        print file_list 
+        print(file_list )
         for f in file_list:
             plotOneFile(axLC,f)
             pass
@@ -267,7 +267,7 @@ if __name__=="__main__":
 
     #cbar = fig.colorbar(axLC, ticks=ticks, orientation='horizontal')
     #cbar.ax.set_xticklabels(ticks)  # horizontal colorbar
-    print duration[duration>0].min(),duration.max()
+    print(duration[duration>0].min(),duration.max())
     # adding the GRB LAT Lighcturve
     # THIS IS THE SKYMAP ON TOP:
     fig.savefig(args.out_plot)

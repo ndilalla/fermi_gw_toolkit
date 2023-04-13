@@ -2,7 +2,7 @@ import gcn
 import lxml.etree
 import healpy as hp
 import json
-from urllib2 import urlopen, HTTPError
+import urllib
 
 # Function to call every time a GCN is received.
 def process_gcn(payload, root):
@@ -18,13 +18,13 @@ def process_gcn(payload, root):
 def get_info(name):
     url = 'https://gracedb.ligo.org/apiweb/superevents/%s/voevents/?format=json' % name
     try:
-        json_url = urlopen(url)
+        json_url = urllib.request.urlopen(url)
         data = json.load(json_url)
         index = int(data['numRows']) - 1
         xml_link = data['voevents'][index]['links']['file']
-        #print xml_link
-        payload = urlopen(xml_link).read()
-    except HTTPError, e:
+        #print(xml_link)
+        payload = urllib.request.urlopen(xml_link).read()
+    except urllib.error.HTTPError:
         return None
     
     root = lxml.etree.fromstring(payload)
@@ -33,5 +33,5 @@ def get_info(name):
 if __name__ == "__main__":
     #name = 'S200116ah'
     name = 'S200114f'
-    get_info(name)
+    print(get_info(name))
 

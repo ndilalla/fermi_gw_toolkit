@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from fermi_gw_toolkit import GTBURST_PATH
+
 import argparse
 import subprocess
 
@@ -37,17 +39,15 @@ if __name__ == "__main__":
 
     for tstarts, tstops, ra, dec in zip(args.tstarts, args.tstops, args.ra, args.dec):
 
-        cmd_line = 'doTimeResolvedLike.py %s --ra %s --dec %s ' \
-                   '--tstarts %s --tstops %s ' \
-                   '--outfile %s_%.3f_%.3f_res.txt ' \
-                   '--flemin 100 --flemax 1000 ' \
-                   '--tsmap_spec 0.5,8 --fgl_mode complete %s' % (args.triggername, ra, dec,
-                                                                  tstarts, tstops,
-                                                                  args.triggername, ra, dec,
-                                                                  everything_else_str)
+        cmd_line = 'python %s/scripts/doTimeResolvedLike.py %s --ra %s '\
+                   '--dec %s --tstarts %s --tstops %s ' \
+                   '--outfile %s_%.3f_%.3f_res.txt --flemin 100 --flemax 1000 '\
+                   '--tsmap_spec 0.5,8 --fgl_mode complete %s' %\
+                   (GTBURST_PATH, args.triggername, ra, dec, tstarts, tstops, 
+                    args.triggername, ra, dec, everything_else_str)
                    
         print("\nAbout to execute:\n")
-        print cmd_line
+        print(cmd_line)
         print("")
 
         try:
@@ -57,4 +57,3 @@ if __name__ == "__main__":
                 (ra, dec))
             print(err)
             continue
-

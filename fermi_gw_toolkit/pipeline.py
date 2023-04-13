@@ -15,18 +15,10 @@ from fermi_gw_toolkit.bin.merge_results import merge_results, parser as\
 from fermi_gw_toolkit.bin.fill_maps import fill_maps, parser as\
                                                         fill_maps_parser
 from fermi_gw_toolkit import GTBURST_PATH
+from fermi_gw_toolkit.utils.run_at_slac import run_at_slac
 
-import os, socket
+import os
 import glob
-
-def run_at_slac():
-    """Decide if we are running locally at SLAC or not
-    """
-    hostname = socket.getfqdn()
-    run_at_slac = True
-    if hostname.find("slac.stanford.edu") == -1:
-        run_at_slac = False
-    return run_at_slac
 
 class gwPipeline:
 

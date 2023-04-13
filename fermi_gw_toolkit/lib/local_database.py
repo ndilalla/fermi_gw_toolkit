@@ -9,13 +9,13 @@ class gw_local_database(dict):
     
     @classmethod
     def load(cls, infile):
-        print "Loading the local database %s..." % infile
+        print("Loading the local database %s..." % infile)
         with open(infile, 'rb') as f:
             _dict = pickle.load(f)
         return cls(_dict)
     
     def save(self, outfile):
-        print "Saving the database to %s..." % outfile
+        print("Saving the database to %s..." % outfile)
         with open(outfile, 'wb') as f:
             pickle.dump(dict(self), f)
     
@@ -42,7 +42,7 @@ class gw_local_database(dict):
         self[_key][key] = value
     
     def show(self):
-        print json.dumps(self, indent=2, sort_keys=True)
+        print(json.dumps(self, indent=2, sort_keys=True))
     
     
 

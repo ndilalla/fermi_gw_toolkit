@@ -4,9 +4,9 @@ import numpy
 import healpy as hp
 #import webbrowser
 import astropy.io.fits as pyfits
-from contour_finder import pix_to_sky
-from local_database import gw_local_database
-from html_lib import *
+from fermi_gw_toolkit.lib.contour_finder import pix_to_sky
+from fermi_gw_toolkit.lib.local_database import gw_local_database
+from fermi_gw_toolkit.lib.html_lib import *
 
 #from automatic_pipeline.utils import send_email
 
@@ -75,9 +75,8 @@ def load_file(file_path):
     return page
 
 def write_file(text, outfile):
-    output = open(outfile, "w")
-    output.write(text)
-    output.close()
+    with open(outfile, "w") as output:
+        output.write(text)
     
 def max_ts(map_path, ts_cut, text='TS'):
     if not os.path.exists(map_path):
@@ -114,7 +113,7 @@ def min_max_ul(map_path):
 
 def proc_pgwave(file_list):
     if len(file_list) == 0:
-        print 'PGWAVE map not found.'
+        print('PGWAVE map not found.')
         return ''
     pgwave = ''
     for file_coords in file_list:
@@ -181,7 +180,7 @@ def show_results(**kwargs):
         lle_ts_map = fix_path(glob.glob(img_folder + '/LLE_ts_map.png')[0])
     except IndexError:
         lle_ts_map = None
-        print 'LLE map not found.'
+        print('LLE map not found.')
 
     #take the max ts and the ts_list from ati e fti ts maps
     ts_cut = kwargs['ts_cut']
@@ -235,7 +234,7 @@ def show_results(**kwargs):
         bayesian_ul = bayesian_ul_content.format(**locals())
     else:
         bayesian_ul = ''
-        print 'Bayesian UL not found.'
+        print('Bayesian UL not found.')
     
     #save and show the page
     outfile = kwargs['outfile']

@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 import argparse
-from check_file_exists import check_file_exists
+from fermi_gw_toolkit.utils.check_file_exists import check_file_exists
+from fermi_gw_toolkit.lib.contour_finder import ContourFinder,pix_to_sky,sky_to_pix
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import healpy as hp
 import numpy as np
-from contour_finder import ContourFinder,pix_to_sky,sky_to_pix
 from matplotlib import rc
 import matplotlib.cm as cm
 from matplotlib.colors import LogNorm
@@ -25,7 +25,7 @@ from astropy.coordinates import SkyCoord
 class pgwave_list():
     def __init__(self,filename):
         self.data=np.loadtxt(filename)
-        #print self.data
+        #print(self.data)
         pass
     def get_info(self):
         snr     = self.data[:,6]
@@ -46,7 +46,7 @@ class pgwave_list():
 def save_empty(out_filename=None):
     txt='#     [RA]      [DEC]        [L]        [B]      [S/N]     [KSIG]  [COUNTS]  [GWPROB]\n'
     if out_filename is not None: file(out_filename,'w').writelines(txt)
-    print txt
+    print(txt)
     pass
 
 def save(ra,dec,l,b,snr,ksig,counts,prob,pmin,out_filename=None):
@@ -55,7 +55,7 @@ def save(ra,dec,l,b,snr,ksig,counts,prob,pmin,out_filename=None):
         if p>pmin: txt+='%10.3f %10.3f %10.3f %10.3f %10.1f %10.1f %7d %10.1e\n' %(r,d,ll,bb,s,k,c,p)
         pass
     if out_filename is not None: file(out_filename,'w').writelines(txt)
-    print txt
+    print(txt)
     pass
 
 def galactic(f,ax,l,b,symbol='cross',size=11,color='red',prob=None,pmin=0):
@@ -139,8 +139,8 @@ if __name__=="__main__":
     if pgwlist is not None:
         _list=pgwave_list(pgwlist)
         if len(_list.data) == 0:
-            print 'WARNING: pgwave candidate source list is empty.'
-            print 'Saving an empty output list...'
+            print('WARNING: pgwave candidate source list is empty.')
+            print('Saving an empty output list...')
             save_empty(args.pgwoutlist)
         else:
             l_b             = _list.get_galactic()
@@ -166,17 +166,17 @@ if __name__=="__main__":
                 cel       = SkyCoord(ra=cra*u.degree, dec=cdec*u.degree, frame='fk5')            
                 gal       = cel.transform_to('galactic')
                 cl,cb     = gal.l.degree,gal.b.degree
-                print 'plotting countour...%d points' % len(cl)
+                print('plotting countour...%d points' % len(cl))
                 galactic(f,ax,cl,cb,symbol='circle',size=1,color='magenta',prob=None)
 
                 pmin = hpx[indexes].min()
-                print np.sum(hpx),pmin
+                print(np.sum(hpx),pmin)
             else:
                 pmin=0
                 prob=None
                 pass
             
-            print 'plotting sources...' 
+            print('plotting sources...')
             galactic(f,ax,l,b,symbol='cross',size=11,color='red',prob=None)
             galactic(f,ax,l,b,symbol='circle',size=11,color='red',prob=prob,pmin=pmin)
             if prob is not None:

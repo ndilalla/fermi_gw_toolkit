@@ -1,5 +1,5 @@
 import os
-import pyfits
+from astropy.io import fits as pyfits
 from GtBurst.angularDistance import getAngularDistance
 from GtBurst import sunpos
 

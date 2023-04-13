@@ -6,10 +6,10 @@ import argparse
 from astropy.io import fits
 from reproject import reproject_from_healpix
 
-from check_file_exists import check_file_exists
+from fermi_gw_toolkit.utils.check_file_exists import check_file_exists
 
 
-if __name__=="__main__":
+if __name__== "__main__":
 
     desc = '''Convert a HEALPIX map into a WCS (projected) one'''
 

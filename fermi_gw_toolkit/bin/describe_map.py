@@ -2,7 +2,7 @@
 
 import argparse
 
-from check_file_exists import check_file_exists
+from fermi_gw_toolkit.utils.check_file_exists import check_file_exists
 
 import matplotlib
 import seaborn as sns

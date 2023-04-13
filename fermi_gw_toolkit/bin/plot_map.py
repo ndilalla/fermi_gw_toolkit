@@ -2,14 +2,14 @@
 
 import argparse
 
-from check_file_exists import check_file_exists
+from fermi_gw_toolkit.utils.check_file_exists import check_file_exists
+from fermi_gw_toolkit.lib.contour_finder import pix_to_sky
 
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import healpy as hp
 import numpy as np
-from contour_finder import pix_to_sky
 from matplotlib import rc
 #rc('text', usetex=True)
 

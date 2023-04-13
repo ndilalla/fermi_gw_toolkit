@@ -1,12 +1,12 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 import os
-import urllib2
+import urllib
 import time
 import subprocess
 import argparse
 import pickle
 from glob import glob
-from gcn_info import get_info
+from fermi_gw_toolkit.utils.gcn_info import get_info
 
 decorator = 'http://glast-ground.slac.stanford.edu/Decorator/exp/Fermi/Decorate/groups/grb/GWPIPELINE//'
 local_dir = '/nfs/farm/g/glast/u26/GWPIPELINE/output/'
@@ -30,9 +30,9 @@ parser.add_argument("--directory", help="Path to the 'done' folder",
 
 def check_url(url):
     try: 
-        urllib2.urlopen(url)
+        urllib.request.urlopen(url)
         return True
-    except urllib2.HTTPError, e:
+    except urllib.error.HTTPError:
         return False
 
 def save_dict(_dict, outfile):
@@ -55,19 +55,19 @@ def fix_html(html, remove):
 
 def _rmdir(folder):
     command = 'ssh ndilalla@galprop.stanford.edu "rm -rf %s"' % folder
-    print 'Executing %s...' % command
+    print('Executing %s...' % command)
     os.system(command)
     raw_input()
 
 def _mkdir(folder):
     command = 'ssh ndilalla@galprop.stanford.edu "mkdir -p %s"' % folder
-    print 'Executing %s...' % command
+    print('Executing %s...' % command)
     os.system(command)
 
 def _copy(file_path, outfolder, outname=''):
     command = 'scp -r %s ndilalla@galprop.stanford.edu:%s/%s' %\
         (file_path, outfolder, outname)
-    print 'Executing %s...' % command
+    print('Executing %s...' % command)
     os.system(command)
 
 def make_copy(file_path, outfolder):
@@ -86,7 +86,7 @@ def copy_event(name, version=None, overwrite=False):
     gw_info = get_info(grace_name)
     if gw_info is None:
         # NOT a grace superevent
-        print '%s is not a grace superevent' % grace_name
+        print('%s is not a grace superevent' % grace_name)
         return
     
     if version is None:
@@ -94,7 +94,7 @@ def copy_event(name, version=None, overwrite=False):
     res_list = glob('%s/%s/%s/%s_results.html'% (local_dir, name, version, name))
     if len(res_list) == 0:
         # Analysis NOT completed yet
-        print 'Analysis of %s seems not over yet' % grace_name
+        print('Analysis of %s seems not over yet' % grace_name)
         return
     
     for path in res_list:
@@ -109,28 +109,28 @@ def copy_event(name, version=None, overwrite=False):
             db_dict[key_event].update({'Copied':False})
         
         if gw_info['AlertType'] == 'Retraction':
-            print '%s was retracted' % grace_name
+            print('%s was retracted' % grace_name)
             db_dict[key_event].update({'Retracted':True})
             if db_dict[key_event]['Copied']:
                 # Retracted but copied yet
-                print '%s has been already copied. Removing now.' % grace_name
+                print('%s has been already copied. Removing now.' % grace_name)
                 _rmdir(outfolder)
                 db_dict[key_event].update({'Copied':False})
             continue    
         if db_dict[key_event]['Copied'] and not overwrite:
             # copied yet and NOT overwrite
-            print '%s/%s already copied but NOT set to overwrite' %\
-                (grace_name, version)
+            print('%s/%s already copied but NOT set to overwrite' %\
+                (grace_name, version))
             continue
         
-        print 'Copying %s (%s) to Stanford...' % (name, version)
+        print('Copying %s (%s) to Stanford...' % (name, version))
         remove = decorator + os.path.join('output', name, version) + '/'
         new_path = fix_html(path, remove)
         make_copy(new_path, outfolder)
         db_dict[key_event].update({'Copied':True})
     
         db_update = True
-        print 'Updating the database...'
+        print('Updating the database...')
         if gw_info['Group'] == 'Burst':
             db_dict[key_event].update({'Burst':True, 'FAR':gw_info['FAR']})
         else:
@@ -147,16 +147,16 @@ def copy_events(**kwargs):
     db_update = False
     if done_dir is not None:
         files = glob('%s*' % done_dir)
-        print 'Found %d new events in %s.' % (len(files), done_dir)
+        print('Found %d new events in %s.' % (len(files), done_dir))
         for file_path in files:
             file_name = os.path.basename(file_path).replace('.txt', '')
             name, version = file_name.split('_')
             db_update = copy_event(name, version, overwrite=True) or db_update
             cmd = 'mv %s %s../copied/' % (file_path, done_dir)
-            print cmd
+            print(cmd)
             os.system(cmd)
     elif name is None:
-        print 'Trigger name not provided. Looking for new events to copy...'
+        print('Trigger name not provided. Looking for new events to copy...')
         files = sorted(glob('%s*' % (local_dir)), reverse=True)
         for directory in files:
             if not os.path.isdir(directory):
@@ -170,10 +170,10 @@ def copy_events(**kwargs):
     
     #print(db_dict)
     if db_update is True:
-        print 'Saving the database to %s...' % dbfile
+        print('Saving the database to %s...' % dbfile)
         save_dict(db_dict, dbfile)
         _copy(dbfile, stanford_dir)
-    print 'Done!'
+    print('Done!')
 
 if __name__ == "__main__":
     args = parser.parse_args()

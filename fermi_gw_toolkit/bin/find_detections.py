@@ -7,8 +7,8 @@ import numpy as np
 import healpy as hp
 import scipy.stats
 
-from fermi_gw_toolkit.check_file_exists import check_file_exists
-from fermi_gw_toolkit.contour_finder import pix_to_sky, ContourFinder
+from fermi_gw_toolkit.utils.check_file_exists import check_file_exists
+from fermi_gw_toolkit.lib.contour_finder import pix_to_sky, ContourFinder
 
 
 def Hopkins_method(ts_map_array, ra, dec, fdr, psf_size, N, nside, hopkins_correction=True):

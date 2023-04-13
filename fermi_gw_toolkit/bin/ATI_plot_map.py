@@ -2,14 +2,14 @@
 
 import argparse
 
-from check_file_exists import check_file_exists
+from fermi_gw_toolkit.utils.check_file_exists import check_file_exists
+from fermi_gw_toolkit.lib.contour_finder import pix_to_sky
 
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import healpy as hp
 import numpy as np
-from contour_finder import pix_to_sky
 
 #from matplotlib import rc
 #rc('text', usetex=True)
@@ -125,7 +125,7 @@ if __name__=="__main__":
         z_title  =r'$\sigma$ ' 
         magnitude = 1
     else:
-        print 'Unrecognized map type %s. Use EFLUX, FLUX or TS' % args.map_type
+        print('Unrecognized map type %s. Use EFLUX, FLUX or TS' % args.map_type)
         exit()
         pass
 
@@ -134,9 +134,9 @@ if __name__=="__main__":
     px_max  = np.nanargmax(hpx_ul)
     ra_max, dec_max = pix_to_sky(px_max,nside)
 
-    print 'Minimum Value = ', hpx_ul[idx].min()
-    print 'Maximum Value = ', MAXVALUE
-    print 'RA,DEC=%f %f MAX= %f' %(ra_max, dec_max, MAXVALUE)
+    print('Minimum Value = ', hpx_ul[idx].min())
+    print('Maximum Value = ', MAXVALUE)
+    print('RA,DEC=%f %f MAX= %f' %(ra_max, dec_max, MAXVALUE))
 
 
     ticks=np.logspace(np.log10(mmin / magnitude), np.log10(mmax / magnitude), 4),
@@ -145,7 +145,7 @@ if __name__=="__main__":
         ticks=np.linspace(mmin / magnitude, mmax / magnitude, 4),
         #mmin=0
         pass
-    print 'Normalization of the axis:',norm
+    print('Normalization of the axis:',norm)
     if args.zoom is None:
         projected_map = hp.mollview(hpx_ul / magnitude, rot=rot,
                                     min=mmin / magnitude,

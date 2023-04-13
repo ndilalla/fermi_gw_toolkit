@@ -4,7 +4,8 @@ import argparse
 import subprocess
 import os
 import glob
-from get_sources import getSourcesInTheROI
+from fermi_gw_toolkit import GTBURST_PATH
+from fermi_gw_toolkit.utils.get_sources import getSourcesInTheROI
 from GtBurst.commands import fits2png
 from GtBurst.commands.gtdotsmap import thisCommand as gtdotsmap
 
@@ -15,12 +16,12 @@ def _execute_command(cmd_line):
     print("")
 
     output = subprocess.check_output(cmd_line, stderr=subprocess.STDOUT, shell=True)
-    print output
+    print(output)
 
 def _chdir_rmdir(init_dir, subfolder_dir):
-    print "Returning to: %s" % init_dir
+    print("Returning to: %s" % init_dir)
     os.chdir(init_dir)
-    print "Removing: %s" % subfolder_dir
+    print("Removing: %s" % subfolder_dir)
     os.system('rm -rf %s' % subfolder_dir)
 
 if __name__ == "__main__":
@@ -86,14 +87,14 @@ if __name__ == "__main__":
     for ra, dec in zip(args.ra, args.dec):
 
         outfile = '%s_%.3f_%.3f_res.txt' % (args.triggername, ra, dec)
-        # cmd_line = 'python $FERMI_DIR/lib/python/GtBurst/scripts/'
-        cmd_line = 'doTimeResolvedLike.py %s --ra %s --dec %s --outfile %s ' \
-                   '--roi %s --tstarts %s --tstops %s --zmax %s --emin %s ' \
-                   '--emax %s --irf %s --galactic_model %s ' \
-                   '--particle_model "%s" --tsmin %s --strategy %s ' \
-                   '--thetamax %s --datarepository %s --ulphindex %s --flemin 100 --flemax 1000 ' \
+        cmd_line = 'python %s/scripts/doTimeResolvedLike.py %s --ra %s '\
+                   '--dec %s --outfile %s --roi %s --tstarts %s ' \
+                   '--tstops %s --zmax %s --emin %s --emax %s --irf %s '\
+                   '--galactic_model %s --particle_model "%s" --tsmin %s '\
+                   '--strategy %s --thetamax %s --datarepository %s '\
+                   '--ulphindex %s --flemin 100 --flemax 1000 ' \
                    '--tsmap_spec %s --fgl_mode %s' % \
-                   (args.triggername, ra, dec, outfile,
+                   (GTBURST_PATH, args.triggername, ra, dec, outfile,
                     args.roi, args.tstarts, args.tstops, args.zmax, args.emin,
                     args.emax, args.irf, args.galactic_model,
                     args.particle_model, args.tsmin, args.strategy,
@@ -123,9 +124,9 @@ if __name__ == "__main__":
             new_ft1 = glob.glob(subfolder_dir + '/*filt.fit')[0]
             ltcube = glob.glob(subfolder_dir + '/*filt_ltcube.fit')[0]
         except IndexError:
-            print 'Data are not available for pixel at RA=%.3f, DEC=%.3f' %\
-                (ra, dec)
-            print 'Skipping this one...'
+            print('Data are not available for pixel at RA=%.3f, DEC=%.3f' %\
+                (ra, dec))
+            print('Skipping this one...')
             #_chdir_rmdir(init_dir, subfolder_dir)
             continue
 
@@ -133,14 +134,14 @@ if __name__ == "__main__":
             print('Bayesian UL not executed.')
         else:
 
-            print 'Using:\n %s,\n %s,\n %s,\n %s' % (xml, expomap, new_ft1,
-                                                     ltcube)
+            print('Using:\n %s,\n %s,\n %s,\n %s' % (xml, expomap, new_ft1,
+                                                     ltcube))
             outplot = os.path.join(init_dir, '%s_%.3f_%.3f_corner_plot.png' % \
                                    (args.triggername, ra, dec))
             outul = os.path.join(init_dir, '%s_%.3f_%.3f_bayesian_ul' % \
                                  (args.triggername, ra, dec))
             print("")
-            print "Changing working directory to: %s" % subfolder_dir
+            print("Changing working directory to: %s" % subfolder_dir)
             os.chdir(subfolder_dir)
             cmd_line = 'python $GPL_TASKROOT/fermi_gw_toolkit/fermi_gw_toolkit/bayesian_ul.py ' \
                        '--ft1 %s --ft2 %s --expomap %s --ltcube %s --xml %s ' \
@@ -168,11 +169,11 @@ if __name__ == "__main__":
             rsp = glob.glob(args.datarepository + '/%s/*.rsp' % args.triggername)[0]
             expomap = os.path.basename(expomap)
             ltcube = os.path.basename(ltcube)
-            #print 'Using:\n %s,\n %s,\n %s,\n %s,\n %s' %\
-            #    (xml, expomap, new_ft1, ltcube, rsp)
+            #print('Using:\n %s,\n %s,\n %s,\n %s,\n %s' %\
+            #    (xml, expomap, new_ft1, ltcube, rsp))
             outfits = os.path.join(init_dir, '%s_%.3f_%.3f_tsmap.fits' % \
                                  (args.triggername, ra, dec))
-            print "Changing working directory to: %s" % subfolder_dir
+            print("Changing working directory to: %s" % subfolder_dir)
             os.chdir(subfolder_dir)
             
             ramax, decmax, tsmax = gtdotsmap.run(filteredeventfile=new_ft1, 
@@ -195,13 +196,15 @@ if __name__ == "__main__":
             #count map
             outfits = os.path.join(init_dir, '%s_%.3f_%.3f_cmap.fits' % \
                                  (args.triggername, ra, dec))
-            cmd_line = 'gtdocountsmap.py ' \
+            
+            cmd_line = 'python %s/commands/gtdocountsmap.py ' \
                        'eventfile=%s rspfile=%s ft2file=%s ra=%s dec=%s '\
                        'rad=%s irf=%s zmax=%s tstart=%s tstop=%s emin=%s '\
                        'emax=%s skymap=%s thetamax=%s strategy=%s' % \
-                       (new_ft1, rsp, ft2, ra, dec, args.roi, args.irf, 
-                        args.zmax, args.tstarts, args.tstops, args.emin, 
-                        args.emax, outfits, args.thetamax, args.strategy)
+                       (GTBURST_PATH, new_ft1, rsp, ft2, ra, dec, args.roi, 
+                        args.irf, args.zmax, args.tstarts, args.tstops, 
+                        args.emin, args.emax, outfits, args.thetamax, 
+                        args.strategy)
             _execute_command(cmd_line)
             
             #fits2png with sources
@@ -223,16 +226,16 @@ if __name__ == "__main__":
             cmd_line = 'python $GPL_TASKROOT/fermi_gw_toolkit/fermi_gw_toolkit/simulation_tools/measure_ts_distrib.py ' \
                        '--filtered_ft1 %s --ft2 %s ' \
                        '--expmap %s --ltcube %s --xmlfile %s --tar %s ' \
-                       '--tsmap_spec %s --srcname GRB --outfile %s' % (new_ft1, ft2, expomap,
-                                                                       ltcube, xml, tar_file_path, tsmap_spec,
-                                                                       ts_outfile)
+                       '--tsmap_spec %s --srcname GRB --outfile %s' %\
+                       (new_ft1, ft2, expomap, ltcube, xml, tar_file_path, 
+                        tsmap_spec, ts_outfile)
 
             print("")
-            print "Changing working directory to: %s" % subfolder_dir
+            print("Changing working directory to: %s" % subfolder_dir)
             os.chdir(subfolder_dir)
 
             _execute_command(cmd_line)
             pass
         _chdir_rmdir(init_dir, subfolder_dir)
-        print 'Done!'
+        print('Done!')
         

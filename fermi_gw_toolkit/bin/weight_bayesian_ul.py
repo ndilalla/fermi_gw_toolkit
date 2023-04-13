@@ -6,7 +6,7 @@ import matplotlib as mpl
 mpl.use('agg')
 
 import matplotlib.pyplot as plt
-from local_database import gw_local_database
+from fermi_gw_toolkit.lib.local_database import gw_local_database
 
 import argparse
 import glob
@@ -31,8 +31,8 @@ except ImportError:
     # Not an issue, only estethic
     pass
 
-from sky_to_healpix_id import sky_to_healpix_id
-from check_file_exists import check_file_exists
+from fermi_gw_toolkit.utils.sky_to_healpix_id import sky_to_healpix_id
+from fermi_gw_toolkit.utils.check_file_exists import check_file_exists
 
 
 def get_interpolator(fluxes, weight):
