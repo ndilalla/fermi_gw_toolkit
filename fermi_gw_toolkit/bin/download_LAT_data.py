@@ -17,6 +17,10 @@ parser = argparse.ArgumentParser(description=__description__,
 
 parser.add_argument("--outdir", help="Output directory for LAT data", type=str,
                     default='.')
+parser.add_argument("--ft1", help="Name of the output ft1 file", type=str,
+                    default='FT1.fits')
+parser.add_argument("--ft2", help="Name of the output ft1 file", type=str,
+                    default='FT2.fits')                
 parser.add_argument("--tstart", help="Start time in MET", type=float,
                     required=True)
 parser.add_argument("--tstop", help="Stop times in MET", type=float,
@@ -38,11 +42,13 @@ def download_LAT_data(**kwargs):
     padding = kwargs['padding']
     met_start = kwargs['tstart'] - padding
     met_stop = kwargs['tstop'] + padding
-    ft2 = 'FT2'
+    ft1 = kwargs['ft1']
+    ft2 = kwargs['ft2']
+    ft2_type = 'FT2'
     if kwargs['one_sec']:
-        ft2 = 'FT2SECONDS'
+        ft2_type = 'FT2SECONDS'
     
-    cmd = f'getLATFitsFiles.py --wdir {outdir} --outfile {outdir}/FT1.fits' \
+    cmd = f'getLATFitsFiles.py --wdir {outdir} --outfile {outdir}/{ft1}' \
           f' --minTimestamp {met_start} --maxTimestamp {met_stop} --type FT1'\
           f' --verbose 1 --overwrite 1' % locals()
     print('About to run: ', cmd)
@@ -51,15 +57,17 @@ def download_LAT_data(**kwargs):
     except:
         print('ERROR: impossible to run getLATFitsFiles.py')
         print('Are you sure to have installed astrowrap and added it to your PATH?')
-    cmd = f'getLATFitsFiles.py --wdir {outdir} --outfile {outdir}/FT2.fits' \
-          f' --minTimestamp {met_start} --maxTimestamp {met_stop} --type {ft2}'\
-          f' --verbose 1 --overwrite 1' % locals()
+    cmd = f'getLATFitsFiles.py --wdir {outdir} --outfile {outdir}/{ft2}' \
+          f' --minTimestamp {met_start} --maxTimestamp {met_stop} '\
+          f'--type {ft2_type} --verbose 1 --overwrite 1' % locals()
     print('About to run: ', cmd)
     try:
         os.system(cmd)
     except:
         print('ERROR: impossible to run getLATFitsFiles.py')
         print('Are you sure to have installed astrowrap and added it to your PATH?')
+    
+    return f'{outdir}/{ft1}', f'{outdir}/{ft2}'
 
 
 if __name__=="__main__":
