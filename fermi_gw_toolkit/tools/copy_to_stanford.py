@@ -133,8 +133,8 @@ def copy_events(overwrite=False):
             else:
                 #db_dict[key_event].update({'Burst':False})
                 db_dict.set_value(name, version, 'Burst', False)
-                _keys = ['FAR', 'BBH', 'BNS', 'NSBH', 'Terrestrial', 'MassGap',
-                         'HasNS', 'HasRemnant']
+                _keys = ['FAR', 'BBH', 'BNS', 'NSBH', 'Noise',\
+                         'HasMassGap', 'HasNS', 'HasRemnant']
                 _info = {_key:gw_info[_key] for _key in _keys}
                 #db_dict[key_event].update(_info)
                 db_dict.update(name, version, _info)

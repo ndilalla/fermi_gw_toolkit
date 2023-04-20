@@ -6,8 +6,8 @@ import numpy
 from fermi_gw_toolkit import GPL_TASKROOT
 from fermi_gw_toolkit.tools.ScanEvents import get_info
 
-EVENT_LIST_FILE = GPL_TASKROOT + '/O3_event_list.txt'
-HISTORY_FILE = GPL_TASKROOT + '/status/history.txt'
+EVENT_LIST_FILE = GPL_TASKROOT + '/databases/O3_event_list.txt'
+HISTORY_FILE = GPL_TASKROOT + '/databases/O3_history.txt'
 
 __description__='Script to launch the O3 reprocessing'
 formatter = argparse.ArgumentDefaultsHelpFormatter
@@ -38,7 +38,7 @@ info = get_info(repro_name)
 skymap = info['skymap_fits']
 print('Using skymap %s...' % skymap)
 
-cmd = 'python %s/submitJob.py --url %s --nside 64 --version v01 --run_bayul 1 --pixels_job 5 --wall_time 4' % (GPL_TASKROOT, skymap)
+cmd = 'python %s/tools/submit_gwfup_job.py --url %s --nside 64 --version v01 --run_bayul 1 --pixels_job 5 --wall_time 4' % (FERMI_GW_ROOT, skymap)
 print(cmd)
 
 os.system(cmd)
