@@ -4,9 +4,16 @@ import healpy as hp
 import json
 import urllib
 
+def check_url(url):
+    try: 
+        urllib.request.urlopen(url)
+        return True
+    except urllib.error.HTTPError:
+        return False
+
 # Function to call every time a GCN is received.
-def process_gcn(payload, root):
-    if root.attrib['role'] != 'observation':
+def read_gcn(payload, root, role='observation'):
+    if root.attrib['role'] != role:
         return None
 
     # Read all of the VOEvent parameters from the "What" section.
@@ -28,7 +35,7 @@ def get_info(name):
         return None
     
     root = lxml.etree.fromstring(payload)
-    return process_gcn(payload, root)
+    return read_gcn(payload, root)
 
 if __name__ == "__main__":
     #name = 'S200116ah'

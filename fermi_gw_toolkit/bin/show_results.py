@@ -4,6 +4,7 @@ import numpy
 import healpy as hp
 #import webbrowser
 import astropy.io.fits as pyfits
+from fermi_gw_toolkit import GPL_TASKROOT, DECORATOR_PATH
 from fermi_gw_toolkit.lib.contour_finder import pix_to_sky
 from fermi_gw_toolkit.lib.local_database import gw_local_database
 from fermi_gw_toolkit.lib.html_lib import *
@@ -13,11 +14,9 @@ from fermi_gw_toolkit.lib.html_lib import *
 formatter = argparse.ArgumentDefaultsHelpFormatter
 parser = argparse.ArgumentParser(formatter_class=formatter)
 
-_nfs_home='/nfs/farm/g/glast/u26/GWPIPELINE'
-_db_file = os.path.join(_nfs_home, 'output', 'db_gw_events.pkl')
+_db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4_events.pkl')
 def fix_path(local_path):
-    _html_home='http://glast-ground.slac.stanford.edu/Decorator/exp/Fermi/Decorate/groups/grb/GWPIPELINE/'
-    return local_path.replace(_nfs_home,_html_home)
+    return local_path.replace(GPL_TASKROOT, DECORATOR_PATH)
 
 parser.add_argument("--triggername", help="Trigger name", type=str,
                     required=True)
@@ -249,7 +248,3 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     outfile = show_results(**args.__dict__)
-
-    text = """ Results here: %s  """ % outfile
-
-    #send_email('nicola.omodei@gmail.com', 'Processing of %s completed' % args.triggername, text)

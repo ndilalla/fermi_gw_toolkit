@@ -2,6 +2,8 @@ import pickle
 import json
 import os
 
+from fermi_gw_toolkit import GPL_TASKROOT
+
 class gw_local_database(dict):
     
     def __init__(self, _dict):
@@ -19,26 +21,30 @@ class gw_local_database(dict):
         with open(outfile, 'wb') as f:
             pickle.dump(dict(self), f)
     
-    def _get_key(self, name, version):
+    def get_key(self, name, version):
         return '%s/%s' % (name, version)
     
     def initialize(self, name, version):
-        _key = self._get_key(name, version)
+        _key = self.get_key(name, version)
         if not _key in self:
             self[_key] = {'Name' : name, 'Version' : version}
     
     def update(self, name, version, _dict):
+        """ Update the internal dictionary
+        """
         self.initialize(name, version)
-        _key = self._get_key(name, version)
+        _key = self.get_key(name, version)
         self[_key].update(_dict)
     
-    def get(self, name, version, key):
-        _key = self._get_key(name, version)
+    def get_value(self, name, version, key):
+        _key = self.get_key(name, version)
         return self[_key].get(key, None)
     
-    def set(self, name, version, key, value):
+    def set_value(self, name, version, key, value):
+        """ Set a single key/value of the internal dictionary
+        """
         self.initialize(name, version)
-        _key = self._get_key(name, version)
+        _key = self.get_key(name, version)
         self[_key][key] = value
     
     def show(self):
@@ -47,8 +53,7 @@ class gw_local_database(dict):
     
 
 if __name__ == '__main__':
-    nfs_home='/nfs/farm/g/glast/u26/GWPIPELINE'
-    db_file = os.path.join(nfs_home, 'output', 'db_gw_events.pkl')
+    db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_events.pkl')
     db = gw_local_database.load(db_file)
     db.show()
-    #db.save(os.path.join(nfs_home, 'output', 'db_gw_events_copy.pkl'))
+    #db.save(os.path.join(GPL_TASKROOT, 'databases', 'db_gw_events_copy.pkl'))

@@ -79,7 +79,7 @@ if __name__ == "__main__":
     assert os.path.exists(ft2), "FT2 %s does not exist" % ft2
 
     tsmap_spec = "0.5,8"
-    if args.bayesian_ul is 0 or args.do_tsmap is 1:
+    if args.bayesian_ul == 0 or args.do_tsmap == 1:
         fgl_mode = 'complete'
     else:
         fgl_mode = 'fast'
@@ -130,7 +130,7 @@ if __name__ == "__main__":
             #_chdir_rmdir(init_dir, subfolder_dir)
             continue
 
-        if args.bayesian_ul is 0 or args.do_tsmap is 1:
+        if args.bayesian_ul == 0 or args.do_tsmap == 1:
             print('Bayesian UL not executed.')
         else:
 
@@ -164,7 +164,7 @@ if __name__ == "__main__":
         
         # If do_tsmap option is 1 run the gtdotsmap script
         
-        if args.do_tsmap is 1:
+        if args.do_tsmap == 1:
             #ts map
             rsp = glob.glob(args.datarepository + '/%s/*.rsp' % args.triggername)[0]
             expomap = os.path.basename(expomap)
