@@ -1,4 +1,4 @@
-from fermi_gw_toolkit.pipeline import gwPipeline
+from fermi_gw_toolkit.tools.pipeline import gwPipeline
 from fermi_gw_toolkit import FERMI_GW_DATA, FERMI_GW_OUTPUT
 from fermi_gw_toolkit.utils.date_to_met import get_met
 import os, numpy, glob, shutil
