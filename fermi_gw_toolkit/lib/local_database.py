@@ -7,15 +7,30 @@ from fermi_gw_toolkit import GPL_TASKROOT
 class gw_local_database(dict):
     
     def __init__(self, _dict):
-        dict.__init__(self, _dict)
+        dict.__init__(self, _dict) 
     
+    @staticmethod
+    def check_extension(file_path):
+        if not file_path.endswith('.pkl'):
+            raise RuntimeError("Input file must have '.pkl' extension.")
+    
+    @staticmethod
+    def create_empty(file_path):
+        gw_local_database.check_extension(file_path)
+        if not os.path.isfile(file_path):
+            with open(file_path, 'wb') as file:
+                pickle.dump({}, file)
+        else:
+            print(f"{file_path} already exists!")
+
     @classmethod
     def load(cls, infile):
         print("Loading the local database %s..." % infile)
+        cls.check_extension(infile)
         with open(infile, 'rb') as f:
             _dict = pickle.load(f)
         return cls(_dict)
-    
+
     def save(self, outfile):
         print("Saving the database to %s..." % outfile)
         with open(outfile, 'wb') as f:
@@ -53,7 +68,8 @@ class gw_local_database(dict):
     
 
 if __name__ == '__main__':
-    db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_events.pkl')
+    db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4_events.pkl')
+    gw_local_database.create_empty(db_file)
     db = gw_local_database.load(db_file)
     db.show()
     #db.save(os.path.join(GPL_TASKROOT, 'databases', 'db_gw_events_copy.pkl'))
