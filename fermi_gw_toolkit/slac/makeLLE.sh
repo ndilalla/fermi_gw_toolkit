@@ -6,12 +6,13 @@ mkdir -p $stage
 cd $stage
 echo PWD=$PWD
 export HOME=$PWD
-source ${GPL_TASKROOT}/setup_gtgrb.sh
+source ${GPL_TASKROOT}/set_env/setup_gtgrb.sh
 which bbbd_lle.py
 which makeLLE.py
-echo makeLLE.py --ttime $TRIGGERTIME --ra $OBJ_RA --dec $OBJ_DEC --tstart $TSTART --tstop $TSTOP --outdir $stage --version 0 --name $TRIGGERNAME --clobber 1 --regenerate_after_detection 1 --radius -1 --thetamax 89 --zmax 90 --ignore_theta 1 
 
-makeLLE.py --ttime $TRIGGERTIME --ra $OBJ_RA --dec $OBJ_DEC --tstart $TSTART --tstop $TSTOP --outdir $stage --version 0 --name $TRIGGERNAME --clobber 1 --regenerate_after_detection 1 --radius -1 --thetamax 89 --zmax 90 --ignore_theta 1 
+CMD="makeLLE.py --ttime $TRIGGERTIME --ra $OBJ_RA --dec $OBJ_DEC --tstart $TSTART --tstop $TSTOP --outdir $stage --version 0 --name $TRIGGERNAME --clobber 1 --regenerate_after_detection 1 --radius -1 --thetamax 89 --zmax 90 --ignore_theta 1"
+echo $CMD
+$CMD
 
 mkdir -p $OUTPUT_FILE_PATH/LLE
 ls $stage/$TRIGGERNAME/v00/*

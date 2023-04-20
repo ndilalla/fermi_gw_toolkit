@@ -1,10 +1,10 @@
 #!/bin/bash -e
 echo SIMULATE_MODE=$SIMULATE_MODE
 echo 'Sourcing the setup script!'
-source $GPL_TASKROOT/config/DEV/setup_conda.sh
+source $GPL_TASKROOT/set_env/setup_gwfup.sh
 
-touch $GPL_TASKROOT/status/running/${TRIGGERNAME}_${VERSION}.txt
-chmod a+w $GPL_TASKROOT/status/running/${TRIGGERNAME}_${VERSION}.txt
+#touch $GPL_TASKROOT/status/running/${TRIGGERNAME}_${VERSION}.txt
+#chmod a+w $GPL_TASKROOT/status/running/${TRIGGERNAME}_${VERSION}.txt
 
 mkdir -p $DATA_PATH
 mkdir -p $OUTPUT_FILE_PATH/images
@@ -32,9 +32,11 @@ then
     rm $FT2_PATH 
 fi
 echo 'Getting the data...'
-# I download the data also before the trigger...
-echo getLATFitsFiles.py --output-ft1 $FT1_PATH --output-ft2 $FT2_PATH --minTimestamp $MET_FT2TSTART --maxTimestamp $MET_FT2TSTOP --name $TRIGGERNAME --noextended
-getLATFitsFiles.py --output-ft1 $FT1_PATH --output-ft2 $FT2_PATH --minTimestamp $MET_FT2TSTART --maxTimestamp $MET_FT2TSTOP --name $TRIGGERNAME --noextended
+
+CMD="python ${FERMI_GWTOOLS}/bin/download_LAT_data.py --outdir $DATA_PATH --ft1 $FT1_NAME --ft2 $FT2_NAME --tstart $MET_FT2TSTART --tstop $MET_FT2TSTOP --padding 1000 --one_sec True"
+
+echo $CMD
+$CMD
 
 if [ ! -f $FT1_PATH ];
 then

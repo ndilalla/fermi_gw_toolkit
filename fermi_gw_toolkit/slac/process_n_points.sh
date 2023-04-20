@@ -28,17 +28,14 @@ echo PWD=$PWD
 ls
 #ls diffuse
 echo 'sourcing the setup script!'
-source $GPL_TASKROOT/config/DEV/setup_gw_giacomvst.csh
-mkdir -p $PFILES
+source $GPL_TASKROOT/set_env/setup_gwfup.csh
+#What is this command this doing?
+#mkdir -p $PFILES 
 
 echo 'About run the process_n_points.py script...'
-#echo python ${GPL_TASKROOT}/fermi_gw_toolkit/fermi_gw_toolkit/process_n_points.py $TRIGGERNAME --ra $OBJ_RA --dec $OBJ_DEC --roi $ROI --tstarts ${MET_TSTART} --tstops ${MET_TSTOP} --irf $IRFS --galactic_model $GAL_MODEL --particle_model "$PART_MODEL" --tsmin $TSMIN --emin $EMIN --emax $EMAX --zmax $ZMAX --strategy $STRATEGY --datarepository $OUTPUT_FILE_PATH --ulphindex $UL_INDEX
-
-#python ${GPL_TASKROOT}/fermi_gw_toolkit/fermi_gw_toolkit/process_n_points.py $TRIGGERNAME --ra $OBJ_RA --dec $OBJ_DEC --roi $ROI --tstarts ${MET_TSTART} --tstops ${MET_TSTOP} --irf $IRFS --galactic_model $GAL_MODEL --particle_model "$PART_MODEL" --tsmin $TSMIN --emin $EMIN --emax $EMAX --zmax $ZMAX --strategy $STRATEGY --datarepository $OUTPUT_FILE_PATH --ulphindex $UL_INDEX
-
-echo python ${GPL_TASKROOT}/fermi_gw_toolkit/fermi_gw_toolkit/process_n_points.py $TRIGGERNAME --ra $OBJ_RA --dec $OBJ_DEC --roi $ROI --tstarts ${MET_TSTART} --tstops ${MET_TSTOP} --irf $IRFS --galactic_model $GAL_MODEL --particle_model "$PART_MODEL" --tsmin $TSMIN --emin $EMIN --emax $EMAX --zmax $ZMAX --strategy $STRATEGY --thetamax $THETAMAX --datarepository $OUTPUT_FILE_PATH_STAGE --ulphindex $UL_INDEX --ft2 $FT2_PATH_STAGE --src $SRC --burn_in $BURN_IN --n_samples $N_SAMPLES --bayesian_ul $BAYESIAN_UL --sim_ft1_tar $TAR_STAGE --do_tsmap $DO_TSMAP
-
-python ${GPL_TASKROOT}/fermi_gw_toolkit/fermi_gw_toolkit/process_n_points.py $TRIGGERNAME --ra $OBJ_RA --dec $OBJ_DEC --roi $ROI --tstarts ${MET_TSTART} --tstops ${MET_TSTOP} --irf $IRFS --galactic_model $GAL_MODEL --particle_model "$PART_MODEL" --tsmin $TSMIN --emin $EMIN --emax $EMAX --zmax $ZMAX --strategy $STRATEGY --thetamax $THETAMAX --datarepository $OUTPUT_FILE_PATH_STAGE --ulphindex $UL_INDEX --ft2 $FT2_PATH_STAGE --src $SRC --burn_in $BURN_IN --n_samples $N_SAMPLES --bayesian_ul $BAYESIAN_UL --sim_ft1_tar $TAR_STAGE --do_tsmap $DO_TSMAP
+CMD="python ${FERMI_GWTOOLS}/bin/process_n_points.py $TRIGGERNAME --ra $OBJ_RA --dec $OBJ_DEC --roi $ROI --tstarts ${MET_TSTART} --tstops ${MET_TSTOP} --irf $IRFS --galactic_model $GAL_MODEL --particle_model "$PART_MODEL" --tsmin $TSMIN --emin $EMIN --emax $EMAX --zmax $ZMAX --strategy $STRATEGY --thetamax $THETAMAX --datarepository $OUTPUT_FILE_PATH_STAGE --ulphindex $UL_INDEX --ft2 $FT2_PATH_STAGE --src $SRC --burn_in $BURN_IN --n_samples $N_SAMPLES --bayesian_ul $BAYESIAN_UL --sim_ft1_tar $TAR_STAGE --do_tsmap $DO_TSMAP"
+echo $CMD
+$CMD
 
 
 mkdir -p $OUTPUT_FILE_PATH/$SUBDIR

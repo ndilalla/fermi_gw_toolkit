@@ -7,12 +7,14 @@ mkdir -p $stage
 cd $stage
 echo PWD=$PWD
 echo 'sourcing the setup script!'
-source $GPL_TASKROOT/config/DEV/setup_gw_giacomvst.csh
-mkdir -p $PFILES
+source $GPL_TASKROOT/set_env/setup_gwfup.csh
+#What is this command this doing?
+#mkdir -p $PFILES 
 
 echo 'About run the process_n_points_times.py script...'
-echo python ${GPL_TASKROOT}/fermi_gw_toolkit/fermi_gw_toolkit/process_n_points_times.py $TRIGGERNAME --ra $OBJ_RA --dec $OBJ_DEC --roi $ROI --tstarts $TSTARTS --tstops $TSTOPS --irf $IRFS --galactic_model $GAL_MODEL --particle_model "$PART_MODEL" --tsmin $TSMIN --emin $EMIN --emax $EMAX --zmax $ZMAX --strategy $STRATEGY --thetamax $THETAMAX --datarepository $OUTPUT_FILE_PATH --ulphindex $UL_INDEX
-python ${GPL_TASKROOT}/fermi_gw_toolkit/fermi_gw_toolkit/process_n_points_times.py $TRIGGERNAME --ra $OBJ_RA --dec $OBJ_DEC --roi $ROI --tstarts $TSTARTS --tstops $TSTOPS --irf $IRFS --galactic_model $GAL_MODEL --particle_model "$PART_MODEL" --tsmin $TSMIN --emin $EMIN --emax $EMAX --zmax $ZMAX --strategy $STRATEGY --thetamax $THETAMAX --datarepository $OUTPUT_FILE_PATH --ulphindex $UL_INDEX
+CMD="python ${FERMI_GWTOOLS}/bin/process_n_points_times.py $TRIGGERNAME --ra $OBJ_RA --dec $OBJ_DEC --roi $ROI --tstarts $TSTARTS --tstops $TSTOPS --irf $IRFS --galactic_model $GAL_MODEL --particle_model "$PART_MODEL" --tsmin $TSMIN --emin $EMIN --emax $EMAX --zmax $ZMAX --strategy $STRATEGY --thetamax $THETAMAX --datarepository $OUTPUT_FILE_PATH --ulphindex $UL_INDEX"
+echo $CMD
+$CMD
 
 mkdir -p $OUTPUT_FILE_PATH/$SUBDIR
 set nonomatch x=(${TRIGGERNAME}_*_res.txt)
