@@ -3,7 +3,7 @@ import time
 import argparse, glob
 
 from astropy.io import fits
-from genutils import  date2met
+from GtBurst.dataHandling import date2met
 from fermi_gw_toolkit import GPL_TASKROOT
 from fermi_gw_toolkit.utils.check_ft1_ft2_files import check_ft1_ft2_files
 
