@@ -40,7 +40,7 @@ def process_gcn(payload, root):
     new_skymap_url = skymap_url.replace('.multiorder.fits', '.fits.gz')
     print('New Flat Resolution Sky Map: %s' % new_skymap_url)
 
-    cmd = 'python %s/tools/submit_gwfup_job.py --url %s --nside 64 --version v01 --run_bayul 0 --pixels_job 5 --wall_time 4 --test' % (FERMI_GW_ROOT, new_skymap_url)
+    cmd = 'python %s/tools/submit_gwfup_job.py --url %s --nside 64 --version v01 --run_bayul 0 --pixels_job 5 --wall_time 4' % (FERMI_GW_ROOT, new_skymap_url)
     print(cmd)
 
     os.system(cmd)
