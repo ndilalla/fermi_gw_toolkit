@@ -110,7 +110,7 @@ if __name__=='__main__':
         BAYESIAN_UL = 1
     WALL_TIME = args.wall_time
     
-    cmd='./pipeline createStream GWFUP '
+    cmd='%spipeline createStream GWFUP ' % GPL_TASKROOT
     cmd+='--define TRIGGERNAME=%(TRIGGERNAME)s ' % locals()
     cmd+='--define TRIGGERTIME=%(TRIGGERTIME)s ' % locals()
     cmd+='--define MET_TSTART=%(MET_TSTART)s ' % locals()
@@ -175,7 +175,8 @@ if __name__=='__main__':
         conf_email='mail -r ndilalla@stanford.edu -s "GWFUP Pipeline: Job submitted for %s " ndilalla@stanford.edu <  %s' %(TRIGGERNAME,small_file)
         print(conf_email)
         os.system(conf_email)
-        txt=cmd.replace('./pipeline createStream GWFUP --define ','')
+        txt=cmd.replace('%spipeline createStream GWFUP --define ' %\
+                        GPL_TASKROOT, '')
         txt=txt.replace('--define','\n')
         with open(small_file,'w') as f:
             f.write(txt)
