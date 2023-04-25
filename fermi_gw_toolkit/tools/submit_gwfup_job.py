@@ -169,17 +169,17 @@ if __name__=='__main__':
         print('This was a test!')
     else: 
         os.system(cmd)
+        # txt=cmd.replace('%spipeline createStream GWFUP --define ' %\
+        #                 GPL_TASKROOT, '')
+        txt = cmd.replace('--define','\n --define')
+        with open(small_file,'w') as f:
+            f.write(txt)
         conf_email='mail -r nicola.omodei@gmail.com -s "GWFUP Pipeline: Job submitted for %s " nicola.omodei@gmail.com <  %s' %(TRIGGERNAME,small_file)
         print(conf_email)
         os.system(conf_email)
         conf_email='mail -r ndilalla@stanford.edu -s "GWFUP Pipeline: Job submitted for %s " ndilalla@stanford.edu <  %s' %(TRIGGERNAME,small_file)
         print(conf_email)
         os.system(conf_email)
-        txt=cmd.replace('%spipeline createStream GWFUP --define ' %\
-                        GPL_TASKROOT, '')
-        txt=txt.replace('--define','\n')
-        with open(small_file,'w') as f:
-            f.write(txt)
         #conf_email='mail -r nicola.omodei@gmail.com -s "GWFUP Pipeline: Job submitted for %s " o2x6m0g8y0j6y5i7@fermi-lat.slack.com <  %s' %(TRIGGERNAME,small_file)
         #print(conf_email)
         #os.system(conf_email)
