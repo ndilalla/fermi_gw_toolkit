@@ -147,7 +147,7 @@ if __name__=='__main__':
 
     temp_dir = '%sinput/temp/%s_%s' % (GPL_TASKROOT, TRIGGERNAME, VERSION)
     while not ok:
-        ft1, ft2 = download_LAT_data(dict(outdir=temp_dir, 
+        ft1, ft2 = download_LAT_data(**dict(outdir=temp_dir, 
             tstart=MET_FT2TSTART,  tstop=MET_FT2TSTOP, padding=1000, 
             one_sec=False))
         print(ft1)
