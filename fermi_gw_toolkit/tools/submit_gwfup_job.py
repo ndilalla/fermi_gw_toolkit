@@ -5,6 +5,7 @@ import argparse, glob
 from astropy.io import fits
 from GtBurst.dataHandling import date2met
 from fermi_gw_toolkit import GPL_TASKROOT
+from fermi_gw_toolkit.bin.download_LAT_data import download_LAT_data
 from fermi_gw_toolkit.utils.check_ft1_ft2_files import check_ft1_ft2_files
 from fermi_gw_toolkit.utils.gcn_info import curl_s3df
 
