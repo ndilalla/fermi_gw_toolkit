@@ -45,7 +45,9 @@ class pgwave_list():
 
 def save_empty(out_filename=None):
     txt='#     [RA]      [DEC]        [L]        [B]      [S/N]     [KSIG]  [COUNTS]  [GWPROB]\n'
-    if out_filename is not None: file(out_filename,'w').writelines(txt)
+    if out_filename is not None: 
+        with open(out_filename,'w') as f:
+            f.writelines(txt)
     print(txt)
     pass
 

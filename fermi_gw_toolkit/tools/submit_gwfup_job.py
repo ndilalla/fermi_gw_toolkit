@@ -162,10 +162,7 @@ if __name__=='__main__':
             pass
         pass
     os.system('rm -rf %s' % temp_dir)
-
-    outfile=file(small_file,'w')
-    outfile.write(cmd)
-    outfile.close()
+    
     print('Submitting:')
     print(cmd)
     if args.test == True:
@@ -180,9 +177,8 @@ if __name__=='__main__':
         os.system(conf_email)
         txt=cmd.replace('./pipeline createStream GWFUP --define ','')
         txt=txt.replace('--define','\n')
-        outfile=file(small_file,'w')
-        outfile.write(txt)
-        outfile.close()
+        with open(small_file,'w') as f:
+            f.write(txt)
         #conf_email='mail -r nicola.omodei@gmail.com -s "GWFUP Pipeline: Job submitted for %s " o2x6m0g8y0j6y5i7@fermi-lat.slack.com <  %s' %(TRIGGERNAME,small_file)
         #print(conf_email)
         #os.system(conf_email)
