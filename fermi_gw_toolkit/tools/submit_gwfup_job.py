@@ -6,6 +6,7 @@ from astropy.io import fits
 from GtBurst.dataHandling import date2met
 from fermi_gw_toolkit import GPL_TASKROOT
 from fermi_gw_toolkit.utils.check_ft1_ft2_files import check_ft1_ft2_files
+from fermi_gw_toolkit.utils.gcn_info import curl_s3df
 
 def getfromfile(filename):
     cmd='chmod a+r %s' % filename
@@ -26,10 +27,11 @@ def getfromweb(url):
     trigger_name = 'bn%s' % name
     out_file = '%sinput/input_maps/%s' % (GPL_TASKROOT, out_name)
     print(trigger_name, extension, out_name)
-    cmd = 'curl %s -o %s' % (url,out_file)
-    print(cmd)
+    #cmd = 'curl %s -o %s' % (url,out_file)
+    #print(cmd)
     #if not os.path.exists(out_file): 
-    os.system(cmd)
+    #os.system(cmd)
+    curl_s3df(url, out_file)
     cmd='chmod 777 %s' % out_file
     os.system(cmd)
     #else:

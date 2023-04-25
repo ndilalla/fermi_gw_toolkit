@@ -15,7 +15,7 @@ from fermi_gw_toolkit.utils.gcn_info import read_gcn
     gcn.notice_types.LVC_RETRACTION)
 def process_gcn(payload, root):
     # Read all of the VOEvent parameters
-    params = read_gcn(payload, root, role='observation') #'test')
+    params = read_gcn(root, role='observation') #'test')
     if params is None:
         return
 

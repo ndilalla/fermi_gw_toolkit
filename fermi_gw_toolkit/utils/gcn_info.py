@@ -3,16 +3,39 @@ import lxml.etree
 import healpy as hp
 import json
 import urllib
+import subprocess
+
+from fermi_gw_toolkit.utils.run_at_slac import run_at_slac
+
+def gracedb_request(url, slac=run_at_slac(), **kwargs):
+    if slac:
+        try:
+            return curl_s3df(url, **kwargs)
+        except subprocess.CalledProcessError:
+            raise RuntimeError('URL not available')
+    else:
+        try: 
+            return urllib.request.urlopen(url).read()
+        except urllib.error.HTTPError:
+            raise RuntimeError('URL not available')
 
 def check_url(url):
     try: 
-        urllib.request.urlopen(url)
+        gracedb_request(url)
         return True
-    except urllib.error.HTTPError:
+    except RuntimeError:
         return False
 
+def curl_s3df(url, outfile=None, shell=True, text=False):
+    #ssh ndilalla@s3dflogin.slac.stanford.edu curl -S https://gracedb.ligo.org/api/superevents/S200316bj/files/bayestar.fits.gz -o - > prova.fits
+    cmd = f'ssh ndilalla@s3dflogin.slac.stanford.edu curl -S {url} -o -'
+    if outfile is not None:
+        cmd += f' > {outfile}'
+    print('About to run: %s' % cmd)
+    return subprocess.check_output(cmd, shell=shell, text=text)
+
 # Function to call every time a GCN is received.
-def read_gcn(payload, root, role='observation'):
+def read_gcn(root, role='observation'):
     if root.attrib['role'] != role:
         return None
 
@@ -22,20 +45,18 @@ def read_gcn(payload, root, role='observation'):
               for elem in root.iterfind('.//Param')}
     return params
 
-def get_info(name):
+def get_info(name, slac=run_at_slac()):
     url = 'https://gracedb.ligo.org/apiweb/superevents/%s/voevents/?format=json' % name
     try:
-        json_url = urllib.request.urlopen(url)
-        data = json.load(json_url)
+        json_url = gracedb_request(url, slac=slac)
+        data = json.loads(json_url)
         index = int(data['numRows']) - 1
-        xml_link = data['voevents'][index]['links']['file']
-        #print(xml_link)
-        payload = urllib.request.urlopen(xml_link).read()
-    except urllib.error.HTTPError:
+        xml_url = data['voevents'][index]['links']['file']
+        payload = gracedb_request(xml_url, slac=slac, text=True)
+        root = lxml.etree.fromstring(payload)
+        return read_gcn(root)
+    except RuntimeError:
         return None
-    
-    root = lxml.etree.fromstring(payload)
-    return read_gcn(payload, root)
 
 if __name__ == "__main__":
     #name = 'S200116ah'
