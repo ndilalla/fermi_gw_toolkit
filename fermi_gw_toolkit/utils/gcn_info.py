@@ -52,7 +52,7 @@ def get_info(name, slac=run_at_slac()):
         data = json.loads(json_url)
         index = int(data['numRows']) - 1
         xml_url = data['voevents'][index]['links']['file']
-        payload = gracedb_request(xml_url, slac=slac, text=True)
+        payload = gracedb_request(xml_url, slac=slac)
         root = lxml.etree.fromstring(payload)
         return read_gcn(root)
     except RuntimeError:
