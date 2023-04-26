@@ -18,6 +18,7 @@ def process_gcn(payload, root):
     # Read all of the VOEvent parameters
     params = read_gcn(root, role='observation') #'test')
     if params is None:
+        print('This was a test. Ignoring it.')
         return
     
     print('New GCN Notice received on: ', datetime.now())
