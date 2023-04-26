@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ve
 # THIS SHOULD SOURCE THE APPROPRIATE FILES TO SET UP THE ENVIRONMENT AND EXCECUTE THE PYTHON SCRIPT
 
 echo 'Sourcing the setup script-->'
@@ -10,10 +10,7 @@ mkdir -p $OUTPUT_FILE_PATH/$TRIGGERNAME
 echo "Creating and moving to $OUTPUT_FILE_PATH/$TRIGGERNAME"
 cd $OUTPUT_FILE_PATH/$TRIGGERNAME
 
-CMD="python $GTBURST_PATH/scripts/rawdata2package.py $FT1_PATH $FT2_PATH $TRIGGERTIME $TRIGGERNAME 0.0 0.0"
-
-echo $CMD
-$CMD
+python $GTBURST_PATH/scripts/rawdata2package.py $FT1_PATH $FT2_PATH $TRIGGERTIME $TRIGGERNAME 0.0 0.0
 
 chmod -R 777 $OUTPUT_FILE_PATH
 #exit(1)
