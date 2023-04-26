@@ -122,7 +122,7 @@ if __name__=="__main__":
     vmax=data.max()
     #ax      = fig.add_axes([0.17, 0.02, 0.72, 0.79])
     axcolor = fig.add_axes([0.9, 0.1, 0.03, 0.8])
-    im=ax.imshow(data, cmap=cm.jet, origin="lower",norm=LogNorm(),vmin=1e-3*vmax,vmax=vmax)
+    im=ax.imshow(data, cmap=cm.jet, origin="lower",norm=LogNorm(vmin=1e-3*vmax,vmax=vmax))
     #t = [0.01, 0.1, 0.2, 0.4, 0.6, 0.8, 1.0]
     fig.colorbar(im, cax=axcolor)#, ticks=t, format='$%.2f$')    
     #    gc = aplpy.FITSFigure(cmap_file,figure=fig)        
