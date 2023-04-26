@@ -224,10 +224,10 @@ def show_results(**kwargs):
     db.save(db_file)
     
     #take Bayesian UL from database (if available)
-    ph_ul = db.get(kwargs['triggername'], version, 'Ph_ul')
-    ene_ul = db.get(kwargs['triggername'], version, 'Ene_ul')
+    ph_ul = db.get_value(kwargs['triggername'], version, 'Ph_ul')
+    ene_ul = db.get_value(kwargs['triggername'], version, 'Ene_ul')
     if ene_ul is not None:
-        cl = int(db.get(kwargs['triggername'], version, 'CL') * 100)
+        cl = int(db.get_value(kwargs['triggername'], version, 'CL') * 100)
         ph_ul = round(ph_ul / 1e-7, 2)
         ene_ul = round(ene_ul / 1e-10, 2)
         bayesian_ul = bayesian_ul_content.format(**locals())
