@@ -17,3 +17,5 @@ if ($BAYESIAN_UL == 1) then
 else
     echo "Bayesian UL not enabled. Skipping this task..."
 endif
+
+echo "Done!"
