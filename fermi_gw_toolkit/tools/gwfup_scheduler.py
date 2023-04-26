@@ -54,5 +54,6 @@ def process_gcn(payload, root):
 
 # Listen for GCNs until the program is interrupted
 # (killed or interrupted with control-C).
-print('GWFUP scheduler successfully started! Listening for new GCN Notices...')
+print('GWFUP scheduler successfully started on ', datetime.now())
+print('Starting to listen for new GCN Notices...')
 gcn.listen(handler=process_gcn)
