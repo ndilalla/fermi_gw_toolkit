@@ -174,7 +174,7 @@ if __name__=="__main__":
     scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cmap)
     colors=scalarMap.to_rgba(start)
     print(len(flux),len(flux_err))
-    axLC.errorbar(center,flux,xerr=(duration/2.,duration/2.),yerr=flux_err,ls='None',capsize=0,color=colors,linewidth=3,alpha=1)
+    axLC.errorbar(center,flux,xerr=(duration/2.,duration/2.),yerr=flux_err,ls='None',capsize=0,ecolor=colors,linewidth=3,alpha=1)
     axLC.set_ylim((ymin, ymax))
     axLC.set_xlim((tmin, tmax))
     # THIS IS THE COLORBAR ON THE TOP OF THE LC
