@@ -12,6 +12,7 @@ from fermi_gw_toolkit.utils.gcn_info import read_gcn
 # Run only for notices of type, LVC_INITIAL, LVC_UPDATE, or LVC_RETRACTION.
 # LVC_EARLY_WARNING, LVC_PRELIMINARY will not trigger the GWFUP pipeline
 @gcn.handlers.include_notice_types(
+    gcn.notice_types.LVC_PRELIMINARY,
     gcn.notice_types.LVC_INITIAL,
     gcn.notice_types.LVC_UPDATE,
     gcn.notice_types.LVC_RETRACTION)
@@ -22,10 +23,14 @@ def process_gcn(payload, root):
         print('This was a test. Ignoring it.')
         return
     
-    print('New GCN Notice received on: ', datetime.now())
-
-    if params['AlertType'] == 'Retraction':
-        print(params['GraceID'], 'was retracted')
+    print('New GCN Notice for %s received on: %s' %\
+        (params['GraceID'], datetime.now()))
+    if params['AlertType'] == 'Preliminary':
+        print(params['GraceID'], 'is still preliminary.') 
+        print('Waiting for the Initial notice...')
+        return
+    elif params['AlertType'] == 'Retraction':
+        print(params['GraceID'], 'was retracted.')
         return
 
     # Respond only to 'CBC' events. Change 'CBC' to 'Burst'
@@ -57,6 +62,6 @@ def process_gcn(payload, root):
 # Listen for GCNs until the program is interrupted
 # (killed or interrupted with control-C).
 print('GWFUP scheduler successfully started on ', datetime.now())
-print('Using %s machine with PID %s' % (socket.getfqdn(), os.getpid()))
+print('Using %s with PID %s' % (socket.getfqdn(), os.getpid()))
 print('Starting to listen for new GCN Notices...')
 gcn.listen(handler=process_gcn)
