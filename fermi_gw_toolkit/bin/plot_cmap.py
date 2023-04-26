@@ -56,7 +56,9 @@ def save(ra,dec,l,b,snr,ksig,counts,prob,pmin,out_filename=None):
     for r,d,ll,bb,s,k,c,p in zip(ra,dec,l,b,snr,ksig,counts,prob):
         if p>pmin: txt+='%10.3f %10.3f %10.3f %10.3f %10.1f %10.1f %7d %10.1e\n' %(r,d,ll,bb,s,k,c,p)
         pass
-    if out_filename is not None: file(out_filename,'w').writelines(txt)
+    if out_filename is not None: 
+        with open(out_filename,'w') as f:
+            f.writelines(txt)
     print(txt)
     pass
 

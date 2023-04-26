@@ -24,9 +24,9 @@ if __name__=="__main__":
     parser.add_argument('--out_plot',help='Name for the output file (the format will be guessed from the extension)',
                         required=True, type=str)
     parser.add_argument('--min_percentile', help='Percentile to use as minimum for color bar',
-                        required=True, type=str)
+                        required=True, type=float)
     parser.add_argument('--max_percentile', help='Percentile to use as maximum for color bar',
-                        required=True, type=str)
+                        required=True, type=float)
     parser.add_argument('--zscale', help='scale for the color bar',
                         required=False, type=str, default='linear')
     parser.add_argument('--cmap', help='color map for the color bar',
@@ -57,7 +57,7 @@ if __name__=="__main__":
         norm = 'linear'
         pass
     # Use the provided percentiles
-    if args.min_percentile != 0:
+    if args.min_percentile > 0:
 
         mmin = np.percentile(hpx_ul[idx],args.min_percentile)
 

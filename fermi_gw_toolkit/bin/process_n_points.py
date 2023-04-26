@@ -4,7 +4,7 @@ import argparse
 import subprocess
 import os
 import glob
-from fermi_gw_toolkit import GTBURST_PATH
+from fermi_gw_toolkit import GTBURST_PATH, FERMI_GW_ROOT
 from fermi_gw_toolkit.utils.get_sources import getSourcesInTheROI
 from GtBurst.commands import fits2png
 from GtBurst.commands.gtdotsmap import thisCommand as gtdotsmap
@@ -15,8 +15,7 @@ def _execute_command(cmd_line):
     print(cmd_line)
     print("")
 
-    output = subprocess.check_output(cmd_line, stderr=subprocess.STDOUT, shell=True)
-    print(output)
+    subprocess.check_output(cmd_line, stderr=subprocess.STDOUT, shell=True)
 
 def _chdir_rmdir(init_dir, subfolder_dir):
     print("Returning to: %s" % init_dir)
@@ -144,13 +143,13 @@ if __name__ == "__main__":
             print("")
             print("Changing working directory to: %s" % subfolder_dir)
             os.chdir(subfolder_dir)
-            cmd_line = 'python $GPL_TASKROOT/fermi_gw_toolkit/fermi_gw_toolkit/bayesian_ul.py ' \
-                       '--ft1 %s --ft2 %s --expomap %s --ltcube %s --xml %s ' \
-                       '--emin %s --emax %s --output_file %s --corner_plot %s ' \
+            cmd_line = 'python %s/bin/bayesian_ul.py --ft1 %s --ft2 %s ' \
+                       '--expomap %s --ltcube %s --xml %s --emin %s ' \
+                       '--emax %s --output_file %s --corner_plot %s ' \
                        '--n_samples %s --src %s --burn_in %s' % \
-                       (new_ft1, ft2, expomap, ltcube, xml, args.emin,
-                        args.emax, outul, outplot, args.n_samples, args.src,
-                        args.burn_in)
+                       (FERMI_GW_ROOT, new_ft1, ft2, expomap, ltcube, xml, 
+                        args.emin, args.emax, outul, outplot, args.n_samples, 
+                        args.src, args.burn_in)
 
             try:
                 _execute_command(cmd_line)
