@@ -2,8 +2,9 @@ import os
 import gcn
 import healpy as hp
 import lxml.etree
+from datetime import datetime
 
-from fermi_gw_toolkit import FERMI_GW_ROOT
+from fermi_gw_toolkit import FERMI_GW_ROOT, GPL_TASKROOT
 from fermi_gw_toolkit.utils.gcn_info import read_gcn
 
 # Function to call every time a GCN is received.
@@ -18,6 +19,8 @@ def process_gcn(payload, root):
     params = read_gcn(root, role='observation') #'test')
     if params is None:
         return
+    
+    print('New GCN Notice received on: ', datetime.now())
 
     if params['AlertType'] == 'Retraction':
         print(params['GraceID'], 'was retracted')
@@ -40,8 +43,8 @@ def process_gcn(payload, root):
     new_skymap_url = skymap_url.replace('.multiorder.fits', '.fits.gz')
     print('New Flat Resolution Sky Map: %s' % new_skymap_url)
 
-    cmd = 'python %s/tools/submit_gwfup_job.py --url %s --nside 64 --version v01 --run_bayul 0 --pixels_job 5 --wall_time 4' % (FERMI_GW_ROOT, new_skymap_url)
-    print(cmd)
+    cmd = f'{FERMI_GW_ROOT}/slac/submit_gwfup_job.sh {new_skymap_url} >> {GPL_TASKROOT}/logs/submit.log'
+    print('About to run: ', cmd)
 
     os.system(cmd)
 
@@ -51,4 +54,5 @@ def process_gcn(payload, root):
 
 # Listen for GCNs until the program is interrupted
 # (killed or interrupted with control-C).
+print('GWFUP scheduler successfully started! Listening for new GCN Notices...')
 gcn.listen(handler=process_gcn)
