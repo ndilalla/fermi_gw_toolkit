@@ -1,5 +1,6 @@
 import os 
 import gcn
+import socket
 import healpy as hp
 import lxml.etree
 from datetime import datetime
@@ -56,5 +57,6 @@ def process_gcn(payload, root):
 # Listen for GCNs until the program is interrupted
 # (killed or interrupted with control-C).
 print('GWFUP scheduler successfully started on ', datetime.now())
+print('Using %s machine with PID %s' % (socket.getfqdn(), os.getpid()))
 print('Starting to listen for new GCN Notices...')
 gcn.listen(handler=process_gcn)
