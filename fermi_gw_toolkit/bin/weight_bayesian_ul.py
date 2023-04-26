@@ -79,7 +79,7 @@ class WeightedIntegralDistribution(object):
 
     def __call__(self, x):
 
-        int_distr = map(lambda distrib: distrib(x), self._integral_distributions)
+        int_distr = list(map(lambda distrib: distrib(x), self._integral_distributions))
 
         assert np.all(np.isfinite(int_distr)), "Infinite or NaN in one of the integral distributions when summing them"
 
@@ -112,7 +112,7 @@ class WeightedIntegralDistribution(object):
 
         try:
 
-            ys = map(lambda x: self(x), xs)
+            ys = list(map(lambda x: self(x), xs))
 
         except:
 

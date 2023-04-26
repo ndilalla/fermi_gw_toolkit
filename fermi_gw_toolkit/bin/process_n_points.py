@@ -13,9 +13,8 @@ def _execute_command(cmd_line):
 
     print("\nAbout to execute:\n")
     print(cmd_line)
-    print("")
 
-    subprocess.check_output(cmd_line, stderr=subprocess.STDOUT, shell=True)
+    subprocess.check_call(cmd_line, shell=True)
 
 def _chdir_rmdir(init_dir, subfolder_dir):
     print("Returning to: %s" % init_dir)
@@ -67,7 +66,7 @@ if __name__ == "__main__":
     #    else:
     #        return "'%s'" % x
 
-    # everything_else = map(add_quotes, everything_else)
+    # everything_else = list(map(add_quotes, everything_else))
     # everything_else_str = " ".join(everything_else)
 
     args = parser.parse_args()
