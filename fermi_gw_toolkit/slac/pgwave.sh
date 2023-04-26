@@ -8,11 +8,13 @@ endif
 echo 'sourcing the setup script for pgwave!'
 source $GPL_TASKROOT/set_env/setup_pgwave.csh
 
+set echo
+
 #rm -rf ${OUTPUT_FILE_PATH}/PGWAVE/*
 echo 'About to run pgwave'
-CMD="pgwave2D input_file=${PGW_OUTCMAP}.fits bgk_choise=n circ_square=s N_scale=1 scala=2.5 otpix=4 n_sigma=7 median_box=3 r_threshold=0.5 kappa=3 min_pix=5 m_num=10"
-echo $CMD
-$CMD
+pgwave2D input_file=${PGW_OUTCMAP}.fits bgk_choise=n circ_square=s N_scale=1 scala=2.5 otpix=4 n_sigma=7 median_box=3 r_threshold=0.5 kappa=3 min_pix=5 m_num=10
 
 chmod a+r ${PGW_OUTCMAP}.reg
 chmod a+r ${PGW_OUTCMAP}.list
+
+echo 'Done!'

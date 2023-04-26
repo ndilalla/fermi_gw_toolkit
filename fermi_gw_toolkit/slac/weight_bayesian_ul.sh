@@ -5,10 +5,10 @@ if ($BAYESIAN_UL == 1) then
     echo 'sourcing the setup script!'
     source $GPL_TASKROOT/set_env/setup_gwfup.csh
 
+    set echo
+
     echo 'About to run weight_bayesian_ul.py..'
-    CMD="python ${FERMI_GWTOOLS}/bin/weight_bayesian_ul.py --map ${HEALPIX_PATH_MAP} --ul_directory ${OUTPUT_FILE_PATH}/FIXEDINTERVAL/ --outroot ${OUT_BAYUL} --db_file ${GW_DB_FILE_PATH}"
-    echo $CMD
-    $CMD
+    python ${FERMI_GWTOOLS}/bin/weight_bayesian_ul.py --map ${HEALPIX_PATH_MAP} --ul_directory ${OUTPUT_FILE_PATH}/FIXEDINTERVAL/ --outroot ${OUT_BAYUL} --db_file ${GW_DB_FILE_PATH}
 
     chmod a+w "${OUT_BAYUL}_ph.png"
     chmod a+w "${OUT_BAYUL}_ene.png"

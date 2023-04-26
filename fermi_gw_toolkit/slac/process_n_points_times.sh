@@ -11,10 +11,10 @@ source $GPL_TASKROOT/set_env/setup_gwfup.csh
 #What is this command this doing?
 #mkdir -p $PFILES 
 
+set echo
+
 echo 'About run the process_n_points_times.py script...'
-CMD="python ${FERMI_GWTOOLS}/bin/process_n_points_times.py $TRIGGERNAME --ra $OBJ_RA --dec $OBJ_DEC --roi $ROI --tstarts $TSTARTS --tstops $TSTOPS --irf $IRFS --galactic_model $GAL_MODEL --particle_model "$PART_MODEL" --tsmin $TSMIN --emin $EMIN --emax $EMAX --zmax $ZMAX --strategy $STRATEGY --thetamax $THETAMAX --datarepository $OUTPUT_FILE_PATH --ulphindex $UL_INDEX"
-echo $CMD
-$CMD
+python ${FERMI_GWTOOLS}/bin/process_n_points_times.py $TRIGGERNAME --ra $OBJ_RA --dec $OBJ_DEC --roi $ROI --tstarts $TSTARTS --tstops $TSTOPS --irf $IRFS --galactic_model $GAL_MODEL --particle_model "$PART_MODEL" --tsmin $TSMIN --emin $EMIN --emax $EMAX --zmax $ZMAX --strategy $STRATEGY --thetamax $THETAMAX --datarepository $OUTPUT_FILE_PATH --ulphindex $UL_INDEX
 
 mkdir -p $OUTPUT_FILE_PATH/$SUBDIR
 set nonomatch x=(${TRIGGERNAME}_*_res.txt)

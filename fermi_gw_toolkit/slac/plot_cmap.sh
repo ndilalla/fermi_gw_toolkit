@@ -8,11 +8,11 @@ endif
 echo 'sourcing the setup script!'
 source $GPL_TASKROOT/set_env/setup_gwfup.csh
 
+set echo
+
 #rm -rf ${OUTPUT_FILE_PATH}/PGWAVE/*
 echo 'About to run plot_cmap'
-CMD="python ${FERMI_GWTOOLS}/bin/plot_cmap.py --map ${PGW_OUTCMAP}.fits --out ${PGW_OUTCMAP_PLOT} --pgwlist ${PGW_OUTCMAP}.list --smooth 4 --hpmap $HEALPIX_PATH_MAP --pgwoutlist $PGW_OUTLIST"
-echo $CMD
-$CMD
+python ${FERMI_GWTOOLS}/bin/plot_cmap.py --map ${PGW_OUTCMAP}.fits --out ${PGW_OUTCMAP_PLOT} --pgwlist ${PGW_OUTCMAP}.list --smooth 4 --hpmap $HEALPIX_PATH_MAP --pgwoutlist $PGW_OUTLIST
 
 chmod a+r ${PGW_OUTCMAP_PLOT}
 chmod a+r ${PGW_OUTLIST}

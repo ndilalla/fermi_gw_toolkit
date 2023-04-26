@@ -15,3 +15,5 @@ gtselect infile=${FT1_PATH} outfile=${PGW_FT1} ra=180 dec=0 rad=180 tmin=${MET_T
 
 echo 'About to create the counts map'
 gtbin evfile=${PGW_FT1} scfile=${FT2_PATH} outfile=${PGW_OUTCMAP}.fits algorithm=CMAP emin=${EMIN} emax=${EMAX} tstart=${MET_TSTART} tstop=${MET_TSTOP} xref=0 yref=0 nxpix=650 nypix=325 binsz=0.5 coordsys=GAL axisrot=0 proj=AIT
+
+echo 'Done!'
