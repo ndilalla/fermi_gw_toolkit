@@ -139,10 +139,10 @@ if __name__=="__main__":
     print('RA,DEC=%f %f MAX= %f' %(ra_max, dec_max, MAXVALUE))
 
 
-    ticks=np.logspace(np.log10(mmin / magnitude), np.log10(mmax / magnitude), 4),
+    ticks=np.logspace(np.log10(mmin / magnitude), np.log10(mmax / magnitude), 4)
     if norm == 'linear': 
         norm=None
-        ticks=np.linspace(mmin / magnitude, mmax / magnitude, 4),
+        ticks=np.linspace(mmin / magnitude, mmax / magnitude, 4)
         #mmin=0
         pass
     print('Normalization of the axis:',norm)
