@@ -109,10 +109,11 @@ if __name__ == "__main__":
                 (ra, dec))
             print(err)
             print(err.output)
-            if "ModuleNotFoundError" in err.output:
-                raise RuntimeError
-            else:
-                continue
+            # if "ModuleNotFoundError" in err.output:
+            #     raise RuntimeError
+            # else:
+            #     continue
+            continue
 
         # Figure out path of output files for the Bayesian upper limit and/or the simulation step below
         init_dir = os.getcwd()

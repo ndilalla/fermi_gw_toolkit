@@ -56,4 +56,5 @@ if __name__ == "__main__":
             print('ERROR: doTimeResolvedLike.py skipped for RA=%.3f, DEC=%.3f'%\
                 (ra, dec))
             print(err)
+            print(err.output)
             continue
