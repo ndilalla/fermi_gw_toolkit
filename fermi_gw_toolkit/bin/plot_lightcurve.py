@@ -25,7 +25,7 @@ def sky_to_healpix_id(this_ra, this_dec,nside):
 def plotOneFile(ax,text_file_name):
     MeV2erg=1.6027e-6
 
-    data = np.recfromtxt(text_file_name, names=True)
+    data = np.recfromtxt(text_file_name, names=True, encoding=None)
     x   = data['median']
     dx0 = x-data['start']
     dx1 = data['end']-x
@@ -74,7 +74,7 @@ if __name__=="__main__":
     ##################################################
     # READ THE DATA:
     ##################################################
-    data = np.recfromtxt(args.input, names=True)
+    data = np.recfromtxt(args.input, names=True, encoding=None)
     triggertime=args.triggertime
     
     #start    = data['met']-triggertime+data['t0']
