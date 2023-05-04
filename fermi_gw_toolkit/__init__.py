@@ -45,3 +45,7 @@ except:
     DECORATOR_PATH = 'http://glast-ground.slac.stanford.edu/Decorator/exp/Fermi/Decorate/groups/grb/GWFUP//'
 _print('Decorator path set to: %s ' % DECORATOR_PATH, verbose=VERBOSE)
 
+try:
+	FERMISOURCECATALOG = os.environ['FERMISOURCECATALOG']
+except:
+    print('You have to set FERMISOURCECATALOG before proceding with the analysis.')
