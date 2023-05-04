@@ -108,7 +108,7 @@ if __name__=="__main__":
     # Rotation for the mollview map:
     rot=args.rot.split(',')
 
-    fig = plt.figure(figsize=(15, 8))
+    fig = plt.figure(figsize=(12, 8))
 
     # Get order of magnitude of the median (to scale the values)
     
@@ -169,7 +169,7 @@ if __name__=="__main__":
     ###
     ax = plt.gca()
     image = ax.get_images()[0]
-    cmap = fig.colorbar(image, ax=ax, cmap=cmap, orientation='horizontal', shrink=0.5,
+    cmap = fig.colorbar(image, ax=ax, cmap=cmap, orientation='horizontal', shrink=0.7,
                         label=z_title,
                         ticks=ticks,
                         format='%.2g')
