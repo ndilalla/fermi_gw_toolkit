@@ -22,13 +22,23 @@
   color: blue;
   text-align: center;
   font-weight:bold;
-  border: 1px solid red;
+  border: 2px solid red;
+  width: 100%;
 }
 
+.buttons {
+  text-align: center;
+  width: 100%;
+}
+
+.buttons td {
+  border: 1px solid;
+}
 
 .customers {
     border-collapse: collapse;
     width: 100%;
+    max-width:1110px;
 }
 
 .customers th, .customers td {
@@ -37,7 +47,8 @@
 }
 
 .customers tr:first-child td {
-  background-color: #DEB887;
+  /*background-color: #DEB887;*/
+  background-color:#9CCBDB;
 }
   
 .customers tr:nth-child(even){background-color: #f2f2f2}
@@ -47,6 +58,44 @@
 .customers th {
     background-color: #4CAF50;
     color: white;
+}
+
+.results {
+    border-collapse: collapse;
+    width: 100%;
+    max-width:1110px;
+}
+
+.results th, .results td {
+    text-align: left;
+    padding: 8px;
+}
+
+.results tr.border_top td {
+  /*background-color: #DEB887;*/
+  border-top: 1px solid black;
+  text-align: left;
+  padding: 8px;
+}
+
+/*.results tr:first-child td {
+  background-color: #DEB887;
+  background-color:#9CCBDB;
+}*/
+
+.results tr:nth-child(odd){background-color: #f2f2f2}
+ 
+.results tr.border_top:first-child td {
+  /*background-color: #DEB887;*/
+  background-color:"";
+}
+
+
+.results tr:hover {background-color: #ddd;}
+
+.results th {
+    background-color: #9CCBDB;
+    /*color: white;*/
 }
 
 /*.customers {
@@ -81,3 +130,10 @@
     -webkit-column-span: all; /* Chrome, Safari, Opera */
     column-span: all;
 }
+
+/*
+body {
+    background-color: rgba(210,194,149,0.6);
+    background-image: url("fermi_logo.svg");
+    background-repeat: repeat-x;
+}*/

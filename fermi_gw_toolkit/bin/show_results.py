@@ -7,9 +7,8 @@ import astropy.io.fits as pyfits
 from fermi_gw_toolkit import GPL_TASKROOT, DECORATOR_PATH
 from fermi_gw_toolkit.lib.contour_finder import pix_to_sky
 from fermi_gw_toolkit.lib.local_database import gw_local_database
+from fermi_gw_toolkit.lib.check_association import check_catalog, check_sun_moon
 from fermi_gw_toolkit.lib.html_lib import *
-
-#from automatic_pipeline.utils import send_email
 
 formatter = argparse.ArgumentDefaultsHelpFormatter
 parser = argparse.ArgumentParser(formatter_class=formatter)
@@ -83,25 +82,40 @@ def max_ts(map_path, ts_cut, text='TS'):
     ts_map, header = hp.read_map(map_path, h=True)
     header = dict(header)
     nside = header['NSIDE']
-    ts_max = round(numpy.nanmax(ts_map),2)
+    radius = hp.nside2resol(nside, arcmin=True) / (60. * numpy.sqrt(2.)) #deg
+    ts_max = str(round(numpy.nanmax(ts_map), 1))
     px_max = numpy.nanargmax(ts_map)
     ra_max, dec_max = pix_to_sky(px_max,nside)
     # hp.pix2ang(nside, px_max, lonlat=True)
     ra_max = round(ra_max, 2)
     dec_max = round(dec_max, 2)
-    ts_list = insert_ts_list(ts_map, ts_cut, nside, text)
-    return ts_max, ra_max, dec_max, ts_list, nside
+    ts_list = insert_ts_list(ts_map, ts_cut, nside, text, radius)
+    return ts_max, ra_max, dec_max, ts_list, nside, radius
 
-def insert_ts_list(ts_map, ts_cut, nside, text):
+def insert_ts_list(ts_map, ts_cut, nside, text, radius):
     ts_px = numpy.argwhere(ts_map>ts_cut)
+    #sort ts descending
+    idx = numpy.argsort(-ts_map[ts_px], axis=0)
+    ts_px = numpy.take_along_axis(ts_px, idx, axis=0).flatten()
     table = ""
-    for px in ts_px.T[0]:
-        ts = round(ts_map[px],2)
-        ra, dec = pix_to_sky(px,nside)
+    for px in ts_px[1:]:
+        ts = str(round(ts_map[px],1))
+        ra, dec = pix_to_sky(px, nside)
+        src_names, src_sep = check_catalog(ra, dec, radius)
         #ra, dec = hp.pix2ang(nside, px, lonlat=True)
         ra = round(ra, 2)
         dec = round(dec, 2)
+        table += open_tbody
         table += list_content.format(text, ts, ra, dec)
+        table += insert_src_list(src_names, src_sep)
+        table += end_tbody
+    return table
+
+def insert_src_list(src_names, src_sep):
+    table = ""
+    for name, sep in zip(src_names, src_sep):
+        _sep = str(round(sep, 2))
+        table += src_content.format(name, _sep)
     return table
 
 def min_max_ul(map_path):
@@ -110,22 +124,27 @@ def min_max_ul(map_path):
     ul_min = round(numpy.nanmin(ul_map[numpy.nonzero(ul_map)]) / 1e-10, 2)
     return ul_min, ul_max
 
-def proc_pgwave(file_list):
+def proc_ts_count_maps(file_list, met, radius=1):
     if len(file_list) == 0:
-        print('PGWAVE map not found.')
+        print('TS and count maps not found in file list %s' % file_list)
         return ''
-    pgwave = ''
+    ts_count_map = ''
     for file_coords in file_list:
         with open(file_coords, 'r') as f:
             f.readline()
-            ra_max, dec_max, ts_max = f.readline().split()
-        ra_max = round(float(ra_max), 2)
-        dec_max = round(float(dec_max), 2)
-        ts_max = round(float(ts_max), 2)
-        ts_map = fix_path(file_coords.replace('_coords.txt', '_tsmap.png'))
-        c_map = fix_path(ts_map.replace('_tsmap', '_cmap'))
-        pgwave += pgw_content.format(**locals())
-    return pgwave
+            pgw_ra_max, pgw_dec_max, pgw_ts_max = f.readline().split()
+        pgw_ra_max = round(float(pgw_ra_max), 2)
+        pgw_dec_max = round(float(pgw_dec_max), 2)
+        pgw_ts_max = round(float(pgw_ts_max), 1)
+        pgw_src_names, pgw_src_sep = check_catalog(pgw_ra_max, pgw_dec_max, 
+                                                   radius)
+        pgw_n_src = len(pgw_src_names)
+        pgw_max_src_list = insert_src_list(pgw_src_names, pgw_src_sep)
+        pgw_sun, pgw_moon = check_sun_moon(pgw_ra_max, pgw_dec_max, met, radius)
+        pgw_ts_map = fix_path(file_coords.replace('_coords.txt', '_tsmap.png'))
+        pgw_c_map = fix_path(pgw_ts_map.replace('_tsmap', '_cmap'))
+        ts_count_map += ts_count_map_content.format(**locals())
+    return ts_count_map
 
 def proc_coverage(cov_path):
     npzfile = numpy.load(cov_path)
@@ -141,16 +160,16 @@ def proc_coverage(cov_path):
         t0 = ''
     index = numpy.argmax(cov)
     tmax = round(dt[index], 1)
-    covmax = round(cov[index]*100, 2)
+    covmax = round(cov[index] * 100, 2)
     return cov0, t0, ssa, tmax, covmax
     
 def show_results(**kwargs):
     web_page = load_file(kwargs['template'])
-    #styles = load_file(kwargs['styles'])
+    styles = kwargs['styles']
     
     #define all the variables to be used in the template
     triggername = kwargs['triggername'].replace('bn','')
-    triggertime = kwargs['triggertime']
+    triggertime = round(kwargs['triggertime'], 2)
     date, time = get_date(kwargs['ligo_map'])
     emin = kwargs['emin']
     emax = kwargs['emax']
@@ -181,32 +200,56 @@ def show_results(**kwargs):
         lle_ts_map = None
         print('LLE map not found.')
 
-    #take the max ts and the ts_list from ati e fti ts maps
-    ts_cut = kwargs['ts_cut']
-    sigma_cut = 4
-    fti_ts_max, fti_ra_max, fti_dec_max, fti_ts_list, nside =\
+    #FTI
+    #take the max ts and the ts_list from fti ts maps
+    ts_cut = kwargs['ts_cut'] 
+    fti_ts_max, fti_ra_max, fti_dec_max, fti_ts_list, nside, radius =\
                                     max_ts(kwargs['fti_ts_map'], ts_cut)
-    ati_ts_max, ati_ra_max, ati_dec_max, ati_ts_list, nside =\
-                                    max_ts(kwargs['ati_ts_map'], ts_cut)
+    # check the catalog and if Sun and Moon are close to the pixel
+    fti_src_names, fti_src_sep = check_catalog(fti_ra_max, fti_dec_max, radius)
+    fti_n_src = len(fti_src_names)
+    fti_max_src_list = insert_src_list(fti_src_names, fti_src_sep)
+    _met = triggertime + 0.5 * (tstop - tstart)
+    fti_sun, fti_moon = check_sun_moon(fti_ra_max, fti_dec_max, _met, radius)
     
-    #take the max/min UL from ati e fti ul maps
+    #take the max/min UL from fti ul maps
     outdir = os.path.dirname(kwargs['fti_ts_map'])
+    fti_ = proc_ts_count_maps(glob.glob(outdir + '/FIXEDINTERVAL/%s_*_coords.txt' % kwargs['triggername']), _met)
+    
+    # ATI
+    #take the max ts and the ts_list from ati ts maps
+    ati_ts_max, ati_ra_max, ati_dec_max, ati_ts_list, nside, radius =\
+                                    max_ts(kwargs['ati_ts_map'], ts_cut)
+    # check the catalog and if Sun and Moon are close to the pixel
+    ati_src_names, ati_src_sep = check_catalog(ati_ra_max, ati_dec_max, radius)
+    ati_n_src = len(ati_src_names)
+    ati_max_src_list = insert_src_list(ati_src_names, ati_src_sep)
+    ati_sun, ati_moon = check_sun_moon(ati_ra_max, ati_dec_max, _met, radius)
+
+    #take the max/min UL from ati ul maps
     fti_ul_path = os.path.join(outdir, 'FTI_ul_map.fits')
     fti_ul_min, fti_ul_max = min_max_ul(fti_ul_path)
     ati_ul_path = os.path.join(outdir, 'ATI_ul_map.fits')
     ati_ul_min, ati_ul_max = min_max_ul(ati_ul_path)
     
     #LLE
-    lle = ''
+    sigma_cut = 4
+    lle_ = ''
+    lle_link = ''
     if lle_ts_map is not None: 
-        lle_ts_max, lle_ra_max, lle_dec_max, lle_ts_list, nside =\
-                                    max_ts(kwargs['lle_ts_map'], sigma_cut, 
-                                    'SIGMA')
-        lle = lle_content.format(**locals())
+        lle_ts_max, lle_ra_max, lle_dec_max, lle_ts_list, lle_nside, _radius =\
+                                max_ts(kwargs['lle_ts_map'], sigma_cut, 'SIGMA')
+        lle_src_names, lle_src_sep = check_catalog(lle_ra_max, lle_dec_max, radius)
+        lle_n_src = len(lle_src_names)
+        lle_max_src_list = insert_src_list(lle_src_names, lle_src_sep)
+        lle_sun, lle_moon = check_sun_moon(lle_ra_max, lle_dec_max, _met,
+                                          radius)
+        lle_ = lle_content.format(**locals())
+        lle_link = lle_link_content
     
     #PGWAVE
-    pgwave = proc_pgwave(glob.glob(outdir + '/PGWAVE/%s_*_coords.txt' %\
-                                   kwargs['triggername']))
+    pgwave_ = proc_ts_count_maps(glob.glob(outdir + '/PGWAVE/%s_*_coords.txt' %\
+                                   kwargs['triggername']), _met)
 
     #process the coverage file to recover some useful info to display
     cov_file_path = os.path.join(outdir, 'bn%s_coverage.npz' % triggername)
@@ -218,15 +261,18 @@ def show_results(**kwargs):
     event_dict = {'Date'   : date,
                   'Time'   : time,
                   'Fti_ts' : fti_ts_max,
-                  'Ati_ts' : ati_ts_max}
+                  'Ati_ts' : ati_ts_max,
+                  'Cov_0'  : cov0,
+                  'SSA'    : ssa,
+                  'Cov_max': covmax}
     version = img_folder.split('/')[-3]
     db.update(kwargs['triggername'], version, event_dict)
     db.save(db_file)
     
     #take Bayesian UL from database (if available)
-    ph_ul = db.get_value(kwargs['triggername'], version, 'Ph_ul')
     ene_ul = db.get_value(kwargs['triggername'], version, 'Ene_ul')
     if ene_ul is not None:
+        ph_ul = db.get_value(kwargs['triggername'], version, 'Ph_ul')
         cl = int(db.get_value(kwargs['triggername'], version, 'CL') * 100)
         ph_ul = round(ph_ul / 1e-7, 2)
         ene_ul = round(ene_ul / 1e-10, 2)

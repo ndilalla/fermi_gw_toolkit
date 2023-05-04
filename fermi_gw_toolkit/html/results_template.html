@@ -3,10 +3,33 @@
   <head>
     <meta charset="utf-8">
     <title>Analysis report for {triggername}</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="{styles}">
   </head>
   <body>
     <table align="center" >
+
+      <tr>
+        <td colspan="2">
+          <table class="td_title">
+            <tr>
+              <td id="title">GWFUP ANALYSIS REPORT FOR GW {triggername}</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <tr>
+        <td colspan="2">
+          <table class="buttons">
+            <tr>
+              <td><a href="#fti">FTI Analysis</a></td>
+              <td><a href="#ati">ATI Analysis</a></td>
+              {lle_link}
+              <td><a href="#pgwave">PGW Analysis</a></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
       
       <!-- SUMMARY -->
       
@@ -33,6 +56,7 @@
             <tr><td>Strategy</td><td>{strategy}</td></tr>
             <tr><td>Particle Model</td><td>{part_model}</td></tr>
             <tr><td>NSide</td><td>{nside}</td></tr>
+            <tr><td>Version</td><td>{version}</td></tr>
           </table>
         </td>
         <td valign="top">
@@ -53,24 +77,29 @@
         <td colspan="2">
           <table class="td_title">
             <tr>
-              <td>FIXED TIME ANALYSIS</td>
+              <td id="fti">FIXED TIME INTERVAL ANALYSIS</td>
             </tr>
           </table>
         </td>
       </tr>
       <tr>
         <td valign="top" rowspan="1">
-          <table class="customers" >
-            <tr><td ><b>TS MAXIMUM</b></td><td ></td><td ></td></tr>
+          <table class="results">
+            <tr><th colspan="3"><b>TS MAXIMUM</b></th></tr>
+            <tbody>
             <tr>
               <td rowspan="2" align="center">
-                TS<br>{fti_ts_max}</td>
+                TS = {fti_ts_max}</td>
               <td>Ra</td><td>{fti_ra_max}&deg</td>
             </tr>
             <tr><td>Dec</td><td>{fti_dec_max}&deg</td></tr>
-            <tr><td colspan="3"></td></tr>
-            <tr><td >LIST OF TS &gt {ts_cut} </td></tr>
-            {fti_ts_list}
+            <tr><td colspan="2">Nearby 4FGL sources</td><td>{fti_n_src}</td></tr>
+            {fti_max_src_list}
+            <tr><td colspan="2">Sun in this pixel?</td><td>{fti_sun}</td></tr>
+            <tr><td colspan="2">Moon in this pixel?</td><td>{fti_moon}</td></tr>
+            </tbody>
+            <tr><th colspan="3"><b>LIST OF OTHER TS &gt {ts_cut}</b></th></tr>
+              {fti_ts_list}
           </table>
 
         </td>
@@ -88,12 +117,13 @@
       <tr>
         <td valign="top" rowspan="1">
            <table class="customers" >
-            <tr><td colspan="3"><b>UL EXTREMES</b></td></tr>
-            <tr><td>UL min</td><td colspan="2">{fti_ul_min} e-10 erg cm<sup>-2</sup> s<sup>-1</sup></td></tr>
-            <tr><td>UL max</td><td colspan="2">{fti_ul_max} e-9 erg cm<sup>-2</sup> s<sup>-1</sup></td></tr>
+            <tr><td colspan="3"><b>FLUX UB EXTREMES</b></td></tr>
+            <tr><td>UB min</td><td colspan="2">{fti_ul_min} e-10 erg cm<sup>-2</sup> s<sup>-1</sup></td></tr>
+            <tr><td>UB max</td><td colspan="2">{fti_ul_max} e-9 erg cm<sup>-2</sup> s<sup>-1</sup></td></tr>
+            {bayesian_ul}
           </table>
         </td>
-        <td rowspan="2">
+        <td rowspan="1">
           <table class="customers">
             <tr><td align="center"><b>UL MAP</b></td></tr>
             <tr>
@@ -104,10 +134,7 @@
           </table>
         </td>
       </tr>
-      <tr>
-        <td valign="top" rowspan="1">{bayesian_ul}</td>
-      </tr>
-      <tr><td colspan="3"><p></p></td></tr>
+      {fti_}
             
       <!-- ATI -->
       
@@ -115,7 +142,7 @@
         <td colspan="2">
           <table class="td_title">
             <tr>
-              <td>ADAPTIVE TIME ANALYSIS</td>
+              <td id="ati">ADAPTIVE TIME INTERVAL ANALYSIS</td>
             </tr>
           </table>
         </td>
@@ -137,16 +164,21 @@
       </tr>
       <tr>
         <td valign="top" rowspan="1">
-          <table class="customers">
-            <tr><td><b>TS MAXIMUM</b><td></td><td ></td></td></tr>
+          <table class="results">
+            <tr><th colspan="3"><b>TS MAXIMUM</b></th></tr>
+            <tbody>
             <tr>
               <td rowspan="2" align="center">
-                TS<br>{ati_ts_max}</td>
+                TS = {ati_ts_max}</td>
               <td>Ra</td><td>{ati_ra_max}&deg</td>
             </tr>
             <tr><td>Dec</td><td>{ati_dec_max}&deg</td></tr>
-            <tr><td colspan="3"></td></tr>
-            <tr><td >LIST OF TS &gt {ts_cut} </td></tr>
+            <tr><td colspan="2">Nearby 4FGL sources</td><td>{ati_n_src}</td></tr>
+            {ati_max_src_list}
+            <tr><td colspan="2">Sun in this pixel?</td><td>{ati_sun}</td></tr>
+            <tr><td colspan="2">Moon in this pixel?</td><td>{ati_moon}</td></tr>
+            </tbody>
+            <tr><th colspan="3"><b>LIST OF OTHER TS &gt {ts_cut}</b></th></tr>
             {ati_ts_list}
           </table>
         </td>
@@ -166,9 +198,9 @@
       <tr>
         <td valign="top" rowspan="1">
           <table class="customers" >
-            <tr><td colspan="3"><b>UL EXTREMES</b></td></tr>
-            <tr><td>UL min</td><td colspan="2">{ati_ul_min} e-10 erg cm<sup>-2</sup> s<sup>-1</sup></td></tr>
-            <tr><td>UL max</td><td colspan="2">{ati_ul_max} e-9 erg cm<sup>-2</sup> s<sup>-1</sup></td></tr>
+            <tr><td colspan="3"><b>FLUX UB EXTREMES</b></td></tr>
+            <tr><td>UB min</td><td colspan="2">{ati_ul_min} e-10 erg cm<sup>-2</sup> s<sup>-1</sup></td></tr>
+            <tr><td>UB max</td><td colspan="2">{ati_ul_max} e-9 erg cm<sup>-2</sup> s<sup>-1</sup></td></tr>
           </table>
         </td>
         <td>
@@ -187,7 +219,7 @@
       
       <!-- LLE -->
       
-      {lle}
+      {lle_}
             
       <!-- PGWAVE -->
       
@@ -195,7 +227,7 @@
         <td colspan="2">
           <table class="td_title">
             <tr>
-              <td>PGWAVE ANALYSIS</td>
+              <td id="pgwave">PGWAVE ANALYSIS</td>
             </tr>
           </table>
         </td>
@@ -214,15 +246,19 @@
             </tr>
           </table>
         </td>
-      </tr> 
-      {pgwave}
+      </tr>
+      {pgwave_}
+
+      <tr>
+        <td colspan="2">
+          <table class="buttons">
+            <tr>
+              <td><a href="#title">Return to the top of the page</a></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
     
     </table>
-    <small>
-      <p id="date" align="center"></p>
-        <script>
-          document.getElementById("date").innerHTML = Date();
-        </script>
-      </p>
-    </small>
+
 </html>
