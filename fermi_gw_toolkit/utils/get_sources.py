@@ -3,6 +3,8 @@ from astropy.io import fits as pyfits
 from GtBurst.angularDistance import getAngularDistance
 from GtBurst import sunpos
 
+from fermi_gw_toolkit import FERMISOURCECATALOG
+
 FGL_CLASSES = ['HMB','hmb','NOV','nov','BZB','bzb','BZQ','bzq','AGN','agn',
                'SEY','sey','AGU','agu','SBG','sbg','PSR','psr','PWN','pwn',
                'SNR','snr']
