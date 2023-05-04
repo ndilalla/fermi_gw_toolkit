@@ -8,3 +8,6 @@ def run_at_slac():
     if hostname.find("slac.stanford.edu") == -1:
         run_at_slac = False
     return run_at_slac
+
+if __name__=="__main__":
+    print(run_at_slac())
