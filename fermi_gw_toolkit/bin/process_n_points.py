@@ -5,9 +5,15 @@ import subprocess
 import os
 import glob
 from fermi_gw_toolkit import GTBURST_PATH, FERMI_GW_ROOT
-from fermi_gw_toolkit.utils.get_sources import getSourcesInTheROI
+#from fermi_gw_toolkit.utils.get_sources import getSourcesInTheROI
+from fermi_gw_toolkit.lib.check_association import get_sources_roi
 from GtBurst.commands import fits2png
 from GtBurst.commands.gtdotsmap import thisCommand as gtdotsmap
+
+try:
+    ts_min = os.environ['TSMIN']
+except:
+    ts_min = 30
 
 def _execute_command(cmd_line):
 
@@ -112,7 +118,21 @@ if __name__ == "__main__":
             # else:
             #     continue
             continue
-
+        
+        # Check the output TS and if it's greater than a given threshold do the
+        # ts map
+        if args.do_tsmap == 0:
+            try:    
+                data = np.recfromtxt(outfile, names=True, encoding=None)
+            except: 
+                print('WARNING!! %s file probably empty, skipping TS check.' %\
+                      outfile)
+            else:
+                ts = data['TS']
+                if ts > ts_min:
+                    print('Output TS is %.2f. Activating the TS map...' % ts)
+                    args.do_tsmap = 1
+    
         # Figure out path of output files for the Bayesian upper limit and/or the simulation step below
         init_dir = os.getcwd()
         subfolder_dir = os.path.abspath("interval%s-%s" % \
@@ -188,7 +208,8 @@ if __name__ == "__main__":
                 f.write("%f %f %f\n" % (ramax, decmax, tsmax))
             
             #fits2png
-            sources = [['Maximum TS', float(ramax), float(decmax)]]
+            sources = get_sources_roi(ra, dec, float(args.roi), float(args.tstarts))
+            sources.append(['TS Max', float(ramax), float(decmax), 0.])
             fits2png.fitsToPNG(outfits, outfits.replace('.fits', '.png'), 0.0,
                                tsmax, sources=sources)
             
@@ -207,7 +228,7 @@ if __name__ == "__main__":
             _execute_command(cmd_line)
             
             #fits2png with sources
-            sources = getSourcesInTheROI(ra, dec, args.roi, float(args.tstarts))
+            #sources = getSourcesInTheROI(ra, dec, args.roi, float(args.tstarts))
             fits2png.fitsToPNG(outfits, outfits.replace('.fits', '.png'), 
                                sources=sources)
             pass
