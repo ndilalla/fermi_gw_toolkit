@@ -9,7 +9,8 @@ import healpy as hp
 import numpy as np
 from matplotlib import rc
 import matplotlib.cm as cm
-from matplotlib.colors import LogNorm
+from matplotlib.colors import LogNorm, PowerNorm
+from matplotlib.ticker import MaxNLocator
 #import aplpy
 import pyregion
 from astropy.wcs import WCS
@@ -67,14 +68,14 @@ def galactic(f,ax,l,b,symbol='cross',size=11,color='red',prob=None,pmin=0):
     valid=False
     if prob is None:
         for x,y in zip(l,b):
-            reg+='point (%f,%f)  # color=%s point=%s %d\n' %(x,y,color,symbol,size)
+            reg+='point (%f,%f)  # color=%s width=2 point=%s %d\n' %(x,y,color,symbol,size)
             valid=True
             pass
         pass
     else:
         for x,y,p in zip(l,b,prob):
             if p>pmin:
-                reg+='point (%f,%f)  # color=%s point=%s size=%d text={%.1e}\n' %(x,y,color,symbol,size,p)
+                reg+='point (%f,%f)  # color=%s width=2 point=%s size=%d text={%.1e} font="times 13 bold"\n' %(x,y,color,symbol,size,p)
                 valid=True
             pass
         pass
@@ -111,7 +112,8 @@ if __name__=="__main__":
     hpmap     = args.hpmap
 
     f         = fits.open(cmap_file)
-    fig = plt.figure(figsize=(10, 8))        
+    fig = plt.figure(figsize=(12, 8))
+
     wcs = WCS(f[0].header)
     ax = WCSAxes(fig, [0.1, 0.1, 0.8, 0.8], wcs=wcs)
     fig.add_axes(ax)
@@ -120,13 +122,16 @@ if __name__=="__main__":
     if args.smooth>0:
         data=gaussian_filter(data, args.smooth/(2*np.sqrt(2*np.log(2))))
         pass
-    vmin=data.min()
-    vmax=data.max()
-    #ax      = fig.add_axes([0.17, 0.02, 0.72, 0.79])
-    axcolor = fig.add_axes([0.9, 0.1, 0.03, 0.8])
-    im=ax.imshow(data, cmap=cm.jet, origin="lower",norm=LogNorm(vmin=1e-3*vmax,vmax=vmax))
-    #t = [0.01, 0.1, 0.2, 0.4, 0.6, 0.8, 1.0]
-    fig.colorbar(im, cax=axcolor)#, ticks=t, format='$%.2f$')    
+    mask = np.logical_not(data > 0)
+    data[mask] = np.nan
+    vmax = np.ceil(np.nanmax(data))
+    #axcolor = fig.add_axes([0.9, 0.1, 0.03, 0.8])
+    im = ax.imshow(data, cmap=cm.jet, origin="lower", norm=PowerNorm(0.25, vmin=0, vmax=vmax)) #norm=LogNorm(vmin=1e-5*vmax,vmax=vmax))
+    plt.text(data.shape[1]/2.,-20,'GAL l',size=20,ha='center')
+    plt.text(-20,140,'GAL b',rotation=90,size=20)
+    cbar = fig.colorbar(im, orientation='horizontal', pad=0.15, shrink=0.8, label='Counts')
+    cbar.ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+
     #    gc = aplpy.FITSFigure(cmap_file,figure=fig)        
     #    gc.show_colorscale(aspect='auto')
     if regions is not None:
@@ -171,7 +176,7 @@ if __name__=="__main__":
                 gal       = cel.transform_to('galactic')
                 cl,cb     = gal.l.degree,gal.b.degree
                 print('plotting countour...%d points' % len(cl))
-                galactic(f,ax,cl,cb,symbol='circle',size=1,color='magenta',prob=None)
+                galactic(f,ax,cl,cb,symbol='circle',size=1,color='black',prob=None)
 
                 pmin = hpx[indexes].min()
                 print(np.sum(hpx),pmin)
