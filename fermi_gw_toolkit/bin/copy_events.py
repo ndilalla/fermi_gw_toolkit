@@ -68,9 +68,9 @@ def make_copy(file_path, outfolder):
     _copy(file_path, outfolder, new_name)
     img_folder = os.path.join(os.path.dirname(file_path), 'images')
     _copy(img_folder, outfolder)
-    pgw = os.path.join(os.path.dirname(file_path), 'PGWAVE', '*.png')
+    pgw = os.path.join(os.path.dirname(file_path), 'PGWAVE', '*map.png')
     _copy(pgw, outfolder + '/images/')
-    fti =  os.path.join(os.path.dirname(file_path), 'FIXEDINTERVAL', '*.png')
+    fti =  os.path.join(os.path.dirname(file_path), 'FIXEDINTERVAL', '*map.png')
     _copy(fti, outfolder + '/images/')
     time.sleep(60)
 
