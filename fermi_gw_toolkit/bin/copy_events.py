@@ -172,9 +172,9 @@ def copy_events(**kwargs):
     
     #print(db_dict)
     if db_update is True:
-        print('Saving the database to %s...' % dbfile)
+        print('Saving the database to %s...' % db_file)
         db_dict.save(db_file)
-        _copy(dbfile, stanford_dir + db_dict.obs_run + '/')
+        _copy(db_file, stanford_dir + db_dict.obs_run + '/')
     print('Done!')
 
 if __name__ == "__main__":
