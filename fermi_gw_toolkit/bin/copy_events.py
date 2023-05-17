@@ -14,9 +14,9 @@ from fermi_gw_toolkit.lib.local_database import gw_local_database
 local_dir = os.path.join(GPL_TASKROOT, 'output')
 stanford_dir = '/var/www/html/FermiGRB/GWFUP/'
 try:
-    _dbfile = os.environ['GW_DB_FILE_PATH']
+    _db_file = os.environ['GW_DB_FILE_PATH']
 except:
-    _dbfile = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4_events.pkl')
+    _db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4_events.pkl')
 
 formatter = argparse.ArgumentDefaultsHelpFormatter
 parser = argparse.ArgumentParser(formatter_class=formatter)
