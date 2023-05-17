@@ -6,17 +6,17 @@ import subprocess
 import argparse
 import pickle
 from glob import glob
-from fermi_gw_toolkit.utils.gcn_info import get_info
+from astropy.time import Time
+from fermi_gw_toolkit import GPL_TASKROOT, DECORATOR_PATH
+from fermi_gw_toolkit.utils.gcn_info import read_gcn
+from fermi_gw_toolkit.lib.local_database import gw_local_database
 
-decorator = 'http://glast-ground.slac.stanford.edu/Decorator/exp/Fermi/Decorate/groups/grb/GWPIPELINE//'
-local_dir = '/nfs/farm/g/glast/u26/GWPIPELINE/output/'
-stanford_dir = '/var/www/html/FermiGRB/GWFUP/output/'
-dbfile = local_dir + 'db_gw_events.pkl'
-def load_dict(infile):
-    with open(infile, 'rb') as f:
-        _dict = pickle.load(f)
-    return _dict
-db_dict = load_dict(dbfile)
+local_dir = os.path.join(GPL_TASKROOT, 'output')
+stanford_dir = '/var/www/html/FermiGRB/GWFUP/'
+try:
+    _dbfile = os.environ['GW_DB_FILE_PATH']
+except:
+    _dbfile = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4_events.pkl')
 
 formatter = argparse.ArgumentDefaultsHelpFormatter
 parser = argparse.ArgumentParser(formatter_class=formatter)
@@ -26,18 +26,9 @@ parser.add_argument("--version", help="Analysis version", required=False,
                     default=None, type=str)
 parser.add_argument("--directory", help="Path to the 'done' folder", 
                     required=False, default=None, type=str)
+parser.add_argument("--db_file", help="File used for database", type=str,
+                    required=False, default=_db_file)
 #parser.add_argument("--overwrite", )
-
-def check_url(url):
-    try: 
-        urllib.request.urlopen(url)
-        return True
-    except urllib.error.HTTPError:
-        return False
-
-def save_dict(_dict, outfile):
-    with open(outfile, 'wb') as f:
-        pickle.dump(_dict, f)
 
 def fix_html(html, remove):
     if not html.endswith('.html'):
@@ -48,6 +39,7 @@ def fix_html(html, remove):
     filedata = filedata.replace(remove, '')
     filedata = filedata.replace('styles.css', '../../../css/styles.css')
     filedata = filedata.replace('src=PGWAVE', 'src=images/')
+    filedata = filedata.replace('src=FIXEDINTERVAL', 'src=images/')
     outfile = html.replace('.html', '_fixed.html')
     with open(outfile, 'w') as file:
         file.write(filedata)
@@ -78,9 +70,11 @@ def make_copy(file_path, outfolder):
     _copy(img_folder, outfolder)
     pgw = os.path.join(os.path.dirname(file_path), 'PGWAVE', '*.png')
     _copy(pgw, outfolder + '/images/')
+    fti =  os.path.join(os.path.dirname(file_path), 'FIXEDINTERVAL', '*.png')
+    _copy(fti, outfolder + '/images/')
     time.sleep(60)
 
-def copy_event(name, version=None, overwrite=False):
+def copy_event(name, db_dict, version=None, overwrite=False):
     db_update = False
     grace_name = name.replace('bn', '')
     gw_info = get_info(grace_name)
@@ -98,52 +92,60 @@ def copy_event(name, version=None, overwrite=False):
         return
     
     for path in res_list:
-        version = os.path.dirname(path).split('/')[-1]    
-        outfolder = stanford_dir + '%s/%s' % (name, version)
-        key_event = "%s/%s" % (name, version)
+        version = os.path.dirname(path).split('/')[-1]
+        outfolder = stanford_dir + db_dict.obs_run + '/%s/%s' % (name, version)
+        key_event = db_dict.get_key(name, version)
+
         if not key_event in db_dict:
-            db_dict[key_event] = {'Name':grace_name,
-                                  'Version': version}
+            db_dict.initialize(grace_name, version)
         
         if not 'Copied' in db_dict[key_event]:
-            db_dict[key_event].update({'Copied':False})
+            db_dict.set_value(name, version, 'Copied', False)
         
         if gw_info['AlertType'] == 'Retraction':
             print('%s was retracted' % grace_name)
-            db_dict[key_event].update({'Retracted':True})
+            db_dict.set_value(name, version, 'Retracted', True)
             if db_dict[key_event]['Copied']:
-                # Retracted but copied yet
+                # Retracted but already copied
                 print('%s has been already copied. Removing now.' % grace_name)
                 _rmdir(outfolder)
-                db_dict[key_event].update({'Copied':False})
+                db_dict.set_value(name, version, 'Copied', False)
             continue    
+        
         if db_dict[key_event]['Copied'] and not overwrite:
-            # copied yet and NOT overwrite
-            print('%s/%s already copied but NOT set to overwrite' %\
+            # already copied and NOT overwrite
+            print('%s/%s already copied but option set to NOT overwrite' %\
                 (grace_name, version))
             continue
         
         print('Copying %s (%s) to Stanford...' % (name, version))
-        remove = decorator + os.path.join('output', name, version) + '/'
+        remove = os.path.join(DECORATOR_PATH, 'output', name, version) + '/'
         new_path = fix_html(path, remove)
         make_copy(new_path, outfolder)
-        db_dict[key_event].update({'Copied':True})
+        db_dict.set_value(name, version, 'Copied', True)
     
         db_update = True
         print('Updating the database...')
         if gw_info['Group'] == 'Burst':
-            db_dict[key_event].update({'Burst':True, 'FAR':gw_info['FAR']})
+            db_dict.update(name, version, {'Burst':True, \
+                                           'FAR':gw_info['FAR']})
         else:
-            db_dict[key_event].update({'Burst':False})
-            _keys = ['FAR', 'BBH', 'BNS', 'NSBH', 'Terrestrial', 'MassGap',
-                     'HasNS', 'HasRemnant']
+            db_dict.set_value(name, version, 'Burst', False)
+            if db_dict.obs_run == 'O3':
+                _keys = ['FAR', 'BBH', 'BNS', 'NSBH', 'Terrestrial', 'MassGap',\
+                        'HasNS', 'HasRemnant']
+            else:
+                _keys = ['FAR', 'BBH', 'BNS', 'NSBH', 'Terrestrial', \
+                         'Significant', 'HasMassGap', 'HasNS', 'HasRemnant']
             _info = {_key:gw_info[_key] for _key in _keys}
-            db_dict[key_event].update(_info)
+            db_dict.update(name, version, _info)
     return db_update
 
 def copy_events(**kwargs):
     name = kwargs['triggername']
     done_dir = kwargs['directory']
+    db_file = kwargs['db_file']
+    db_dict = gw_local_database.load(db_file)
     db_update = False
     if done_dir is not None:
         files = glob('%s*' % done_dir)
@@ -151,7 +153,7 @@ def copy_events(**kwargs):
         for file_path in files:
             file_name = os.path.basename(file_path).replace('.txt', '')
             name, version = file_name.split('_')
-            db_update = copy_event(name, version, overwrite=True) or db_update
+            db_update = copy_event(name, db_dict, version, True) or db_update
             cmd = 'mv %s %s../copied/' % (file_path, done_dir)
             print(cmd)
             os.system(cmd)
@@ -163,16 +165,16 @@ def copy_events(**kwargs):
                 continue
             else:
                 name = str(directory).split('/')[-1]
-                db_update = copy_event(name) or db_update
+                db_update = copy_event(name, db_dict) or db_update
     else:
         version = kwargs['version']
-        db_update = copy_event(name, version, overwrite=True)
+        db_update = copy_event(name, db_dict, version, overwrite=True)
     
     #print(db_dict)
     if db_update is True:
         print('Saving the database to %s...' % dbfile)
-        save_dict(db_dict, dbfile)
-        _copy(dbfile, stanford_dir)
+        db_dict.save(db_file)
+        _copy(dbfile, stanford_dir + db_dict.obs_run + '/')
     print('Done!')
 
 if __name__ == "__main__":

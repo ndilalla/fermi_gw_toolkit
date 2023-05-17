@@ -7,8 +7,15 @@ from fermi_gw_toolkit import GPL_TASKROOT
 class gw_local_database(dict):
     
     def __init__(self, _dict):
-        dict.__init__(self, _dict) 
-    
+        dict.__init__(self, _dict)
+
+    @staticmethod
+    def get_obs_run(file_path):
+        if 'O3' in os.path.basename(file_path):
+            return 'O3'
+        else:
+            return 'O4'
+
     @staticmethod
     def check_extension(file_path):
         if not file_path.endswith('.pkl'):
@@ -29,7 +36,9 @@ class gw_local_database(dict):
         cls.check_extension(infile)
         with open(infile, 'rb') as f:
             _dict = pickle.load(f)
-        return cls(_dict)
+        c = cls(_dict)
+        c.obs_run = c.get_obs_run(infile)
+        return c
 
     def save(self, outfile):
         print("Saving the database to %s..." % outfile)

@@ -38,11 +38,12 @@ def curl_s3df(url, outfile=None, shell=True, text=False):
 def read_gcn(root, role='observation'):
     if root.attrib['role'] != role:
         return None
-
+    #print(lxml.etree.tostring(root, pretty_print=True))
     # Read all of the VOEvent parameters from the "What" section.
     params = {elem.attrib['name']:
               elem.attrib['value']
               for elem in root.iterfind('.//Param')}
+    params['Date'] = root.findtext('.//Date')
     return params
 
 def get_info(name, slac=run_at_slac()):
@@ -61,5 +62,6 @@ def get_info(name, slac=run_at_slac()):
 if __name__ == "__main__":
     #name = 'S200116ah'
     name = 'S200114f'
-    print(get_info(name))
+    info = get_info(name)
+    print(info)
 
