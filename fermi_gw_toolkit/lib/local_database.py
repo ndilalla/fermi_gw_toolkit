@@ -40,10 +40,10 @@ class gw_local_database(dict):
         c.obs_run = c.get_obs_run(infile)
         return c
 
-    def save(self, outfile):
+    def save(self, outfile, protocol=2):
         print("Saving the database to %s..." % outfile)
         with open(outfile, 'wb') as f:
-            pickle.dump(dict(self), f)
+            pickle.dump(dict(self), f, protocol=protocol)
     
     def get_key(self, name, version):
         return '%s/%s' % (name, version)
