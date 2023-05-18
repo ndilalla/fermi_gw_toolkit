@@ -174,6 +174,8 @@ if __name__=='__main__':
         txt = cmd.replace('--define','\n --define')
         with open(small_file,'w') as f:
             f.write(txt)
+        _cmd ='chmod 777 %s' % small_file
+        os.system(_cmd)
         conf_email='mail -r nicola.omodei@gmail.com -s "GWFUP Pipeline: Job submitted for %s " nicola.omodei@gmail.com <  %s' %(TRIGGERNAME,small_file)
         print(conf_email)
         os.system(conf_email)
