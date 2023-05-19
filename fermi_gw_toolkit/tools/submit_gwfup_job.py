@@ -21,7 +21,7 @@ def getfromfile(filename):
     return trigger_name, filename, met
     
 def getfromweb(url):
-    # https://gracedb.ligo.org/api/superevents/S190706ai/fits.gzles/LALInference.offline.fits.gz
+    # https://gracedb.ligo.org/api/superevents/S190706ai/files/LALInference.offline.fits.gz
     name = url.replace('https://gracedb.ligo.org/api/superevents/','').split('/files/')[0]
     extension  = url.replace('https://gracedb.ligo.org/api/superevents/','').split('/files/')[-1].split('.')[0]
     out_name = '%s_%s.fits' %(name,extension)

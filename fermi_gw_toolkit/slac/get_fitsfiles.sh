@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -fe
 echo SIMULATE_MODE=$SIMULATE_MODE
 echo 'Sourcing the setup script!'
 source $GPL_TASKROOT/set_env/setup_gwfup.sh
@@ -20,6 +20,9 @@ chmod -R a+w $OUTPUT_FILE_PATH
 if [ $SIMULATE_MODE -eq 1 ]; then
     exit 1
 fi
+
+echo Checking if $HEALPIX_PATH is working properly
+python ${FERMI_GWTOOLS}/bin/check_ligo_map.py $HEALPIX_PATH
 
 echo Coping the $HEALPIX_PATH to $HEALPIX_PATH_MAP
 cp $HEALPIX_PATH $HEALPIX_PATH_MAP
