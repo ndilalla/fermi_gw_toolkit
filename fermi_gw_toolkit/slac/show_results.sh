@@ -20,7 +20,7 @@ mail -r ndilalla@stanford.edu -s "GWFUP Pipeline: Results for ${TRIGGERNAME} ${V
 #mail -r nicola.omodei@gmail.com -s "GWFUP Pieline: Results for ${TRIGGERNAME} ${VERSION} ready" balist@glast2.stanford.edu <  ${OUTPUT_FILE_PATH}/msg.txt
 
 # this triggers the copy to stanford
-chmod a+w $GPL_TASKROOT/status/running/${TRIGGERNAME}_${VERSION}.txt
+#chmod a+w $GPL_TASKROOT/status/running/${TRIGGERNAME}_${VERSION}.txt
 mv $GPL_TASKROOT/status/running/${TRIGGERNAME}_${VERSION}.txt $GPL_TASKROOT/status/done/
 
 echo 'All done!'
