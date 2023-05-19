@@ -103,7 +103,7 @@ if __name__=='__main__':
     NUMBER_PIXELS_RUNS = args.pixels_job
     THETAMAX= 65#73 #->65
     ZMAX    = 100 # (DEFAULT=100)
-    STRATEGY = 'time' # 'events'
+    STRATEGY = 'events' # 'time' #
     # By setting this var to 1 you will save the .pnz files. Set to 0 if you do not want this!
     BAYESIAN_UL = 0
     if args.run_bayul == 1:
