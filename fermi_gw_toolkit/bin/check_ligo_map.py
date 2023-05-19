@@ -1,7 +1,7 @@
 import os
 import argparse
 from astropy.io import fits
-from fermi_gw_toolkit.utils.gcn_info import gracedb_request
+from fermi_gw_toolkit.utils.gcn_info import curl_s3df
 
 formatter = argparse.ArgumentDefaultsHelpFormatter
 parser = argparse.ArgumentParser(formatter_class=formatter)
@@ -11,7 +11,6 @@ def check_ligo_map(file_path):
     try:
         ligo_map = fits.open(file_path)
         print('FITS file %s looks good.' % file_path)
-        raise RuntimeError
     except:
         print('WARNING: FITS file %s looks corrupted!' % file_path)
         print('A second attempt will be made to download it again from GraceDB')
