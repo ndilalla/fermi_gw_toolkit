@@ -84,7 +84,7 @@ def parse_notice(record, test=False):
             print('About to run: ', cmd)
             os.system(cmd)
 
-            cmd = f'{FERMI_GW_ROOT}/slac/submit_gwfup_job.sh {new_skymap_url} {nside} >> {GPL_TASKROOT}/logs/submit.log'
+            cmd = f'{FERMI_GW_ROOT}/slac/submit_gwfup_job.sh {flat_skymap_path} {nside} >> {GPL_TASKROOT}/logs/submit.log'
             print('About to run: ', cmd)
             input()
             if not test:
