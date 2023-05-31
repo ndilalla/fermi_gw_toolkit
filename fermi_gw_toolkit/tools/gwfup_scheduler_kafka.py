@@ -51,13 +51,13 @@ def parse_notice(record, test=False):
         
         if record['event']['group'] != 'Burst' and alert_type == 'PRELIMINARY':
             skipped = glob.glob(skipped_folder)
-            file_name = f'{superevent_id}.txt'
-            if file_name in skipped:
-                print('This is the second Preliminary notice. Starting the analysis.')
-                os.system(f'rm {skipped_folder}/{file_name}')
+            file_path = f'{skipped_folder}/{superevent_id}.txt'
+            if file_path in skipped:
+                print('This is the second Preliminary notice. Starting the analysis now.')
+                os.system(f'rm {file_path}')
             else:
                 print('This is the first Preliminary notice. Waiting the second one before starting the analysis.')
-                os.system(f'touch {skipped_folder}/{file_name}')
+                os.system(f'touch {file_path}')
                 return True
 
         #check and filter if significant / BBH?
@@ -103,7 +103,7 @@ if __name__=='__main__':
     status_dir = os.path.join(GPL_TASKROOT, 'status', 'running')
     if len(os.listdir(status_dir)) != 0:
         print('GWFUP pipeline looks busy. Trying again in a bit.')
-        sys.exit()
+        #sys.exit()
 
     # Connect as a consumer.
     config = {'group.id': 'GWFUP',
