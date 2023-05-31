@@ -127,8 +127,9 @@ def copy_event(name, db_dict, version=None, overwrite=False):
         db_update = True
         print('Updating the database...')
         if gw_info['Group'] == 'Burst':
-            db_dict.update(name, version, {'Burst':True, \
-                                           'FAR':gw_info['FAR']})
+            db_dict.update(name, version, 
+                {'Burst':True, 'FAR':gw_info['FAR'],\
+                 'Significant':gw_info['Significant']})
         else:
             db_dict.set_value(name, version, 'Burst', False)
             if db_dict.obs_run == 'O3':
