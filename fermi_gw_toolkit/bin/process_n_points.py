@@ -12,7 +12,7 @@ from GtBurst.commands import fits2png
 from GtBurst.commands.gtdotsmap import thisCommand as gtdotsmap
 
 try:
-    ts_min = os.environ['TSMIN']
+    ts_min = float(os.environ['TSMIN'])
 except:
     ts_min = 30
 
