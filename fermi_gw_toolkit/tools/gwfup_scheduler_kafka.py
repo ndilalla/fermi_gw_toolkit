@@ -50,7 +50,7 @@ def parse_notice(record, test=False):
             nside = 32
         
         if record['event']['group'] != 'Burst' and alert_type == 'PRELIMINARY':
-            skipped = glob.glob(skipped_folder)
+            skipped = glob.glob(skipped_folder + '/*')
             file_path = f'{skipped_folder}/{superevent_id}.txt'
             if file_path in skipped:
                 print('This is the second Preliminary notice. Starting the analysis now.')
