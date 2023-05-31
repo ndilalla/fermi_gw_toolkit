@@ -1,8 +1,11 @@
 import os
+import sys
 import time
+import socket
 import argparse, glob
 
 from astropy.io import fits
+from datetime import datetime
 from GtBurst.dataHandling import date2met
 from fermi_gw_toolkit import GPL_TASKROOT
 from fermi_gw_toolkit.bin.download_LAT_data import download_LAT_data
@@ -45,7 +48,7 @@ def getfromweb(url):
     return trigger_name, out_file, met
 
 if __name__=='__main__':
-    __description__='Submitjobs to the GWFUP when data are available...'
+    __description__='Submit jobs to the GWFUP when data are available...'
     formatter = argparse.ArgumentDefaultsHelpFormatter
     parser    = argparse.ArgumentParser(description=__description__,
                                         formatter_class=formatter)
@@ -63,6 +66,9 @@ if __name__=='__main__':
     parser.add_argument("--deltatime", help="Overwrite the trigger time by giving the delta", type=int, default=None)
     parser.add_argument("--test", help="Run the script in testing mode", action='store_true')
     args = parser.parse_args()
+
+    print('GWFUP submitter successfully started on ', datetime.now())
+    print('Using %s with PID %s' % (socket.getfqdn(), os.getpid()))
     
     WEB_URL  = args.url
     if WEB_URL is None:
@@ -85,7 +91,6 @@ if __name__=='__main__':
         VERSION='v%02d' % (VNUM+1)
         _outputdir='%soutput/%s/%s' % (GPL_TASKROOT, TRIGGERNAME, VERSION)
         #print('OUTPUT DIRECTORY %s EXISTS!' % _outputdir)
-        #exit()
         pass
     
     TSTART    =  0
@@ -139,12 +144,16 @@ if __name__=='__main__':
 
     small_file = '%sstatus/running/%s_%s.txt' % (GPL_TASKROOT, TRIGGERNAME, VERSION)
     if os.path.exists(small_file):
-        print('Event %s already processed' % TRIGGERNAME)
-        exit()
-        pass    
+        print('Event %s already running' % TRIGGERNAME)
+        sys.exit()
+    else:
+        txt = cmd.replace('--define','\n --define')
+        with open(small_file,'w') as f:
+            f.write(txt)
+        _cmd ='chmod 777 %s' % small_file
+        os.system(_cmd)
 
     ok=False
-
     temp_dir = '%sinput/temp/%s_%s' % (GPL_TASKROOT, TRIGGERNAME, VERSION)
     while not ok:
         ft1, ft2 = download_LAT_data(outdir=temp_dir, ft1='FT1.fits', 
@@ -158,7 +167,6 @@ if __name__=='__main__':
             print('Not enough data...')
             print('Wait 5 minutes...')
             time.sleep(5*60)
-            #    exit()
             pass
         pass
     os.system('rm -rf %s' % temp_dir)
@@ -167,15 +175,9 @@ if __name__=='__main__':
     print(cmd)
     if args.test == True:
         print('This was a test!')
+        os.system('rm %s' % small_file)
     else: 
         os.system(cmd)
-        # txt=cmd.replace('%spipeline createStream GWFUP --define ' %\
-        #                 GPL_TASKROOT, '')
-        txt = cmd.replace('--define','\n --define')
-        with open(small_file,'w') as f:
-            f.write(txt)
-        _cmd ='chmod 777 %s' % small_file
-        os.system(_cmd)
         conf_email='mail -r nicola.omodei@gmail.com -s "GWFUP Pipeline: Job submitted for %s " nicola.omodei@gmail.com <  %s' %(TRIGGERNAME,small_file)
         print(conf_email)
         os.system(conf_email)
