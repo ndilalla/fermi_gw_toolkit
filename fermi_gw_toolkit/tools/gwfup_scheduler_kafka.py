@@ -39,28 +39,24 @@ def parse_notice(record, test=False):
             print(f'Notice for {superevent_id} is still {alert_type}.')
             print('Waiting for Preliminary, Initial or Update notice...')
             return True
+        
+        elif alert_type == 'PRELIMINARY':
+            skipped = glob.glob(skipped_folder + '/*')
+            file_path = f'{skipped_folder}/{superevent_id}.txt'
+            if file_path not in skipped:
+                print('This is the first Preliminary notice. Waiting the second one before starting the analysis.')
+                os.system(f'touch {file_path}')
+                return True
+            else:
+                print('This is the second Preliminary notice. Starting the analysis now.')
+                os.system(f'rm {file_path}')
 
-        # Respond only to 'CBC' events. Change 'CBC' to 'Burst' to respond to
-        # only unmodeled burst events.
-        #if record['event']['group'] != 'CBC':
-        #    return
+        # Add a check to filter if significant or BBH?
+
         instruments = record['event']['instruments']
         nside = 64
         if len(instruments) < 2:
             nside = 32
-        
-        if record['event']['group'] != 'Burst' and alert_type == 'PRELIMINARY':
-            skipped = glob.glob(skipped_folder + '/*')
-            file_path = f'{skipped_folder}/{superevent_id}.txt'
-            if file_path in skipped:
-                print('This is the second Preliminary notice. Starting the analysis now.')
-                os.system(f'rm {file_path}')
-            else:
-                print('This is the first Preliminary notice. Waiting the second one before starting the analysis.')
-                os.system(f'touch {file_path}')
-                return True
-
-        #check and filter if significant / BBH?
 
         # Parse sky map
         skymap_str = record.get('event', {}).pop('skymap')
@@ -103,7 +99,7 @@ if __name__=='__main__':
     status_dir = os.path.join(GPL_TASKROOT, 'status', 'running')
     if len(os.listdir(status_dir)) != 0:
         print('GWFUP pipeline looks busy. Trying again in a bit.')
-        #sys.exit()
+        sys.exit()
 
     # Connect as a consumer.
     config = {'group.id': 'GWFUP',
