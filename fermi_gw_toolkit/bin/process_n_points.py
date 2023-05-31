@@ -4,6 +4,7 @@ import argparse
 import subprocess
 import os
 import glob
+import numpy as np
 from fermi_gw_toolkit import GTBURST_PATH, FERMI_GW_ROOT
 #from fermi_gw_toolkit.utils.get_sources import getSourcesInTheROI
 from fermi_gw_toolkit.lib.check_association import get_sources_roi
@@ -83,7 +84,8 @@ if __name__ == "__main__":
     assert os.path.exists(ft2), "FT2 %s does not exist" % ft2
 
     tsmap_spec = "0.5,8"
-    if args.bayesian_ul == 0 or args.do_tsmap == 1:
+    do_tsmap = args.do_tsmap
+    if args.bayesian_ul == 0 or do_tsmap == 1:
         fgl_mode = 'complete'
     else:
         fgl_mode = 'fast'
@@ -121,17 +123,19 @@ if __name__ == "__main__":
         
         # Check the output TS and if it's greater than a given threshold do the
         # ts map
-        if args.do_tsmap == 0:
+        print('Checking whether TS value is above threshold...')
+        if do_tsmap == 0:
             try:    
                 data = np.recfromtxt(outfile, names=True, encoding=None)
             except: 
                 print('WARNING!! %s file probably empty, skipping TS check.' %\
                       outfile)
             else:
-                ts = data['TS']
+                ts = float(data['TS'])
+                print(ts, ts_min, ts > ts_min)
                 if ts > ts_min:
                     print('Output TS is %.2f. Activating the TS map...' % ts)
-                    args.do_tsmap = 1
+                    do_tsmap = 1
     
         # Figure out path of output files for the Bayesian upper limit and/or the simulation step below
         init_dir = os.getcwd()
@@ -149,7 +153,7 @@ if __name__ == "__main__":
             #_chdir_rmdir(init_dir, subfolder_dir)
             continue
 
-        if args.bayesian_ul == 0 or args.do_tsmap == 1:
+        if args.bayesian_ul == 0 or do_tsmap == 1:
             print('Bayesian UL not executed.')
         else:
 
@@ -183,7 +187,7 @@ if __name__ == "__main__":
         
         # If do_tsmap option is 1 run the gtdotsmap script
         
-        if args.do_tsmap == 1:
+        if do_tsmap == 1:
             #ts map
             rsp = glob.glob(args.datarepository + '/%s/*.rsp' % args.triggername)[0]
             expomap = os.path.basename(expomap)
