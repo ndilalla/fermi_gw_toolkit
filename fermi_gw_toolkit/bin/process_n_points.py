@@ -84,13 +84,15 @@ if __name__ == "__main__":
     assert os.path.exists(ft2), "FT2 %s does not exist" % ft2
 
     tsmap_spec = "0.5,8"
-    do_tsmap = args.do_tsmap
-    if args.bayesian_ul == 0 or do_tsmap == 1:
+    
+    if args.bayesian_ul == 0 or args.do_tsmap == 1:
         fgl_mode = 'complete'
     else:
         fgl_mode = 'fast'
 
     for ra, dec in zip(args.ra, args.dec):
+
+        do_tsmap = args.do_tsmap
 
         outfile = '%s_%.3f_%.3f_res.txt' % (args.triggername, ra, dec)
         cmd_line = 'python %s/scripts/doTimeResolvedLike.py %s --ra %s '\
@@ -153,7 +155,7 @@ if __name__ == "__main__":
             #_chdir_rmdir(init_dir, subfolder_dir)
             continue
 
-        if args.bayesian_ul == 0 or do_tsmap == 1:
+        if args.bayesian_ul == 0 or args.do_tsmap == 1:
             print('Bayesian UL not executed.')
         else:
 
