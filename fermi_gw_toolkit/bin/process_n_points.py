@@ -129,12 +129,11 @@ if __name__ == "__main__":
         if do_tsmap == 0:
             try:    
                 data = np.recfromtxt(outfile, names=True, encoding=None)
+                ts = float(data['TS'])
             except: 
                 print('WARNING!! %s file probably empty, skipping TS check.' %\
                       outfile)
             else:
-                ts = float(data['TS'])
-                print(ts, ts_min, ts > ts_min)
                 if ts > ts_min:
                     print('Output TS is %.2f. Activating the TS map...' % ts)
                     do_tsmap = 1
