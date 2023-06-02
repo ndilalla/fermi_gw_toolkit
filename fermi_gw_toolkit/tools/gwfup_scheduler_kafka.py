@@ -87,10 +87,10 @@ def parse_notice(record, test=False):
 
             cmd = f'{FERMI_GW_ROOT}/slac/submit_gwfup_job.sh {flat_skymap_path} {nside} >> {GPL_TASKROOT}/logs/submit.log'
             print('About to run: ', cmd)
-            input()
-            if not test:
-                os.system(cmd)
-            return True
+            if test:
+                return True    
+            os.system(cmd)
+            return None
         else:
             print('WARNING: Skymap not available.')
             return False
@@ -130,11 +130,14 @@ if __name__=='__main__':
             offset = message.offset()
             print(f"Message #{offset} received on ", datetime.now())
             commit = parse_notice(message.value(), test=test)
-            if commit == True and test == False: 
+            if commit == False or test == True:
+                print(f'WARNING: Message #{offset} not committed.')
+            else:
                 consumer.commit(message)
                 print(f"Message #{offset} committed.")
-            else:
-                print(f'WARNING: Message #{offset} not committed.')
+                if commit is None:
+                    continue_listening = False
+                    print('GWFUP job successfully submitted. Stop listening.')
         else:
             continue_listening = False
             if message.error().code() == KafkaError._PARTITION_EOF:
