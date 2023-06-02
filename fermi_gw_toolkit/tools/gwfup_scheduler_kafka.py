@@ -41,17 +41,22 @@ def parse_notice(record, test=False):
             return True
         
         elif alert_type == 'PRELIMINARY':
+            sign = record['event']['significant']
+            if sign is True:
+                print(f'{superevent_id} is a significant event but this notice is still {alert_type}.')
+                print('Waiting for Initial or Update notices...')
+                os.system(f'touch {file_path}')
+                return True
             skipped = glob.glob(skipped_folder + '/*')
             file_path = f'{skipped_folder}/{superevent_id}.txt'
             if file_path not in skipped:
-                print('This is the first Preliminary notice. Waiting the second one before starting the analysis.')
+                print(f'{superevent_id} is NOT significant but this notice is still the first {alert_type}.')
+                print('Waiting for the second one before starting the analysis.')
                 os.system(f'touch {file_path}')
                 return True
             else:
-                print('This is the second Preliminary notice. Starting the analysis now.')
+                print(f'This is the second {alert_type} notice. Starting the analysis now.')
                 os.system(f'rm {file_path}')
-
-        # Add a check to filter if significant or BBH?
 
         instruments = record['event']['instruments']
         nside = 64
