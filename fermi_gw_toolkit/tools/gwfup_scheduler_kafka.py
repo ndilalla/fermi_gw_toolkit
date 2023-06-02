@@ -96,8 +96,10 @@ def parse_notice(record, test=False):
             return False
     
     except Exception as message:
-        print(message)
-        return False
+        print('WARNING: ', message)
+        print('Exiting now.')
+        sys.exit()
+        #return False
 
 if __name__=='__main__':
     # Check if the GWFUP pipeline is busy
@@ -120,7 +122,7 @@ if __name__=='__main__':
     print('GWFUP scheduler successfully started on ', datetime.now())
     print('Using %s with PID %s' % (socket.getfqdn(), os.getpid()))
 
-    test = True
+    test = False
     continue_listening = True
     while continue_listening == True:
         message = consumer.poll(1)
