@@ -45,7 +45,7 @@ def parse_notice(record, test=False):
             if sign is True:
                 print(f'{superevent_id} is a significant event but this notice is still {alert_type}.')
                 print('Waiting for Initial or Update notices...')
-                os.system(f'touch {file_path}')
+                #os.system(f'touch {file_path}')
                 return True
             skipped = glob.glob(skipped_folder + '/*')
             file_path = f'{skipped_folder}/{superevent_id}.txt'
