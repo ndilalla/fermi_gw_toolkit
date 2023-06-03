@@ -168,7 +168,12 @@ if __name__=='__main__':
             print('Wait 5 minutes...')
             time.sleep(5*60)
             pass
+        # Use the small file to exit the loop and program (if needed)
+        if not os.path.exists(small_file):
+            ok = True
+            args.test = True
         pass
+
     os.system('rm -rf %s' % temp_dir)
     
     print('Submitting:')

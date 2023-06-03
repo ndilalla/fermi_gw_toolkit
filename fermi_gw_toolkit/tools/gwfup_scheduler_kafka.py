@@ -85,10 +85,11 @@ def parse_notice(record, test=False):
             print('About to run: ', cmd)
             os.system(cmd)
 
-            cmd = f'{FERMI_GW_ROOT}/slac/submit_gwfup_job.sh {flat_skymap_path} {nside} >> {GPL_TASKROOT}/logs/submit.log'
+            triggername = 'bn%s' % superevent_id
+            cmd = f'{FERMI_GW_ROOT}/slac/submit_gwfup_job.sh {flat_skymap_path} {nside} {triggername} >> {GPL_TASKROOT}/logs/submit.log'
             print('About to run: ', cmd)
             if test:
-                return True    
+                return True
             os.system(cmd)
             return None
         else:
