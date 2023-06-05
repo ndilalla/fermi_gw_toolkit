@@ -4,6 +4,7 @@ import json
 import glob
 import socket
 import time
+import argparse
 import numpy as np
 import astropy_healpix as ah
 from base64 import b64decode
@@ -17,6 +18,7 @@ from datetime import datetime
 from fermi_gw_toolkit import FERMI_GW_ROOT, GPL_TASKROOT
 
 skipped_folder = os.path.join(GPL_TASKROOT, 'status', 'skipped')
+running_folder = os.path.join(GPL_TASKROOT, 'status', 'running')
 
 def parse_notice(record, test=False):
     try:
@@ -110,10 +112,16 @@ def parse_notice(record, test=False):
         #return False
 
 if __name__=='__main__':
+    __description__= 'Scheduler for GWFUP using kafka broker.'
+    formatter = argparse.ArgumentDefaultsHelpFormatter
+    parser    = argparse.ArgumentParser(description=__description__,
+                                        formatter_class=formatter)
+    parser.add_argument("--test", help="Run the script in testing mode", action='store_true')
+    args = parser.parse_args()
+
     # Check if the GWFUP pipeline is busy
-    status_dir = os.path.join(GPL_TASKROOT, 'status', 'running')
-    if len(os.listdir(status_dir)) != 0:
-        print('GWFUP pipeline looks busy. Trying again in a bit.')
+    if len(os.listdir(running_folder)) != 0 and args.test == False:
+        print('GWFUP pipeline looks busy. Trying again in 1 hour.')
         sys.exit()
 
     # Connect as a consumer.
@@ -130,7 +138,6 @@ if __name__=='__main__':
     print('GWFUP scheduler successfully started on ', datetime.now())
     print('Using %s with PID %s' % (socket.getfqdn(), os.getpid()))
 
-    test = False
     continue_listening = True
     while continue_listening == True:
         message = consumer.poll(1)
@@ -139,8 +146,8 @@ if __name__=='__main__':
         elif not message.error():
             offset = message.offset()
             print(f"Message #{offset} received on ", datetime.now())
-            commit = parse_notice(message.value(), test=test)
-            if commit == False or test == True:
+            commit = parse_notice(message.value(), test=args.test)
+            if commit == False or args.test == True:
                 print(f'WARNING: Message #{offset} not committed.')
             else:
                 consumer.commit(message)
