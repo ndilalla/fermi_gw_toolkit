@@ -92,7 +92,11 @@ def parse_notice(record, test=False):
             if test:
                 return True
             os.system(cmd)
+
             time.sleep(10)
+            conf_email = 'mail -r ndilalla@stanford.edu -s "GWFUP Pipeline: GCN Notice received and submission started for %s" ndilalla@stanford.edu <  %s' % (triggername, record)
+            print(conf_email)
+            os.system(conf_email)
             return None
         else:
             print('WARNING: Skymap not available.')
