@@ -3,6 +3,7 @@ import sys
 import json
 import glob
 import socket
+import time
 import numpy as np
 import astropy_healpix as ah
 from base64 import b64decode
@@ -86,11 +87,12 @@ def parse_notice(record, test=False):
             os.system(cmd)
 
             triggername = 'bn%s' % superevent_id
-            cmd = f'{FERMI_GW_ROOT}/slac/submit_gwfup_job.sh {flat_skymap_path} {nside} {triggername} >> {GPL_TASKROOT}/logs/submit.log'
+            cmd = f'{FERMI_GW_ROOT}/slac/submit_gwfup_job.sh {flat_skymap_path} {nside} {triggername} >> {GPL_TASKROOT}/logs/submit.log 2>&1 &'
             print('About to run: ', cmd)
             if test:
                 return True
             os.system(cmd)
+            time.sleep(10)
             return None
         else:
             print('WARNING: Skymap not available.')

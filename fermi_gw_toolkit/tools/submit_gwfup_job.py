@@ -164,12 +164,13 @@ if __name__=='__main__':
         ok = check_ft1_ft2_files(ft1,ft2,MET_FT2TSTART,MET_FT2TSTOP,patch=600.)
         #ok=True
         if not ok:
-            print('Not enough data...')
-            print('Wait 5 minutes...')
-            time.sleep(5*60)
+            print('Not enough data on ', datetime.now())
+            print('Wait 10 minutes...')
+            time.sleep(10*60)
             pass
         # Use the small file to exit the loop and program (if needed)
         if not os.path.exists(small_file):
+            print('Submitter was stopped by the user. Exiting now.')
             ok = True
             args.test = True
         pass
