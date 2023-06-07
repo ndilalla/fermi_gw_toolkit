@@ -53,15 +53,15 @@ if __name__=='__main__':
     parser    = argparse.ArgumentParser(description=__description__,
                                         formatter_class=formatter)
     
-    parser.add_argument("--url", help="Web URL of the grace map", type=str, required=False,default=None)
-    parser.add_argument("--file", help="Web URL of the grace map", type=str, required=False,default=None)
-    parser.add_argument("--version", help="Version number, for multiple excecutions", type=str,default='v01')
+    parser.add_argument("--url", help="Web URL of the grace map", type=str, required=False, default=None)
+    parser.add_argument("--file", help="Web URL of the grace map", type=str, required=False, default=None)
+    parser.add_argument("--version", help="Version number, for multiple excecutions", type=str, default='v01')
     parser.add_argument("--irfs", help="Instrument Response Function", type=str,default='p8_source')
-    parser.add_argument("--nside", help="Rescale the MAP to NSIDE", type=int,default=128)
+    parser.add_argument("--nside", help="Rescale the MAP to NSIDE", type=int,default=64)
     parser.add_argument("--run_pgwave", help="Run PG wave analysis ONLY", type=bool,default=False)
-    parser.add_argument("--run_bayul", help="Run Bayesian UL", type=int,default=0)
-    parser.add_argument("--pixels_job", help="Number of pixels per job", type=int,default=10)
-    parser.add_argument("--wall_time", help="Pipeline wall time [hours]", type=int, default=2)
+    parser.add_argument("--run_bayul", help="Run Bayesian UL", type=int,default=0, choices=[0, 1])
+    parser.add_argument("--pixels_job", help="Number of pixels per job", type=int,default=5)
+    parser.add_argument("--wall_time", help="Pipeline wall time [hours]", type=int, default=4)
     parser.add_argument("--triggername", help="Overwrite the trigger name", type=str, default=None)
     parser.add_argument("--deltatime", help="Overwrite the trigger time by giving the delta", type=int, default=None)
     parser.add_argument("--test", help="Run the script in testing mode", action='store_true')
@@ -72,9 +72,9 @@ if __name__=='__main__':
     
     WEB_URL  = args.url
     if WEB_URL is None:
-        TRIGGERNAME,HEALPIX_PATH,TRIGGERTIME = getfromfile(args.file)
+        TRIGGERNAME, HEALPIX_PATH, TRIGGERTIME = getfromfile(args.file)
     else:
-        TRIGGERNAME,HEALPIX_PATH,TRIGGERTIME = getfromweb(WEB_URL)
+        TRIGGERNAME, HEALPIX_PATH, TRIGGERTIME = getfromweb(WEB_URL)
         pass
     VERSION  = args.version
     IRFS     = args.irfs
@@ -85,10 +85,10 @@ if __name__=='__main__':
     if args.deltatime is not None:
         TRIGGERTIME += args.deltatime
 
-    _outputdir='%soutput/%s/%s' % (GPL_TASKROOT, TRIGGERNAME, VERSION)
+    _outputdir = '%soutput/%s/%s' % (GPL_TASKROOT, TRIGGERNAME, VERSION)
     while os.path.exists(_outputdir): 
-        VNUM=int(VERSION.replace('v',''))
-        VERSION='v%02d' % (VNUM+1)
+        VNUM = int(VERSION.replace('v', ''))
+        VERSION = 'v%02d' % (VNUM+1)
         _outputdir='%soutput/%s/%s' % (GPL_TASKROOT, TRIGGERNAME, VERSION)
         #print('OUTPUT DIRECTORY %s EXISTS!' % _outputdir)
         pass
@@ -104,15 +104,12 @@ if __name__=='__main__':
     EMIN   = 100
     EMAX   = 100000
     SIMULATE_MODE = 0
-    #NUMBER_PIXELS_RUNS = 5#10
     NUMBER_PIXELS_RUNS = args.pixels_job
     THETAMAX= 65#73 #->65
     ZMAX    = 100 # (DEFAULT=100)
     STRATEGY = 'events' # 'time' #
     # By setting this var to 1 you will save the .pnz files. Set to 0 if you do not want this!
-    BAYESIAN_UL = 0
-    if args.run_bayul == 1:
-        BAYESIAN_UL = 1
+    BAYESIAN_UL = args.run_bayul
     WALL_TIME = args.wall_time
     
     cmd='%spipeline createStream GWFUP ' % GPL_TASKROOT
@@ -153,7 +150,7 @@ if __name__=='__main__':
         _cmd ='chmod 777 %s' % small_file
         os.system(_cmd)
 
-    ok=False
+    ok = False
     temp_dir = '%sinput/temp/%s_%s' % (GPL_TASKROOT, TRIGGERNAME, VERSION)
     while not ok:
         ft1, ft2 = download_LAT_data(outdir=temp_dir, ft1='FT1.fits', 
@@ -162,19 +159,16 @@ if __name__=='__main__':
         print(ft1)
         print(ft2)
         ok = check_ft1_ft2_files(ft1,ft2,MET_FT2TSTART,MET_FT2TSTOP,patch=600.)
-        #ok=True
         if not ok:
             print('Not enough data on ', datetime.now())
-            print('Wait 10 minutes...')
-            time.sleep(10*60)
+            print('Waiting 30 minutes...')
+            time.sleep(30*60)
             pass
         # Use the small file to exit the loop and program (if needed)
         if not os.path.exists(small_file):
             print('Submitter was stopped by the user. Exiting now.')
             ok = True
             args.test = True
-        pass
-
     os.system('rm -rf %s' % temp_dir)
     
     print('Submitting:')
