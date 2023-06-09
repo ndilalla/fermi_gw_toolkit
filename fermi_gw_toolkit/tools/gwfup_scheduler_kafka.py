@@ -44,14 +44,21 @@ def parse_notice(record, test=False):
             return True
         
         elif alert_type == 'PRELIMINARY':
-            sign = record['event']['significant']
-            if sign is True:
+            if record['event']['significant'] is True:
                 print(f'{superevent_id} is a significant event but this notice is still {alert_type}.')
                 print('Waiting for Initial or Update notices...')
                 #os.system(f'touch {file_path}')
                 return True
             skipped = glob.glob(skipped_folder + '/*')
             file_path = f'{skipped_folder}/{superevent_id}.txt'
+            terr = 0
+            if record['event']['group'] != 'Burst':
+                terr = float(record['classification']['Terrestrial']) * 100
+            if terr > 90:
+                print(f'{superevent_id} has a probability to be Terrestrial greater than 90%: {terr}%')
+                print('Skipping the analysis of this event for the moment.')
+                os.system(f'touch {file_path}')
+                return True
             if file_path not in skipped:
                 print(f'{superevent_id} is NOT significant but this notice is still the first {alert_type}.')
                 print('Waiting for the second one before starting the analysis.')
@@ -119,9 +126,9 @@ if __name__=='__main__':
     parser.add_argument("--test", help="Run the script in testing mode", action='store_true')
     args = parser.parse_args()
 
-    # Check if the GWFUP pipeline is busy
-    if len(os.listdir(running_folder)) != 0 and args.test == False:
-        print('GWFUP pipeline looks busy. Trying again in 1 hour.')
+    # Check if the GWFUP pipeline is too busy
+    if len(os.listdir(running_folder)) > 1 and args.test == False:
+        print('GWFUP pipeline looks too busy. Trying again in 1 hour.')
         sys.exit()
 
     # Connect as a consumer.
