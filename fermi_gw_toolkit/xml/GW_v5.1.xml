@@ -561,7 +561,7 @@
     </process>
     
     <task name="FTI_Likelihood"
-          version="1.6" 
+          version="1.7" 
           type="Data">
       <notation>
         Perform a likelihood analysis and compute bayesian upper limits
@@ -583,7 +583,7 @@
     </task>
     
     <task name="ATI_Likelihood"
-          version="1.5" 
+          version="1.6" 
           type="Data">
       <notation>
 	Perform a likelihood analysis for Adaptive Time Intervals
@@ -606,7 +606,7 @@
     </task>
 
     <task name="LLE_Analysis"
-          version="0.1" 
+          version="0.2" 
           type="Data">
       <notation>
 	LLE analysis
@@ -628,7 +628,7 @@
     </task>
 
     <task name="PGW_Likelihood"
-          version="1.1" 
+          version="1.2" 
           type="Data">
       <notation>
         Perform a likelihood analysis
