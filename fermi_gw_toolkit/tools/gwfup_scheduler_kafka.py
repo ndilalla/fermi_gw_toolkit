@@ -128,7 +128,7 @@ if __name__=='__main__':
 
     # Check if the GWFUP pipeline is too busy
     if len(os.listdir(running_folder)) > 1 and args.test == False:
-        print('GWFUP pipeline looks too busy. Trying again in 1 hour.')
+        print('GWFUP pipeline looks too busy. Trying again in 30 minutes.')
         sys.exit()
 
     # Connect as a consumer.
