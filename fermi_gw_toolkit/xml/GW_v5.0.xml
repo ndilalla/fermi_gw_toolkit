@@ -62,7 +62,7 @@
       <var name="FT1_PATH">${DATA_PATH}/${FT1_NAME}</var>
       <var name="FT2_NAME">FT2.fits</var>
       <var name="FT2_PATH">${DATA_PATH}/${FT2_NAME}</var>
-      <var name="NSIDE">128</var>
+      <var name="NSIDE">64</var>
       <var name="LIGO_COVERAGE_CL">0.9</var>
       <var name="NSIDE_LLE">32</var>
       <var name="DURATION">10000</var>
@@ -76,7 +76,7 @@
       <var name="MET_FT2TSTOP">10000</var>
       <var name="EMIN">100</var>
       <var name="EMAX">100000</var>
-      <var name="TSMIN">30</var>
+      <var name="TSMIN">25</var>
       <var name="IRFS">p8_transient010e</var>
       <var name="GAL_MODEL">template</var>
       <var name="PART_MODEL">isotr template</var>
@@ -573,7 +573,7 @@
 	    <prerequisite name="DO_TSMAP" type="string"/>
       </prerequisites>
       
-      <process name="process_n_points" autoRetryMaxAttempts="2">
+      <process name="process_n_points">
         <job 
            executable="${GPL_CONFIGDIR}/process_n_points.sh"
            queue="${GPL_QUEUE}"
@@ -596,7 +596,7 @@
 	<prerequisite name="SUBDIR" type="string"/>
       </prerequisites>
       
-      <process name="process_n_points_times" autoRetryMaxAttempts="2">
+      <process name="process_n_points_times">
 	<job 
            executable="${GPL_CONFIGDIR}/process_n_points_times.sh"
            queue="${GPL_QUEUE}"
@@ -640,7 +640,7 @@
 	    <prerequisite name="DO_TSMAP" type="string"/>
       </prerequisites>
       
-      <process name="process_n_points" autoRetryMaxAttempts="2">
+      <process name="process_n_points">
         <job 
            executable="${GPL_CONFIGDIR}/process_n_points.sh"
            queue="${GPL_QUEUE}"
