@@ -8,7 +8,7 @@
      2023-04-18 NDL: updated to Python3
     -->
   <task name="GWFUP"
-        version="5.0"
+        version="5.1"
         type="Data">
     
     <notation>
