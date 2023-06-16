@@ -93,8 +93,10 @@ if __name__ == "__main__":
     for ra, dec in zip(args.ra, args.dec):
 
         do_tsmap = args.do_tsmap
-
+        init_dir = os.getcwd()
         outfile = '%s_%.3f_%.3f_res.txt' % (args.triggername, ra, dec)
+        subfolder_dir = os.path.abspath("interval%s-%s" % \
+                                (float(args.tstarts), float(args.tstops)))
         cmd_line = 'python %s/scripts/doTimeResolvedLike.py %s --ra %s '\
                    '--dec %s --outfile %s --roi %s --tstarts %s ' \
                    '--tstops %s --zmax %s --emin %s --emax %s --irf %s '\
@@ -121,6 +123,7 @@ if __name__ == "__main__":
             #     raise RuntimeError
             # else:
             #     continue
+            _chdir_rmdir(init_dir, subfolder_dir)
             continue
         
         # Check the output TS and if it's greater than a given threshold do the
@@ -139,9 +142,6 @@ if __name__ == "__main__":
                     do_tsmap = 1
     
         # Figure out path of output files for the Bayesian upper limit and/or the simulation step below
-        init_dir = os.getcwd()
-        subfolder_dir = os.path.abspath("interval%s-%s" % \
-                                        (float(args.tstarts), float(args.tstops)))
         try:
             xml = glob.glob(subfolder_dir + '/*filt_likeRes.xml')[0]
             expomap = glob.glob(subfolder_dir + '/*filt_expomap.fit')[0]
@@ -151,7 +151,7 @@ if __name__ == "__main__":
             print('Data are not available for pixel at RA=%.3f, DEC=%.3f' %\
                 (ra, dec))
             print('Skipping this one...')
-            #_chdir_rmdir(init_dir, subfolder_dir)
+            _chdir_rmdir(init_dir, subfolder_dir)
             continue
 
         if args.bayesian_ul == 0 or args.do_tsmap == 1:

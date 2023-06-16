@@ -2,6 +2,7 @@
 
 from fermi_gw_toolkit import GTBURST_PATH
 
+import os
 import argparse
 import subprocess
 
@@ -39,6 +40,9 @@ if __name__ == "__main__":
 
     for tstarts, tstops, ra, dec in zip(args.tstarts, args.tstops, args.ra, args.dec):
 
+        subfolder_dir = os.path.abspath("interval%s-%s" % \
+                                (float(tstarts), float(tstops)))
+        
         cmd_line = 'python %s/scripts/doTimeResolvedLike.py %s --ra %s '\
                    '--dec %s --tstarts %s --tstops %s ' \
                    '--outfile %s_%.3f_%.3f_res.txt --flemin 100 --flemax 1000 '\
@@ -57,4 +61,6 @@ if __name__ == "__main__":
                 (ra, dec))
             print(err)
             print(err.output)
+            if os.path.exists(subfolder_dir):
+                os.system('rm -rf %s' % subfolder_dir)
             continue
