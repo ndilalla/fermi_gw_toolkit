@@ -63,7 +63,7 @@ def adaptive_time(**kwargs):
     output      = kwargs['output']
     plot        = kwargs['plot']
 
-    orgx        = 0
+    orgx        = 180
     orgy        = 0
 
     my_finder = contour_finder.ContourFinder(healpix_map, nside)
