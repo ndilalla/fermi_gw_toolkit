@@ -107,7 +107,7 @@ if __name__=='__main__':
     NUMBER_PIXELS_RUNS = args.pixels_job
     THETAMAX= 65#73 #->65
     ZMAX    = 100 # (DEFAULT=100)
-    STRATEGY = 'events' # 'time' #
+    STRATEGY = 'time' # 'events' #
     # By setting this var to 1 you will save the .pnz files. Set to 0 if you do not want this!
     BAYESIAN_UL = args.run_bayul
     WALL_TIME = args.wall_time
@@ -152,6 +152,7 @@ if __name__=='__main__':
 
     ok = False
     padding = 1000
+    t = 0 #hours of waiting
     temp_dir = '%sinput/temp/%s_%s' % (GPL_TASKROOT, TRIGGERNAME, VERSION)
     while not ok:
         ft1, ft2 = download_LAT_data(outdir=temp_dir, ft1='FT1.fits', 
@@ -165,7 +166,14 @@ if __name__=='__main__':
             print('Not enough data on ', datetime.now())
             print('Waiting 30 minutes...')
             time.sleep(30*60)
+            t += 0.5
             pass
+        if t > 12:
+            print('WARNING: submitter is likely stuck!')
+            print('Skipping %s for the moment...' % TRIGGERNAME)
+            os.system('rm -rf %s' % temp_dir)
+            os.system('mv %s %sstatus/skipped/' % (small_file, GPL_TASKROOT))
+            sys.exit()
         # Use the small file to exit the loop and program (if needed)
         if not os.path.exists(small_file):
             print('Submitter was stopped by the user. Exiting now.')
