@@ -230,7 +230,15 @@ if __name__ == "__main__":
                         args.irf, args.zmax, args.tstarts, args.tstops, 
                         args.emin, args.emax, outfits, args.thetamax, 
                         args.strategy)
-            _execute_command(cmd_line)
+            try:
+                _execute_command(cmd_line)
+            except subprocess.CalledProcessError as err:
+                print('ERROR: gtdocountsmap.py skipped for RA=%.3f, DEC=%.3f'%\
+                    (ra, dec))
+                print(err)
+                print(err.output)
+                _chdir_rmdir(init_dir, subfolder_dir)
+                continue
             
             #fits2png with sources
             #sources = getSourcesInTheROI(ra, dec, args.roi, float(args.tstarts))
