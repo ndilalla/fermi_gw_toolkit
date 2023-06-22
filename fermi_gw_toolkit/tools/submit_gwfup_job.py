@@ -59,7 +59,7 @@ if __name__=='__main__':
     parser.add_argument("--irfs", help="Instrument Response Function", type=str,default='p8_source')
     parser.add_argument("--nside", help="Rescale the MAP to NSIDE", type=int,default=64)
     parser.add_argument("--run_pgwave", help="Run PG wave analysis ONLY", type=bool,default=False)
-    parser.add_argument("--run_bayul", help="Run Bayesian UL", type=int,default=0, choices=[0, 1])
+    parser.add_argument("--run_bayul", help="Run Bayesian UL", type=int,default=1, choices=[0, 1])
     parser.add_argument("--pixels_job", help="Number of pixels per job", type=int,default=5)
     parser.add_argument("--wall_time", help="Pipeline wall time [hours]", type=int, default=4)
     parser.add_argument("--triggername", help="Overwrite the trigger name", type=str, default=None)
@@ -107,7 +107,7 @@ if __name__=='__main__':
     NUMBER_PIXELS_RUNS = args.pixels_job
     THETAMAX= 65#73 #->65
     ZMAX    = 100 # (DEFAULT=100)
-    STRATEGY = 'time' # 'events' #
+    STRATEGY = 'time' # Don't use event strategy or you will get lots of high TS where the exposure is zero!
     # By setting this var to 1 you will save the .pnz files. Set to 0 if you do not want this!
     BAYESIAN_UL = args.run_bayul
     WALL_TIME = args.wall_time
