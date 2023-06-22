@@ -26,9 +26,12 @@ def check_url(url):
     except RuntimeError:
         return False
 
-def curl_s3df(url, outfile=None, shell=True, text=False):
+def curl_s3df(url, outfile=None, shell=True, text=False, galprop=True):
     #ssh ndilalla@s3dflogin.slac.stanford.edu curl -S https://gracedb.ligo.org/api/superevents/S200316bj/files/bayestar.fits.gz -o - > prova.fits
+    #ssh ndilalla@galprop.stanford.edu "source source_gwtable.sh && curl -S https://gracedb.ligo.org/api/superevents/S200316bj/files/bayestar.fits.gz -o -" > prova.fits
     cmd = f'ssh ndilalla@s3dflogin.slac.stanford.edu curl -S {url} -o -'
+    if galprop:
+        cmd = f'ssh ndilalla@galprop.stanford.edu "source source_gwtable.sh && curl -S {url} -o -"'
     if outfile is not None:
         cmd += f' > {outfile}'
     print('About to run: %s' % cmd)
