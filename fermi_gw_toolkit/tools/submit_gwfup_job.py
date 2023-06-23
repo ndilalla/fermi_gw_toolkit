@@ -168,7 +168,7 @@ if __name__=='__main__':
             time.sleep(30*60)
             t += 0.5
             pass
-        if t > 12:
+        if t > 18:
             print('WARNING: submitter is likely stuck!')
             print('Skipping %s for the moment...' % TRIGGERNAME)
             os.system('rm -rf %s' % temp_dir)
