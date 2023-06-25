@@ -65,6 +65,7 @@ if __name__=='__main__':
     parser.add_argument("--triggername", help="Overwrite the trigger name", type=str, default=None)
     parser.add_argument("--deltatime", help="Overwrite the trigger time by giving the delta", type=int, default=None)
     parser.add_argument("--test", help="Run the script in testing mode", action='store_true')
+    parser.add_argument("--force", help="Force the job submission", action='store_true')
     args = parser.parse_args()
 
     print('GWFUP submitter successfully started on ', datetime.now())
@@ -162,12 +163,17 @@ if __name__=='__main__':
         print(ft2)
         ok = check_ft1_ft2_files(ft1, ft2, MET_FT2TSTART, 
             MET_FT2TSTOP + padding, patch=500.)
-        if not ok:
+        if ok:
+            print('Data look good! Proceeding with the submission now.')
+            break
+        else:
             print('Not enough data on ', datetime.now())
+            if args.force:
+                print('WARNING: forcing the job submission anyway.')
+                break
             print('Waiting 30 minutes...')
             time.sleep(30*60)
             t += 0.5
-            pass
         if t > 18:
             print('WARNING: submitter is likely stuck!')
             print('Skipping %s for the moment...' % TRIGGERNAME)
