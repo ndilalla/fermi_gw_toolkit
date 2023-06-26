@@ -200,10 +200,17 @@ if __name__ == "__main__":
             print("Changing working directory to: %s" % subfolder_dir)
             os.chdir(subfolder_dir)
             
-            ramax, decmax, tsmax = gtdotsmap.run(filteredeventfile=new_ft1, 
-                ft2file=ft2, tsexpomap=expomap, tsltcube=ltcube, xmlmodel=xml, 
-                rspfile=rsp, tsmap=outfits, step=0.8, side='auto', 
-                clobber='yes', verbose='yes')[3:8:2]
+            try:
+                ramax, decmax, tsmax = gtdotsmap.run(filteredeventfile=new_ft1, 
+                    ft2file=ft2, tsexpomap=expomap, tsltcube=ltcube, 
+                    xmlmodel=xml, rspfile=rsp, tsmap=outfits, step=0.8, 
+                    side='auto', clobber='yes', verbose='yes')[3:8:2]
+            except Exception as err:
+                print('ERROR: gtdotsmap.py skipped for RA=%.3f, DEC=%.3f'%\
+                    (ra, dec))
+                print(err)
+                _chdir_rmdir(init_dir, subfolder_dir)
+                continue
             
             #save coordinates and ts value
             outfile = os.path.join(init_dir, '%s_%.3f_%.3f_coords.txt' % \
@@ -213,7 +220,8 @@ if __name__ == "__main__":
                 f.write("%f %f %f\n" % (ramax, decmax, tsmax))
             
             #fits2png
-            sources = get_sources_roi(ra, dec, float(args.roi), float(args.tstarts))
+            sources = get_sources_roi(ra, dec, float(args.roi), 
+                                      float(args.tstarts))
             sources.append(['TS Max', float(ramax), float(decmax), 0.])
             fits2png.fitsToPNG(outfits, outfits.replace('.fits', '.png'), 0.0,
                                tsmax, sources=sources)
