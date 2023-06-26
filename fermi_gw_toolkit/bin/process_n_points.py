@@ -84,11 +84,11 @@ if __name__ == "__main__":
     assert os.path.exists(ft2), "FT2 %s does not exist" % ft2
 
     tsmap_spec = "0.5,8"
-    
-    if args.bayesian_ul == 0 or args.do_tsmap == 1:
-        fgl_mode = 'complete'
-    else:
-        fgl_mode = 'fast'
+    fgl_mode = 'complete'
+    #if args.bayesian_ul == 0 or args.do_tsmap == 1:
+    #    fgl_mode = 'complete'
+    #else:
+    #    fgl_mode = 'fast'
 
     for ra, dec in zip(args.ra, args.dec):
 
