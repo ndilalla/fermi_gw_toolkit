@@ -162,7 +162,7 @@ if __name__=='__main__':
         print(ft1)
         print(ft2)
         ok = check_ft1_ft2_files(ft1, ft2, MET_FT2TSTART, 
-            MET_FT2TSTOP + padding, patch=500.)
+            MET_FT2TSTOP + padding, patch=padding)
         if ok:
             print('Data look good! Proceeding with the submission now.')
             break
