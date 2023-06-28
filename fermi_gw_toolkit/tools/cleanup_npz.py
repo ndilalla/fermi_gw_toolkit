@@ -12,7 +12,8 @@ for fti_dir in fti_dirs[:-10]:
     npz_files = glob('%s/*_bayesian_ul*.npz' % fti_dir)
     for npz_file in npz_files:
         cmd = 'rm %s' % npz_file
+        print(cmd)
         #os.system(cmd)
-        input()
     print('%d files deleted from %s' % (len(npz_files), fti_dir))
+    input()
     
