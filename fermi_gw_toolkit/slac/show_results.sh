@@ -21,6 +21,11 @@ mail -r ndilalla@stanford.edu -s "GWFUP Pipeline: Results for ${TRIGGERNAME} ${V
 
 # this triggers the copy to stanford
 #chmod a+w $GPL_TASKROOT/status/running/${TRIGGERNAME}_${VERSION}.txt
-mv $GPL_TASKROOT/status/running/${TRIGGERNAME}_${VERSION}.txt $GPL_TASKROOT/status/done/
+if ( -f "$GPL_TASKROOT/status/running/${TRIGGERNAME}_${VERSION}.txt" ) then
+    mv $GPL_TASKROOT/status/running/${TRIGGERNAME}_${VERSION}.txt $GPL_TASKROOT/status/done/
+endif
+if ( -f "$GPL_TASKROOT/status/copied/${TRIGGERNAME}_${VERSION}.txt" )
+    mv $GPL_TASKROOT/status/copied/${TRIGGERNAME}_${VERSION}.txt $GPL_TASKROOT/status/done/
+endif
 
 echo 'All done!'
