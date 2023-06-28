@@ -334,9 +334,9 @@ def bayesian_ul(**kwargs):
 
     # Save the samples
 
-    np.savez(kwargs['output_file'] + "_samples", samples=samples)
+    np.savez_compressed(kwargs['output_file'] + "_samples", samples=samples)
 
-    np.savez(kwargs['output_file'], photon_fluxes=photon_fluxes, energy_fluxes=energy_fluxes,
+    np.savez_compressed(kwargs['output_file'], photon_fluxes=photon_fluxes, energy_fluxes=energy_fluxes,
              photon_flux_p95=photon_flux_p95, energy_flux_p95=energy_flux_p95, st_bayes_ul=st_bayes_ul,
              st_bayes_ul_ene=st_bayes_ul_ene)
 
