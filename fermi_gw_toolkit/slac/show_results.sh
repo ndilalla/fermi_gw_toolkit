@@ -24,7 +24,7 @@ mail -r ndilalla@stanford.edu -s "GWFUP Pipeline: Results for ${TRIGGERNAME} ${V
 if ( -f "$GPL_TASKROOT/status/running/${TRIGGERNAME}_${VERSION}.txt" ) then
     mv $GPL_TASKROOT/status/running/${TRIGGERNAME}_${VERSION}.txt $GPL_TASKROOT/status/done/
 endif
-if ( -f "$GPL_TASKROOT/status/copied/${TRIGGERNAME}_${VERSION}.txt" )
+if ( -f "$GPL_TASKROOT/status/copied/${TRIGGERNAME}_${VERSION}.txt" ) then
     mv $GPL_TASKROOT/status/copied/${TRIGGERNAME}_${VERSION}.txt $GPL_TASKROOT/status/done/
 endif
 
