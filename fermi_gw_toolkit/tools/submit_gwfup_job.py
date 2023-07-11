@@ -174,12 +174,13 @@ if __name__=='__main__':
             print('Waiting 30 minutes...')
             time.sleep(30*60)
             t += 0.5
-        if t > 18:
-            print('WARNING: submitter is likely stuck!')
-            print('Skipping %s for the moment...' % TRIGGERNAME)
-            os.system('rm -rf %s' % temp_dir)
-            os.system('mv %s %sstatus/skipped/' % (small_file, GPL_TASKROOT))
-            sys.exit()
+        if t > 15:
+            print('WARNING: submitter is likely stuck! Forcing the submission.')
+            break
+            # print('Skipping %s for the moment...' % TRIGGERNAME)
+            # os.system('rm -rf %s' % temp_dir)
+            # os.system('mv %s %sstatus/skipped/' % (small_file, GPL_TASKROOT))
+            # sys.exit()
         # Use the small file to exit the loop and program (if needed)
         if not os.path.exists(small_file):
             print('Submitter was stopped by the user. Exiting now.')
