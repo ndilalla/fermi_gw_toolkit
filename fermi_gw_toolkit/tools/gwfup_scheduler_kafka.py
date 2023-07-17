@@ -54,8 +54,8 @@ def parse_notice(record, test=False):
             terr = 0
             if record['event']['group'] == 'CBC':
                 terr = record['event']['classification']['Terrestrial'] * 100
-            if terr > 90:
-                print(f'{superevent_id} has a probability to be Terrestrial greater than 90%: {terr}%')
+            if terr > 80:
+                print(f'{superevent_id} has a probability to be Terrestrial greater than 80%: {terr}%')
                 print('Skipping the analysis of this event for the moment.')
                 os.system(f'touch {file_path}')
                 return True

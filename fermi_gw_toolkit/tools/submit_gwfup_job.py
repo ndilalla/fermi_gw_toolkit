@@ -5,12 +5,14 @@ import socket
 import argparse, glob
 
 from astropy.io import fits
+from astropy.time import Time
 from datetime import datetime
 from GtBurst.dataHandling import date2met
 from fermi_gw_toolkit import GPL_TASKROOT
 from fermi_gw_toolkit.bin.download_LAT_data import download_LAT_data
 from fermi_gw_toolkit.utils.check_ft1_ft2_files import check_ft1_ft2_files
 from fermi_gw_toolkit.utils.gcn_info import curl_s3df
+from fermi_gw_toolkit.utils.date_to_met import met_to_utc
 
 def getfromfile(filename):
     cmd='chmod a+r %s' % filename
@@ -154,6 +156,7 @@ if __name__=='__main__':
     ok = False
     padding = 1000
     t = 0 #hours of waiting
+    utc_t0 = met_to_utc(TRIGGERTIME)
     temp_dir = '%sinput/temp/%s_%s' % (GPL_TASKROOT, TRIGGERNAME, VERSION)
     while not ok:
         ft1, ft2 = download_LAT_data(outdir=temp_dir, ft1='FT1.fits', 
@@ -166,7 +169,16 @@ if __name__=='__main__':
         if ok:
             print('Data look good! Proceeding with the submission now.')
             break
-        else:
+        utc_now = Time(datetime.datetime.utcnow(), scale='utc')
+        utc_diff = (utc_now - utc_t0).to_value('hr')
+        if t > 15 or utc_diff > 15:
+            print('WARNING: submitter is likely stuck! Forcing the submission.')
+            break
+            # print('Skipping %s for the moment...' % TRIGGERNAME)
+            # os.system('rm -rf %s' % temp_dir)
+            # os.system('mv %s %sstatus/skipped/' % (small_file, GPL_TASKROOT))
+            # sys.exit()
+        if not ok:
             print('Not enough data on ', datetime.now())
             if args.force:
                 print('WARNING: forcing the job submission anyway.')
@@ -174,13 +186,6 @@ if __name__=='__main__':
             print('Waiting 30 minutes...')
             time.sleep(30*60)
             t += 0.5
-        if t > 15:
-            print('WARNING: submitter is likely stuck! Forcing the submission.')
-            break
-            # print('Skipping %s for the moment...' % TRIGGERNAME)
-            # os.system('rm -rf %s' % temp_dir)
-            # os.system('mv %s %sstatus/skipped/' % (small_file, GPL_TASKROOT))
-            # sys.exit()
         # Use the small file to exit the loop and program (if needed)
         if not os.path.exists(small_file):
             print('Submitter was stopped by the user. Exiting now.')
