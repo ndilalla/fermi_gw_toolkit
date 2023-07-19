@@ -169,7 +169,7 @@ if __name__=='__main__':
         if ok:
             print('Data look good! Proceeding with the submission now.')
             break
-        utc_now = Time(datetime.datetime.utcnow(), scale='utc')
+        utc_now = Time(datetime.utcnow(), scale='utc')
         utc_diff = (utc_now - utc_t0).to_value('hr')
         if t > 15 or utc_diff > 15:
             print('WARNING: submitter is likely stuck! Forcing the submission.')
