@@ -8,8 +8,8 @@ from fermi_gw_toolkit import GPL_TASKROOT
 # parser    = argparse.ArgumentParser(description=__description__,
 #                                     formatter_class=formatter)
 # parser.add_argument("--init", help="Rescale the MAP to NSIDE", type=int,default=None)
-init = 0
-end = -50
+init = 230
+end = -20
 
 output_dir = os.path.join(GPL_TASKROOT, 'output')
 fti_dirs = sorted(glob('%s/*/*/FIXEDINTERVAL/' % (output_dir)))
