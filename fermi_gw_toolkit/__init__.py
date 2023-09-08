@@ -39,11 +39,11 @@ except:
     GTBURST_PATH = os.path.join(site_pkg, 'fermitools', 'GtBurst')
 _print('GtBurst directory set to: %s ' % GTBURST_PATH, verbose=VERBOSE)
 
-try:
-    DECORATOR_PATH = os.environ['DECORATOR_PATH']
-except:
-    DECORATOR_PATH = 'http://glast-ground.slac.stanford.edu/Decorator/exp/Fermi/Decorate/groups/grb/GWFUP//'
-_print('Decorator path set to: %s ' % DECORATOR_PATH, verbose=VERBOSE)
+# try:
+#     DECORATOR_PATH = os.environ['DECORATOR_PATH']
+# except:
+#     DECORATOR_PATH = 'http://glast-ground.slac.stanford.edu/Decorator/exp/Fermi/Decorate/groups/grb/GWFUP//'
+# _print('Decorator path set to: %s ' % DECORATOR_PATH, verbose=VERBOSE)
 
 try:
 	FERMISOURCECATALOG = os.environ['FERMISOURCECATALOG']

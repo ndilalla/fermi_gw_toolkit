@@ -4,7 +4,7 @@ import numpy
 import healpy as hp
 #import webbrowser
 import astropy.io.fits as pyfits
-from fermi_gw_toolkit import GPL_TASKROOT, DECORATOR_PATH
+from fermi_gw_toolkit import GPL_TASKROOT#, DECORATOR_PATH
 from fermi_gw_toolkit.lib.contour_finder import pix_to_sky
 from fermi_gw_toolkit.lib.local_database import gw_local_database
 from fermi_gw_toolkit.lib.check_association import check_catalog, check_sun_moon
@@ -15,7 +15,8 @@ parser = argparse.ArgumentParser(formatter_class=formatter)
 
 _db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4_events.pkl')
 def fix_path(local_path):
-    return local_path.replace(GPL_TASKROOT, DECORATOR_PATH)
+    #return local_path.replace(GPL_TASKROOT, DECORATOR_PATH)
+    return local_path
 
 parser.add_argument("--triggername", help="Trigger name", type=str,
                     required=True)

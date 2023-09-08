@@ -7,7 +7,7 @@ import argparse
 import pickle
 from glob import glob
 from astropy.time import Time
-from fermi_gw_toolkit import GPL_TASKROOT, DECORATOR_PATH
+from fermi_gw_toolkit import GPL_TASKROOT#, DECORATOR_PATH
 from fermi_gw_toolkit.utils.gcn_info import get_info
 from fermi_gw_toolkit.lib.local_database import gw_local_database
 
@@ -30,13 +30,13 @@ parser.add_argument("--db_file", help="File used for database", type=str,
                     required=False, default=_db_file)
 #parser.add_argument("--overwrite", )
 
-def fix_html(html, remove):
+def fix_html(html, remove=None):
     if not html.endswith('.html'):
         return ''
     with open(html, 'r') as file :
         filedata = file.read()
-
-    filedata = filedata.replace(remove, '')
+    if remove is not None:
+        filedata = filedata.replace(remove, '')
     filedata = filedata.replace('styles.css', '../../../css/styles.css')
     filedata = filedata.replace('src=PGWAVE', 'src=images/')
     filedata = filedata.replace('src=FIXEDINTERVAL', 'src=images/')
@@ -119,7 +119,7 @@ def copy_event(name, db_dict, version=None, overwrite=False):
             continue
         
         print('Copying %s (%s) to Stanford...' % (name, version))
-        remove = os.path.join(DECORATOR_PATH, 'output', name, version) + '/'
+        remove = os.path.join(local_dir, name, version) + '/'
         new_path = fix_html(path, remove)
         make_copy(new_path, outfolder)
         db_dict.set_value(name, version, 'Copied', True)

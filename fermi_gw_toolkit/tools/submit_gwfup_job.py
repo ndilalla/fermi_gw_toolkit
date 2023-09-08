@@ -11,7 +11,7 @@ from GtBurst.dataHandling import date2met
 from fermi_gw_toolkit import GPL_TASKROOT
 from fermi_gw_toolkit.bin.download_LAT_data import download_LAT_data
 from fermi_gw_toolkit.utils.check_ft1_ft2_files import check_ft1_ft2_files
-from fermi_gw_toolkit.utils.gcn_info import curl_s3df
+#from fermi_gw_toolkit.utils.gcn_info import curl_s3df
 from fermi_gw_toolkit.utils.date_to_met import met_to_utc
 
 def getfromfile(filename):
@@ -33,11 +33,11 @@ def getfromweb(url):
     trigger_name = 'bn%s' % name
     out_file = '%sinput/input_maps/%s' % (GPL_TASKROOT, out_name)
     print(trigger_name, extension, out_name)
-    #cmd = 'curl %s -o %s' % (url,out_file)
-    #print(cmd)
-    #if not os.path.exists(out_file): 
-    #os.system(cmd)
-    curl_s3df(url, out_file)
+    cmd = 'curl %s -o %s' % (url,out_file)
+    print(cmd)
+    if not os.path.exists(out_file): 
+        os.system(cmd)
+    #curl_s3df(url, out_file)
     cmd='chmod 777 %s' % out_file
     os.system(cmd)
     #else:
@@ -115,7 +115,7 @@ if __name__=='__main__':
     BAYESIAN_UL = args.run_bayul
     WALL_TIME = args.wall_time
     
-    cmd='%spipeline createStream GWFUP ' % GPL_TASKROOT
+    cmd='%spipeline createStream GWFUP-S3DF ' % GPL_TASKROOT
     cmd+='--define TRIGGERNAME=%(TRIGGERNAME)s ' % locals()
     cmd+='--define TRIGGERTIME=%(TRIGGERTIME)s ' % locals()
     cmd+='--define MET_TSTART=%(MET_TSTART)s ' % locals()
@@ -134,7 +134,7 @@ if __name__=='__main__':
     cmd+='--define THETAMAX=%(THETAMAX)s ' % locals()
     cmd+='--define ZMAX=%(ZMAX)s ' % locals()
     cmd+='--define STRATEGY=%(STRATEGY)s ' % locals()
-    cmd+='--define WALL_TIME=%(WALL_TIME)s:0 ' % locals() # this sets the maximum wall time for the likelihood jobs... format is: H:M
+    cmd+='--define WALL_TIME=%(WALL_TIME)s:00:00 ' % locals() # this sets the maximum wall time for the likelihood jobs... format is: H:M:S
     if args.run_pgwave:
         cmd+='--define RUN_ATI=0 '
         cmd+='--define RUN_FTI=0 '

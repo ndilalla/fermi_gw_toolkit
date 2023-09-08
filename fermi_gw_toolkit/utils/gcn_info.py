@@ -5,9 +5,9 @@ import json
 import urllib
 import subprocess
 
-from fermi_gw_toolkit.utils.run_at_slac import run_at_slac
-
-def gracedb_request(url, slac=run_at_slac(), **kwargs):
+def gracedb_request(url, slac=False, **kwargs):
+    # This option was used on the old rhel6 and centos7 machines which had 
+    # issues to reach the gracedb website
     if slac:
         try:
             return curl_s3df(url, **kwargs)
@@ -49,7 +49,7 @@ def read_gcn(root, role='observation'):
     params['Date'] = root.findtext('.//Date')
     return params
 
-def get_info(name, slac=run_at_slac()):
+def get_info(name, slac=False):
     url = 'https://gracedb.ligo.org/apiweb/superevents/%s/voevents/?format=json' % name
     try:
         json_url = gracedb_request(url, slac=slac)
