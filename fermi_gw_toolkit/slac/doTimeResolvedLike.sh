@@ -1,9 +1,8 @@
 #!/bin/tcsh -e
 # THIS SHOULD SOURCE THE APPROPRIATE FILES TO SET UP THE ENVIRONMENT AND EXCECUTE THE PYTHON SCRIPT
 echo 'Create a staging directory:'
-setenv stage /scratch/${PIPELINE_TASKPATH}_${LSB_BATCH_JID}
-echo $stage 
-mkdir -p $stage
+setenv stage ${LSCRATCH}
+echo $stage
 cd $stage
 echo PWD=$PWD
 echo 'sourcing the setup script!'
@@ -19,5 +18,5 @@ if ( -f $OUT_FILE ) then
     ls $OUT_FILE
     mv $OUT_FILE $OUTPUT_FILE_PATH/ADAPTIVEINTERVAL/
 endif
-echo 'Removing staging directory:'
-rm -rf $stage
+
+echo 'Done!'

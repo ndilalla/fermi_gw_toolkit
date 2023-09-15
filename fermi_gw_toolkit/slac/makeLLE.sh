@@ -1,12 +1,11 @@
 #!/bin/bash
 echo 'Create a staging directory:'
-export stage=/scratch/${PIPELINE_TASKPATH}_${LSB_BATCH_JID}  
+export stage=${LSCRATCH}
 echo $stage
-mkdir -p $stage
 cd $stage
 echo PWD=$PWD
 export HOME=$PWD
-source ${GPL_TASKROOT}/set_env/setup_gtgrb.sh
+source ${GPL_TASKROOT}/set_env/gtgrb_py39.sh
 which bbbd_lle.py
 which makeLLE.py
 
@@ -23,8 +22,6 @@ if ls $stage/$TRIGGERNAME/v00/gll_detec_*.png 1> /dev/null 2>&1; then
     mv $stage/$TRIGGERNAME/v00/gll_detec_*.png ${OUTPUT_FILE_PATH}/LLE/gll_detec_${OBJ_RA}_${OBJ_DEC}_${TSTART}_${TSTOP}.png
 fi
 
-echo "Removing staging directory"
-rm -rf $stage
 echo "Done!" 
 
 #--before BEFORE

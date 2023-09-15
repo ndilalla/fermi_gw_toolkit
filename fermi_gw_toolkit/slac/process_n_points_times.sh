@@ -1,15 +1,12 @@
 #!/bin/tcsh -fe
 # THIS SHOULD SOURCE THE APPROPRIATE FILES TO SET UP THE ENVIRONMENT AND EXCECUTE THE PYTHON SCRIPT
 echo 'Create a staging directory:'
-setenv stage /scratch/${PIPELINE_TASKPATH}_${LSB_BATCH_JID}
-echo $stage 
-mkdir -p $stage
+setenv stage ${LSCRATCH}
+echo $stage
 cd $stage
 echo PWD=$PWD
 echo 'sourcing the setup script!'
 source $GPL_TASKROOT/set_env/setup_gwfup.csh
-#What is this command this doing?
-#mkdir -p $PFILES 
 
 set echo
 
@@ -24,5 +21,5 @@ if ( -e $x[1] ) then
 else
     echo "No results file found!"
 endif
-echo 'Removing staging directory:'
-rm -rf $stage
+
+echo 'Done!'
