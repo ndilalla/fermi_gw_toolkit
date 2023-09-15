@@ -8,7 +8,7 @@
      2023-09-07 NDL: updated for s3df
     -->
   <task name="GWFUP-S3DF"
-        version="0.1"
+        version="0.2"
         type="Data">
     
     <notation>
@@ -343,7 +343,9 @@
       <script><![CDATA[
          import os
          print('Opening file %s...' %(OUTADAPTIVEINTERVALS))
-         if os.path.exists(OUTADAPTIVEINTERVALS):
+         if not os.path.exists(OUTADAPTIVEINTERVALS):
+             print('File %s does not exists!' % (OUTADAPTIVEINTERVALS))
+         else:
              roi_list = open(OUTADAPTIVEINTERVALS, 'r')
              rois=roi_list.readlines()
              n_rois=len(rois)
@@ -372,9 +374,7 @@
                      if iStream == n_rois: continue
                  args='OBJ_RA="%s",OBJ_DEC="%s",TSTARTS="%s",TSTOPS="%s",SUBDIR="ADAPTIVEINTERVAL"' %(ras,decs,tstarts,tstops)
                  # print('args=',args)
-                 pipeline.createSubstream("ATI_Likelihood",iStream+1,args)                 
-	 else: 
-             print('File %s does not exists!' % (OUTADAPTIVEINTERVALS))
+                 pipeline.createSubstream("ATI_Likelihood",iStream+1,args)
       ]]></script>
       <depends>
         <after process="adaptive_time_intervals"></after>
