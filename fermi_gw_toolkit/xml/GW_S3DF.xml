@@ -8,7 +8,7 @@
      2023-09-07 NDL: updated for s3df
     -->
   <task name="GWFUP-S3DF"
-        version="0.2"
+        version="0.3"
         type="Data">
     
     <notation>
@@ -24,7 +24,7 @@
       <var name="GPL2_MESSAGELVL">DEBUG</var>
       <var name="PIPELINE_LOGFILE">logFile.txt</var>
       <!-- Job control variables -->
-      <var name="GPL_TASKROOT">/sdf/group/fermi/n/u26/GWFUP</var>
+      <var name="GPL_TASKROOT">/sdf/data/fermi/n/u26/GWFUP</var>
       <!--var name="GPL_TASKCATEGORY">ServiceChallenge</var-->
       <!-- <var name="GPL_SIXDIGSTREAM">${format(pipeline.stream,&quot;%06d&quot;)}</var> -->
       <var name="FERMI_GWTOOLS">${GPL_TASKROOT}/fermi_gw_toolkit/fermi_gw_toolkit</var>
@@ -197,7 +197,7 @@
                  args='OBJ_RA="%s",OBJ_DEC="%s",SUBDIR="PGWAVE",DO_TSMAP="1"' %(ras,decs)
                  print('args=', args)
                  pipeline.createSubstream("PGW_Likelihood",iStream+1,args)
-	 else:       
+         else:       
              print('File %s does not exists!' % (PGW_OUTLIST))
       ]]></script>
       <depends>
@@ -267,7 +267,7 @@
                  args='OBJ_RA="%s",OBJ_DEC="%s",SUBDIR="FIXEDINTERVAL",DO_TSMAP="0"' %(ras,decs)
                  #print('args=',args)
                  pipeline.createSubstream("FTI_Likelihood",iStream+1,args)
-	 else:       
+         else:       
              print('File %s does not exists!' % (OUTLIST))
       ]]></script>
       <depends>
@@ -470,7 +470,7 @@
                  pipeline.createSubstream("LLE_Analysis",iStream+1,args)                 
                  iStream+=1
                  pass
-	 else: 
+         else: 
              print('File %s does not exists!' % (OUTLLEINTERVALS))
       ]]></script>
       <depends>
