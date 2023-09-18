@@ -8,7 +8,7 @@
      2023-09-07 NDL: updated for s3df
     -->
   <task name="GWFUP-S3DF"
-        version="0.3"
+        version="0.4"
         type="Data">
     
     <notation>
@@ -198,7 +198,7 @@
                  print('args=', args)
                  pipeline.createSubstream("PGW_Likelihood",iStream+1,args)
          else:       
-             print('File %s does not exists!' % (PGW_OUTLIST))
+             print('File %s does not exist!' % (PGW_OUTLIST))
       ]]></script>
       <depends>
         <after process="plot_cmap"></after>
@@ -240,36 +240,10 @@
     </process>
     
     <process name="submit_FTI_jobs" site="${JOBSITE}">
-      <script><![CDATA[
-         import os
-         print('Opening file %s...' %(OUTLIST))
-         if os.path.exists(OUTLIST):
-             roi_list = open(OUTLIST, 'r')
-             rois=roi_list.readlines()
-             n_rois=len(rois)
-             print('Number of ROI....:',n_rois)
-             #n_rois=50
-             roi_list.close()
-             iStream=0
-             while iStream < n_rois:
-                 if '#' in rois[iStream]: 
-                     iStream+=1
-                     continue
-                 ras=''
-                 decs=''
-                 for ipixel in range(NUMBER_PIXELS_RUNS):
-                     if iStream < n_rois:
-                         ra,dec=rois[iStream].split()
-                         ras+='%s ' % ra
-                         decs+='%s ' % dec
-                         iStream+=1
-                     if iStream == n_rois: continue
-                 args='OBJ_RA="%s",OBJ_DEC="%s",SUBDIR="FIXEDINTERVAL",DO_TSMAP="0"' %(ras,decs)
-                 #print('args=',args)
-                 pipeline.createSubstream("FTI_Likelihood",iStream+1,args)
-         else:       
-             print('File %s does not exists!' % (OUTLIST))
-      ]]></script>
+      <job
+         executable="python ${GPL_CONFIGDIR}/submit_fti_jobs.py"
+         batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS}${GPL_XTRABATCHRESOURCES}"
+         />
       <depends>
         <after process="prepare_grid"></after>
       </depends>
@@ -344,7 +318,7 @@
          import os
          print('Opening file %s...' %(OUTADAPTIVEINTERVALS))
          if not os.path.exists(OUTADAPTIVEINTERVALS):
-             print('File %s does not exists!' % (OUTADAPTIVEINTERVALS))
+             print('File %s does not exist!' % (OUTADAPTIVEINTERVALS))
          else:
              roi_list = open(OUTADAPTIVEINTERVALS, 'r')
              rois=roi_list.readlines()
@@ -471,7 +445,7 @@
                  iStream+=1
                  pass
          else: 
-             print('File %s does not exists!' % (OUTLLEINTERVALS))
+             print('File %s does not exist!' % (OUTLLEINTERVALS))
       ]]></script>
       <depends>
         <after process="LLE_time_intervals"></after>
