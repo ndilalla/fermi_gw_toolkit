@@ -8,7 +8,7 @@
      2023-09-07 NDL: updated for s3df
     -->
   <task name="GWFUP-S3DF"
-        version="0.4"
+        version="0.5"
         type="Data">
     
     <notation>
@@ -241,7 +241,7 @@
     
     <process name="submit_FTI_jobs" site="${JOBSITE}">
       <job
-         executable="python ${GPL_CONFIGDIR}/submit_fti_jobs.py"
+         executable="python3 ${GPL_CONFIGDIR}/submit_fti_jobs.py"
          batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS}${GPL_XTRABATCHRESOURCES}"
          />
       <depends>
