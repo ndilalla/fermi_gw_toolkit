@@ -8,7 +8,7 @@
      2023-09-07 NDL: updated for s3df
     -->
   <task name="GWFUP-S3DF"
-        version="0.7"
+        version="0.8"
         type="Data">
     
     <notation>
@@ -171,10 +171,25 @@
     </process>
 
     <process name="submit_PGW_jobs" site="${JOBSITE}">
-      <script><![CDATA[
-         import os
+      <job maxCPU="60" batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS}${GPL_XTRABATCHRESOURCES}"><![CDATA[
+         #!/usr/bin/env python3
+         import os, sys
+
+         def pipeline_set(key, value):
+            with open(os.environ["PIPELINE_SUMMARY"], "a") as f:
+                f.write("Pipeline.%s: %s\n" %(key, value))
+             
+         def pipeline_stream(task, stream, args):
+            with open(os.environ["PIPELINE_SUMMARY"], "a") as f:
+                f.write("PipelineCreateStream.%s.%d: %s\n" %(task, int(stream), args))
+         
+         # Bring in shell vars as local vars
+         locals().update({k:v for k,v in os.environ.items() if "." not in k})
+
          print('Opening file %s...' %(PGW_OUTLIST))
-         if os.path.exists(PGW_OUTLIST):
+         if not os.path.exists(PGW_OUTLIST):
+             print('File %s does not exist!' % (PGW_OUTLIST))
+         else:
              roi_list = open(PGW_OUTLIST, 'r')
              rois=roi_list.readlines()
              n_rois = len(rois)
@@ -195,11 +210,8 @@
                          iStream+=1
                      if iStream == n_rois: continue
                  args='OBJ_RA="%s",OBJ_DEC="%s",SUBDIR="PGWAVE",DO_TSMAP="1"' %(ras,decs)
-                 print('args=', args)
-                 pipeline.createSubstream("PGW_Likelihood",iStream+1,args)
-         else:       
-             print('File %s does not exist!' % (PGW_OUTLIST))
-      ]]></script>
+                 pipeline_stream("PGW_Likelihood",iStream+1,args)
+      ]]></job>
       <depends>
         <after process="plot_cmap"></after>
       </depends>
@@ -253,7 +265,8 @@
                 with open(os.environ["PIPELINE_SUMMARY"], "a") as f:
                     f.write("PipelineCreateStream.%s.%d: %s\n" %(task, int(stream), args))
 
-            locals().update(os.environ)
+            # Bring in shell vars as local vars
+            locals().update({k:v for k,v in os.environ.items() if "." not in k})
        
             print('Opening file %s...' %(OUTADAPTIVEINTERVALS))
             if not os.path.exists(OUTADAPTIVEINTERVALS):
@@ -271,7 +284,7 @@
                         continue
                     ras=''
                     decs=''
-                    for ipixel in range(NUMBER_PIXELS_RUNS):
+                    for ipixel in range(int(NUMBER_PIXELS_RUNS)):
                         if iStream < n_rois:
                             ra,dec=rois[iStream].split()
                             ras+='%s ' % ra
@@ -471,10 +484,25 @@
     </process>
     
     <process name="submit_LLE_jobs" site="${JOBSITE}">
-      <script><![CDATA[
-         import os
+      <job maxCPU="60" batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS}${GPL_XTRABATCHRESOURCES}"><![CDATA[
+         #!/usr/bin/env python3
+         import os, sys
+
+         def pipeline_set(key, value):
+            with open(os.environ["PIPELINE_SUMMARY"], "a") as f:
+                f.write("Pipeline.%s: %s\n" %(key, value))
+             
+         def pipeline_stream(task, stream, args):
+            with open(os.environ["PIPELINE_SUMMARY"], "a") as f:
+                f.write("PipelineCreateStream.%s.%d: %s\n" %(task, int(stream), args))
+         
+         # Bring in shell vars as local vars
+         locals().update({k:v for k,v in os.environ.items() if "." not in k})
+
          print('Opening file %s...' %(OUTLLEINTERVALS))
-         if os.path.exists(OUTLLEINTERVALS):
+         if not os.path.exists(OUTLLEINTERVALS):
+             print('File %s does not exist!' % (OUTLLEINTERVALS))
+         else:
              roi_list = open(OUTLLEINTERVALS, 'r')
              rois=roi_list.readlines()
              n_rois=len(rois)
@@ -491,13 +519,9 @@
                      iStream+=1
                      continue
                  args='OBJ_RA="%s",OBJ_DEC="%s",TSTART="%s",TSTOP="%s"' %(ra,dec,t0,t1)
-                 # print('args=',args)
-                 pipeline.createSubstream("LLE_Analysis",iStream+1,args)                 
+                 pipeline_stream("LLE_Analysis",iStream+1,args)
                  iStream+=1
-                 pass
-         else: 
-             print('File %s does not exist!' % (OUTLLEINTERVALS))
-      ]]></script>
+      ]]></job>
       <depends>
         <after process="LLE_time_intervals"></after>
       </depends>
