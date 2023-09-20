@@ -268,11 +268,11 @@
             # Bring in shell vars as local vars
             locals().update({k:v for k,v in os.environ.items() if "." not in k})
        
-            print('Opening file %s...' %(OUTADAPTIVEINTERVALS))
-            if not os.path.exists(OUTADAPTIVEINTERVALS):
-                print('File %s does not exist!' % (OUTADAPTIVEINTERVALS))
+            print('Opening file %s...' %(OUTLIST))
+            if not os.path.exists(OUTLIST):
+                print('File %s does not exist!' % (OUTLIST))
             else:
-                roi_list = open(OUTADAPTIVEINTERVALS, 'r')
+                roi_list = open(OUTLIST, 'r')
                 rois=roi_list.readlines()
                 n_rois=len(rois)
                 print('Number of ROI....:',n_rois)
