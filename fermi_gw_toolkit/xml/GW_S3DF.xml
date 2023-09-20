@@ -8,7 +8,7 @@
      2023-09-07 NDL: updated for s3df
     -->
   <task name="GWFUP-S3DF"
-        version="0.8"
+        version="0.9"
         type="Data">
     
     <notation>
