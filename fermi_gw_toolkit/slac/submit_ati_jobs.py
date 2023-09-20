@@ -33,8 +33,8 @@ else:
                 iStream+=1
             if iStream == n_rois:
                 continue
-        args='OBJ_RA="%s", OBJ_DEC="%s", TSTARTS="%s", TSTOPS="%s", SUBDIR="ADAPTIVEINTERVAL"' %(ras,decs,tstarts,tstops)
-        # print('args=',args)
+        args='OBJ_RA="%s",OBJ_DEC="%s",TSTARTS="%s",TSTOPS="%s",SUBDIR="ADAPTIVEINTERVAL"' %(ras[:-1],decs[:-1],tstarts[:-1],tstops[:-1])
+        print('args=',args)
         print("pipelineCreateStream %s %d %s" %("ATI_Likelihood",iStream+1,args))
 EOF
 python3 -c "$script" | sh
