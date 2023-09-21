@@ -103,7 +103,7 @@ def parse_notice(record, test=False):
             os.system(cmd)
 
             time.sleep(2)
-            conf_email = 'mail -r ndilalla@stanford.edu -s "GWFUP Pipeline: GCN notice received and pipeline triggered for %s" ndilalla@stanford.edu <<< "%s" ' % (triggername, record)
+            conf_email = 'echo "%s" | mail -r ndilalla@stanford.edu -s "GWFUP Pipeline: GCN notice received and pipeline triggered for %s" ndilalla@stanford.edu' % (record, triggername)
             print(conf_email)
             os.system(conf_email)
             time.sleep(5)

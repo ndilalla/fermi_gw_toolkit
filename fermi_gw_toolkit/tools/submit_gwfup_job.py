@@ -200,10 +200,10 @@ if __name__=='__main__':
         os.system('rm %s' % small_file)
     else: 
         os.system(cmd)
-        conf_email='mail -r nicola.omodei@gmail.com -s "GWFUP Pipeline: Job submitted for %s " nicola.omodei@gmail.com <  %s' %(TRIGGERNAME,small_file)
+        conf_email='cat %s | mail -r nicola.omodei@gmail.com -s "GWFUP Pipeline: Job submitted for %s %s " nicola.omodei@gmail.com' % (small_file, TRIGGERNAME, VERSION)
         print(conf_email)
         os.system(conf_email)
-        conf_email='mail -r ndilalla@stanford.edu -s "GWFUP Pipeline: Job submitted for %s " ndilalla@stanford.edu <  %s' %(TRIGGERNAME,small_file)
+        conf_email='cat %s | mail -r ndilalla@stanford.edu -s "GWFUP Pipeline: Job submitted for %s %s " ndilalla@stanford.edu' %(small_file, TRIGGERNAME, VERSION)
         print(conf_email)
         os.system(conf_email)
         #conf_email='mail -r nicola.omodei@gmail.com -s "GWFUP Pipeline: Job submitted for %s " o2x6m0g8y0j6y5i7@fermi-lat.slack.com <  %s' %(TRIGGERNAME,small_file)

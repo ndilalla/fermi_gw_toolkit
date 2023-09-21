@@ -9,15 +9,14 @@ python ${FERMI_GWTOOLS}/bin/show_results.py --triggername ${TRIGGERNAME} --trigg
 
 echo https://s3df.slac.stanford.edu/pun/sys/dashboard/files/fs//sdf/group/fermi/n/u26/GWFUP/output/${TRIGGERNAME}/${VERSION} > ${OUTPUT_FILE_PATH}/msg.txt
 
-#mail -s "Results ${TRIGGERNAME} ${VERSION} ready" nicola.omodei@gmail.com <  ${OUTPUT_FILE_PATH}/msg.txt
-mail -r nicola.omodei@gmail.com -s "GWFUP Pipeline: Results for ${TRIGGERNAME} ${VERSION} ready" nicola.omodei@gmail.com <  ${OUTPUT_FILE_PATH}/msg.txt
+cat ${OUTPUT_FILE_PATH}/msg.txt | mail -r nicola.omodei@gmail.com -s "GWFUP Pipeline: Results for ${TRIGGERNAME} ${VERSION} ready" nicola.omodei@gmail.com
 
-mail -r ndilalla@stanford.edu -s "GWFUP Pipeline: Results for ${TRIGGERNAME} ${VERSION} ready" ndilalla@stanford.edu <  ${OUTPUT_FILE_PATH}/msg.txt
+cat ${OUTPUT_FILE_PATH}/msg.txt | mail -r ndilalla@stanford.edu -s "GWFUP Pipeline: Results for ${TRIGGERNAME} ${VERSION} ready" ndilalla@stanford.edu
 
 # this sends the mail to the SLAC fermigw channel:
 #mail -r nicola.omodei@gmail.com -s "GWFUP Pipeline: Results for ${TRIGGERNAME} ${VERSION} ready" o2x6m0g8y0j6y5i7@fermi-lat.slack.com <  ${OUTPUT_FILE_PATH}/msg.txt
 
-#mail -r nicola.omodei@gmail.com -s "GWFUP Pieline: Results for ${TRIGGERNAME} ${VERSION} ready" balist@glast2.stanford.edu <  ${OUTPUT_FILE_PATH}/msg.txt
+#mail -r nicola.omodei@gmail.com -s "GWFUP Pipeline: Results for ${TRIGGERNAME} ${VERSION} ready" balist@glast2.stanford.edu <  ${OUTPUT_FILE_PATH}/msg.txt
 
 # this triggers the copy to stanford
 #chmod a+w $GPL_TASKROOT/status/running/${TRIGGERNAME}_${VERSION}.txt
