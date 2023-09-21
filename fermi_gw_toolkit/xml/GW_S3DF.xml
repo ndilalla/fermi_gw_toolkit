@@ -8,7 +8,7 @@
      2023-09-07 NDL: updated for s3df
     -->
   <task name="GWFUP-S3DF"
-        version="0.9"
+        version="0.10"
         type="Data">
     
     <notation>
@@ -315,7 +315,7 @@
       </depends>
     </process>
     
-    <process name="FTI_fill_maps">
+    <process name="FTI_fill_maps" site="${JOBSITE}">
       <job
          executable="${GPL_CONFIGDIR}/FTI_fill_maps.sh"
          batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS}${GPL_XTRABATCHRESOURCES}"
@@ -325,7 +325,7 @@
       </depends>
     </process>
 
-    <process name="FTI_plot_ULmap">
+    <process name="FTI_plot_ULmap" site="${JOBSITE}">
       <job
          executable="${GPL_CONFIGDIR}/FTI_plot_ULmap.sh"
          batchOptions="${GPL_BATCHOPTIONS} ${GPL_XTRABATCHOPTIONS}${GPL_XTRABATCHRESOURCES}"

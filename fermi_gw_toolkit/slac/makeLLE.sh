@@ -6,10 +6,7 @@ cd $stage
 echo PWD=$PWD
 export HOME=$PWD
 source ${GPL_TASKROOT}/set_env/gtgrb_py39.sh
-echo $LLEIFILE
-
-mkdir -pv ${PWD}/pfiles
-export PFILES=${PWD}/pfiles:$PFILES
+export PATH=${GRBSW}/bbbd/scripts:${PATH}
 
 which bbbd_lle.py
 which makeLLE.py
