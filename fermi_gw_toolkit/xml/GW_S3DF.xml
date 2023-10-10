@@ -8,7 +8,7 @@
      2023-09-07 NDL: updated for s3df
     -->
   <task name="GWFUP-S3DF"
-        version="0.10"
+        version="0.11"
         type="Data">
     
     <notation>
@@ -40,7 +40,7 @@
       <var name="JOBSITE">S3DFDATA</var>
       <var name="WALL_TIME"> 2:00:00 </var>                 <!-- Two hours by default. Format:       H:M:S -->
       <var name="MAX_CPU">1</var>
-      <var name="GPL_BATCHOPTIONS">--time ${WALL_TIME} --partition ${GPL_BATCHRESOURCES} --account fermi</var>
+      <var name="GPL_BATCHOPTIONS">--time ${WALL_TIME} --partition ${GPL_BATCHRESOURCES} --account fermi:other-pipelines</var>
 
       <!-- Control which parts of the analysis to run -->
       <var name="RUN_ATI">1</var>
