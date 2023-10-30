@@ -16,6 +16,7 @@ from confluent_kafka import KafkaError
 from datetime import datetime
 
 from fermi_gw_toolkit import FERMI_GW_ROOT, GPL_TASKROOT
+from fermi_gw_toolkit.tools.config import client_id, client_secret
 
 skipped_folder = os.path.join(GPL_TASKROOT, 'status', 'skipped')
 running_folder = os.path.join(GPL_TASKROOT, 'status', 'running')
@@ -136,10 +137,8 @@ if __name__=='__main__':
               'auto.offset.reset': 'earliest',
               'enable.auto.commit': False,
               'enable.partition.eof': True}
-
-    consumer = Consumer(config=config,
-                        client_id='1i0tpesjn3drie7jkgup3tvvij',
-                        client_secret='1em1btqb3bggvbs1d85v6a9kgt34k7s8vsm5bket1edvsavg0oa1')
+    consumer = Consumer(config=config, client_id=client_id,
+                        client_secret=client_secret)
     consumer.subscribe(['igwn.gwalert'])
 
     print('GWFUP scheduler successfully started on ', datetime.now())
