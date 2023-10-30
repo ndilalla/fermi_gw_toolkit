@@ -70,7 +70,7 @@ if __name__=='__main__':
     parser.add_argument("--force", help="Force the job submission", action='store_true')
     args = parser.parse_args()
 
-    print('GWFUP submitter successfully started on ', datetime.now())
+    print('GWFUP-S3DF submitter successfully started on ', datetime.now())
     print('Using %s with PID %s' % (socket.getfqdn(), os.getpid()))
     
     WEB_URL  = args.url
@@ -200,10 +200,10 @@ if __name__=='__main__':
         os.system('rm %s' % small_file)
     else: 
         os.system(cmd)
-        conf_email='cat %s | mail -r nicola.omodei@gmail.com -s "GWFUP Pipeline: Job submitted for %s %s " nicola.omodei@gmail.com' % (small_file, TRIGGERNAME, VERSION)
+        conf_email='cat %s | mail -r nicola.omodei@gmail.com -s "GWFUP-S3DF Pipeline: Job submitted for %s %s " nicola.omodei@gmail.com' % (small_file, TRIGGERNAME, VERSION)
         print(conf_email)
         os.system(conf_email)
-        conf_email='cat %s | mail -r ndilalla@stanford.edu -s "GWFUP Pipeline: Job submitted for %s %s " ndilalla@stanford.edu' %(small_file, TRIGGERNAME, VERSION)
+        conf_email='cat %s | mail -r ndilalla@stanford.edu -s "GWFUP-S3DF Pipeline: Job submitted for %s %s " ndilalla@stanford.edu' %(small_file, TRIGGERNAME, VERSION)
         print(conf_email)
         os.system(conf_email)
         #conf_email='mail -r nicola.omodei@gmail.com -s "GWFUP Pipeline: Job submitted for %s " o2x6m0g8y0j6y5i7@fermi-lat.slack.com <  %s' %(TRIGGERNAME,small_file)

@@ -104,7 +104,7 @@ def parse_notice(record, test=False):
             os.system(cmd)
 
             time.sleep(2)
-            conf_email = 'echo "%s" | mail -r ndilalla@stanford.edu -s "GWFUP Pipeline: GCN notice received and pipeline triggered for %s" ndilalla@stanford.edu' % (record, triggername)
+            conf_email = 'echo "%s" | mail -r ndilalla@stanford.edu -s "GWFUP-S3DF Pipeline: GCN notice received and pipeline triggered for %s" ndilalla@stanford.edu' % (record, triggername)
             print(conf_email)
             os.system(conf_email)
             time.sleep(5)
@@ -120,7 +120,7 @@ def parse_notice(record, test=False):
         #return False
 
 if __name__=='__main__':
-    __description__= 'Scheduler for GWFUP using kafka broker.'
+    __description__= 'Scheduler for GWFUP-S3DF using kafka broker.'
     formatter = argparse.ArgumentDefaultsHelpFormatter
     parser    = argparse.ArgumentParser(description=__description__,
                                         formatter_class=formatter)
@@ -133,7 +133,7 @@ if __name__=='__main__':
         sys.exit()
 
     # Connect as a consumer.
-    config = {'group.id': 'GWFUP',
+    config = {'group.id': 'GWFUP-S3DF',
               'auto.offset.reset': 'earliest',
               'enable.auto.commit': False,
               'enable.partition.eof': True}
@@ -141,7 +141,7 @@ if __name__=='__main__':
                         client_secret=client_secret)
     consumer.subscribe(['igwn.gwalert'])
 
-    print('GWFUP scheduler successfully started on ', datetime.now())
+    print('GWFUP-S3DF scheduler successfully started on ', datetime.now())
     print('Using %s with PID %s' % (socket.getfqdn(), os.getpid()))
 
     continue_listening = True
