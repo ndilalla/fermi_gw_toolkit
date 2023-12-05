@@ -12,7 +12,7 @@ from fermi_gw_toolkit.utils.gcn_info import get_info
 from fermi_gw_toolkit.lib.local_database import gw_local_database
 
 local_dir = os.path.join(GPL_TASKROOT, 'output')
-stanford_dir = '/var/www/html/FermiGRB/GWFUP/'
+stanford_dir = '/var/www/html/FermiGRB/GWFUP-S3DF/'
 try:
     _db_file = os.environ['GW_DB_FILE_PATH']
 except:

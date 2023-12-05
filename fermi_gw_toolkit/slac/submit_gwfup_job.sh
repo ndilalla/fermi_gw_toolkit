@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /nfs/farm/g/glast/u26/GWFUP/
+cd /sdf/data/fermi/n/u26/GWFUP/
 
 source set_env/setup_gwfup.sh
 

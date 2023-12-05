@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-export GPL_TASKROOT=/nfs/farm/g/glast/u26/GWFUP/
+export GPL_TASKROOT=/sdf/data/fermi/n/u26/GWFUP/
 export DONE_DIR=$GPL_TASKROOT/status/done/
 date
 
