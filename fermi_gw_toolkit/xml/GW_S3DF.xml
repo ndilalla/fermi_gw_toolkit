@@ -8,7 +8,7 @@
      2023-09-07 NDL: updated for s3df
     -->
   <task name="GWFUP-S3DF"
-        version="0.13"
+        version="0.14"
         type="Data">
     
     <notation>
@@ -348,7 +348,7 @@
     <process name="weight_bayesian_ul" site="${JOBSITE}">
       <job
          executable="${GPL_CONFIGDIR}/weight_bayesian_ul.sh"
-         batchOptions="${GPL_BATCHOPTIONS} --cpus-per-task=1 --mem-per-cpu=80gb ${GPL_XTRABATCHRESOURCES}$"
+         batchOptions="${GPL_BATCHOPTIONS} --mem=16gb ${GPL_XTRABATCHRESOURCES}$"
          />
       <depends>
         <after process="FTI_fill_maps"></after>
