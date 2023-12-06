@@ -8,6 +8,17 @@ export HOME=$PWD
 source ${GPL_TASKROOT}/set_env/gtgrb_py39.sh
 #export PATH=${GRBSW}/bbbd/scripts:${PATH}
 
+export PFILES=".;$PFILES:$GPL_TASKROOT/pfiles:$HEADAS/syspfiles:$CONDA_PREFIX/share/fermitools/syspfiles"
+export PFILES=${PWD}/pfiles:$PFILES
+mkdir -pv ${PWD}/pfiles
+
+chmod 777 /sdf/group/fermi/g/grb/GBMTRIGCAT-v2/pfiles/fchecksum.par
+chmod 777 /sdf/group/fermi/g/grb/GBMTRIGCAT-v2/pfiles/fmerge.par
+chmod 777 /sdf/group/fermi/g/grb/GBMTRIGCAT-v2/pfiles/fcopy.par
+chmod 777 /sdf/group/fermi/g/grb/GBMTRIGCAT-v2/pfiles/gtbin.par
+chmod 777 /sdf/group/fermi/g/grb/GBMTRIGCAT-v2/pfiles/gtmktime.par
+chmod 777 /sdf/group/fermi/g/grb/GBMTRIGCAT-v2/pfiles/gtselect.par
+
 which bbbd_lle.py
 which makeLLE.py
 
