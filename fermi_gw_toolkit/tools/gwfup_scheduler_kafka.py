@@ -78,6 +78,7 @@ def parse_notice(record, test=False):
         skymap_str = record.get('event', {}).pop('skymap')
         print('Notice content:')
         pprint(record)
+        return True
         if skymap_str:
             # Decode, parse skymap, and print most probable sky location
             skymap_bytes = b64decode(skymap_str)

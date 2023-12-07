@@ -72,7 +72,7 @@ def make_copy(file_path, outfolder):
     _copy(pgw, outfolder + '/images/')
     fti =  os.path.join(os.path.dirname(file_path), 'FIXEDINTERVAL', '*map.png')
     _copy(fti, outfolder + '/images/')
-    time.sleep(60)
+    time.sleep(30)
 
 def copy_event(name, db_dict, version=None, overwrite=False):
     db_update = False
