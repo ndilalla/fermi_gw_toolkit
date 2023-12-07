@@ -349,7 +349,7 @@
     <process name="weight_bayesian_ul" site="${JOBSITE}">
       <job
          executable="${GPL_CONFIGDIR}/weight_bayesian_ul.sh"
-         batchOptions="${GPL_BATCHOPTIONS} ${MAX_MEM} ${GPL_XTRABATCHOPTIONS}$ ${GPL_XTRABATCHRESOURCES}$"
+         batchOptions="${GPL_BATCHOPTIONS} ${MAX_MEM} ${GPL_XTRABATCHOPTIONS} ${GPL_XTRABATCHRESOURCES}"
          />
       <depends>
         <after process="FTI_fill_maps"></after>
