@@ -87,8 +87,13 @@ def parse_notice(record, test=False):
             mo_skymap_path = os.path.join(input_dir, mo_skymap_name)
             skymap.write(mo_skymap_path, overwrite=True)
             
-            flat_skymap_name = '%s_flatten.fits.gz' % superevent_id
+            flat_skymap_name = '%s_flatten_v01.fits.gz' % superevent_id
             flat_skymap_path = os.path.join(input_dir, flat_skymap_name)
+            version = 1
+            while os.path.exists(flat_skymap_path):
+                flat_skymap_path.replace('_v%02d' % version,\
+                                         '_v%02d' % version + 1)
+                version += 1
 
             print('Running ligo-skymap-flatten to get a flat skymap.')
             cmd = 'ligo-skymap-flatten %s %s' % \
