@@ -27,8 +27,11 @@ def getfromfile(filename):
     
 def getfromweb(url):
     # https://gracedb.ligo.org/api/superevents/S190706ai/files/LALInference.offline.fits.gz
-    name = url.replace('https://gracedb.ligo.org/api/superevents/','').split('/files/')[0]
-    extension  = url.replace('https://gracedb.ligo.org/api/superevents/','').split('/files/')[-1].split('.')[0]
+    api = 'apiweb'
+    if api not in url:
+        api = 'api'
+    name = url.replace('https://gracedb.ligo.org/%s/superevents/' % api,'').split('/files/')[0]
+    extension  = url.replace('https://gracedb.ligo.org/%s/superevents/' % api,'').split('/files/')[-1].split('.')[0]
     out_name = '%s_%s.fits' %(name,extension)
     trigger_name = 'bn%s' % name
     out_file = '%sinput/input_maps/%s' % (GPL_TASKROOT, out_name)
@@ -57,7 +60,7 @@ if __name__=='__main__':
     
     parser.add_argument("--url", help="Web URL of the grace map", type=str, required=False, default=None)
     parser.add_argument("--file", help="Web URL of the grace map", type=str, required=False, default=None)
-    parser.add_argument("--version", help="Version number, for multiple excecutions", type=str, default='v01')
+    parser.add_argument("--version", help="Starting version number for multiple executions", type=str, default='v01')
     parser.add_argument("--irfs", help="Instrument Response Function", type=str,default='p8_source')
     parser.add_argument("--nside", help="Rescale the MAP to NSIDE", type=int,default=64)
     parser.add_argument("--run_pgwave", help="Run PG wave analysis ONLY", type=bool,default=False)
@@ -94,7 +97,14 @@ if __name__=='__main__':
         VERSION = 'v%02d' % (VNUM+1)
         _outputdir='%soutput/%s/%s' % (GPL_TASKROOT, TRIGGERNAME, VERSION)
         #print('OUTPUT DIRECTORY %s EXISTS!' % _outputdir)
-        pass
+
+    small_file = '%sstatus/running/%s_%s.txt' % (GPL_TASKROOT, TRIGGERNAME, VERSION)
+    while os.path.exists(small_file):
+        print('WARNING: Event %s %s is already running' % (TRIGGERNAME, VERSION))
+        VNUM = int(VERSION.replace('v', ''))
+        VERSION = 'v%02d' % (VNUM+1)
+        print('New version number: %s' % VERSION)
+        small_file = '%sstatus/running/%s_%s.txt' % (GPL_TASKROOT, TRIGGERNAME, VERSION)
     
     TSTART    =  0
     TSTOP     =  10000
@@ -140,18 +150,12 @@ if __name__=='__main__':
         cmd+='--define RUN_FTI=0 '
         cmd+='--define RUN_LLE=0 '
         cmd+='--define RUN_PGW=1 '
-        pass
 
-    small_file = '%sstatus/running/%s_%s.txt' % (GPL_TASKROOT, TRIGGERNAME, VERSION)
-    if os.path.exists(small_file):
-        print('Event %s already running' % TRIGGERNAME)
-        sys.exit()
-    else:
-        txt = cmd.replace('--define','\n --define')
-        with open(small_file,'w') as f:
-            f.write(txt)
-        _cmd ='chmod 777 %s' % small_file
-        os.system(_cmd)
+    txt = cmd.replace('--define','\n --define')
+    with open(small_file, 'w') as f:
+        f.write(txt)
+    _cmd ='chmod 777 %s' % small_file
+    os.system(_cmd)
 
     ok = False
     padding = 1000
