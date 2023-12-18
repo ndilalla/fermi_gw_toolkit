@@ -8,7 +8,7 @@
      2023-09-07 NDL: updated for s3df
     -->
   <task name="GWFUP-S3DF"
-        version="1.0"
+        version="1.1"
         type="Data">
     
     <notation>
@@ -36,7 +36,7 @@
       <!-- <var name="GPL_ALLOGRP">glastgrp</var> -->
       <var name="GPL_BATCHRESOURCES">milano</var>
       <var name="GPL_XTRABATCHRESOURCES"></var>         <!-- intentionally left EMPTY - for rollback -->
-      <var name="GPL_XTRABATCHOPTIONS">--mem 8gb</var>
+      <var name="GPL_XTRABATCHOPTIONS"></var>
       <var name="JOBSITE">S3DFDATA</var>
       <var name="WALL_TIME"> 2:00:00 </var>                 <!-- Two hours by default. Format:       H:M:S -->
       <var name="MAX_CPU">1</var>
@@ -349,7 +349,7 @@
     <process name="weight_bayesian_ul" site="${JOBSITE}">
       <job
          executable="${GPL_CONFIGDIR}/weight_bayesian_ul.sh"
-         batchOptions="${GPL_BATCHOPTIONS} ${MAX_MEM} ${GPL_XTRABATCHRESOURCES}"
+         batchOptions="${GPL_BATCHOPTIONS} ${MAX_MEM} ${GPL_XTRABATCHOPTIONS}${GPL_XTRABATCHRESOURCES}"
          />
       <depends>
         <after process="FTI_fill_maps"></after>
