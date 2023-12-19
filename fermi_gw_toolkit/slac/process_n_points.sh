@@ -12,6 +12,10 @@ else
     setenv TAR_STAGE None
 endif
 
+echo "Beginning"
+ls -lh
+du -h
+
 cp $FT2_PATH $FT2_PATH_STAGE
 cp -r $OUTPUT_FILE_PATH/$TRIGGERNAME $stage/.
 setenv OUTPUT_FILE_PATH_STAGE $stage
@@ -28,11 +32,18 @@ ls
 echo 'sourcing the setup script!'
 source $GPL_TASKROOT/set_env/setup_gwfup.csh
 
+echo "Before running the script"
+ls -lh
+du -h
+
 set echo
 
 echo 'About run the process_n_points.py script...'
 python ${FERMI_GWTOOLS}/bin/process_n_points.py $TRIGGERNAME --ra $OBJ_RA --dec $OBJ_DEC --roi $ROI --tstarts ${MET_TSTART} --tstops ${MET_TSTOP} --irf $IRFS --galactic_model $GAL_MODEL --particle_model "$PART_MODEL" --tsmin $TSMIN --emin $EMIN --emax $EMAX --zmax $ZMAX --strategy $STRATEGY --thetamax $THETAMAX --datarepository $OUTPUT_FILE_PATH_STAGE --ulphindex $UL_INDEX --ft2 $FT2_PATH_STAGE --src $SRC --burn_in $BURN_IN --n_samples $N_SAMPLES --bayesian_ul $BAYESIAN_UL --sim_ft1_tar $TAR_STAGE --do_tsmap $DO_TSMAP
 
+echo "After running the script"
+ls -lh
+du -h
 
 mkdir -p $OUTPUT_FILE_PATH/$SUBDIR
 set nonomatch x=(${TRIGGERNAME}_*_res.txt)
@@ -73,5 +84,12 @@ if ( -e $k[1] ) then
 else
     echo "No TSMAP and CMAP found!"
 endif
+
+echo "End"
+ls -lh
+du -h
+
+echo 'Removing staging directory:'
+rm -rf $stage
 
 echo "Done!"

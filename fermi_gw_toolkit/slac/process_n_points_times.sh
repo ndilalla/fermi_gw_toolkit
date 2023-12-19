@@ -4,14 +4,32 @@ echo 'Create a staging directory:'
 setenv stage ${LSCRATCH}
 echo $stage
 cd $stage
+
+echo "Beginning"
+ls -lh
+du -h
+
+cp -r $OUTPUT_FILE_PATH/$TRIGGERNAME $stage/.
+setenv OUTPUT_FILE_PATH_STAGE $stage
+
 echo PWD=$PWD
+ls
+
 echo 'sourcing the setup script!'
 source $GPL_TASKROOT/set_env/setup_gwfup.csh
+
+echo "Before running the script"
+ls -lh
+du -h
 
 set echo
 
 echo 'About run the process_n_points_times.py script...'
-python ${FERMI_GWTOOLS}/bin/process_n_points_times.py $TRIGGERNAME --ra $OBJ_RA --dec $OBJ_DEC --roi $ROI --tstarts $TSTARTS --tstops $TSTOPS --irf $IRFS --galactic_model $GAL_MODEL --particle_model "$PART_MODEL" --tsmin $TSMIN --emin $EMIN --emax $EMAX --zmax $ZMAX --strategy $STRATEGY --thetamax $THETAMAX --datarepository $OUTPUT_FILE_PATH --ulphindex $UL_INDEX
+python ${FERMI_GWTOOLS}/bin/process_n_points_times.py $TRIGGERNAME --ra $OBJ_RA --dec $OBJ_DEC --roi $ROI --tstarts $TSTARTS --tstops $TSTOPS --irf $IRFS --galactic_model $GAL_MODEL --particle_model "$PART_MODEL" --tsmin $TSMIN --emin $EMIN --emax $EMAX --zmax $ZMAX --strategy $STRATEGY --thetamax $THETAMAX --datarepository $OUTPUT_FILE_PATH_STAGE --ulphindex $UL_INDEX
+
+echo "After running the script"
+ls -lh
+du -h
 
 mkdir -p $OUTPUT_FILE_PATH/$SUBDIR
 set nonomatch x=(${TRIGGERNAME}_*_res.txt)
@@ -21,5 +39,12 @@ if ( -e $x[1] ) then
 else
     echo "No results file found!"
 endif
+
+echo "End"
+ls -lh
+du -h
+
+echo "Removing staging directory"
+rm -rf $stage
 
 echo 'Done!'

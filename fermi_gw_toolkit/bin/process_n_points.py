@@ -23,6 +23,14 @@ def _execute_command(cmd_line):
 
     subprocess.check_call(cmd_line, shell=True)
 
+def _ls_du(directory, message=None):
+    if message is not None:
+        print(message)
+    cmd = 'ls -lh %s' % directory
+    os.system(cmd)
+    cmd = 'du -h %s' % directory
+    os.system(cmd)
+
 def _chdir_rmdir(init_dir, subfolder_dir):
     print("Returning to: %s" % init_dir)
     os.chdir(init_dir)
@@ -125,6 +133,8 @@ if __name__ == "__main__":
             _chdir_rmdir(init_dir, subfolder_dir)
             continue
         
+        _ls_du(init_dir, 'After doTimeResolved')
+
         # Check the output TS and if it's greater than a given threshold do the
         # ts map
         print('Checking whether TS value is above threshold...')
@@ -185,6 +195,8 @@ if __name__ == "__main__":
                 continue
             pass
         
+        _ls_du(init_dir, 'After bayesian_ul')
+
         # If do_tsmap option is 1 run the gtdotsmap script
         
         if do_tsmap == 1:
@@ -252,6 +264,8 @@ if __name__ == "__main__":
             fits2png.fitsToPNG(outfits, outfits.replace('.fits', '.png'), 
                                sources=sources)
             pass
+
+        _ls_du(init_dir, 'After do_tsmap')
         
         # See whether we need to run on simulated data
 
@@ -277,5 +291,8 @@ if __name__ == "__main__":
             _execute_command(cmd_line)
             pass
         _chdir_rmdir(init_dir, subfolder_dir)
+        
+        _ls_du(init_dir, 'After removal of subdir.')
+
         print('Done!')
         

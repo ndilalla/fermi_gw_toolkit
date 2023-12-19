@@ -6,6 +6,14 @@ import os
 import argparse
 import subprocess
 
+def _ls_du(directory, message=None):
+    if message is not None:
+        print(message)
+    cmd = 'ls -lh %s' % directory
+    os.system(cmd)
+    cmd = 'du -h %s' % directory
+    os.system(cmd)
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(prog='process_n_points_times')
@@ -21,6 +29,8 @@ if __name__ == "__main__":
     # parameters
 
     args, everything_else = parser.parse_known_args()
+
+    init_dir = os.getcwd()
 
     # Add " " to all parameters
 
@@ -61,6 +71,9 @@ if __name__ == "__main__":
                 (ra, dec))
             print(err)
             print(err.output)
+        finally:
+            _ls_du(init_dir, 'After doTimeResolved')
             if os.path.exists(subfolder_dir):
+                print("Removing: %s" % subfolder_dir)
                 os.system('rm -rf %s' % subfolder_dir)
-            continue
+                _ls_du(init_dir, 'After removal of subdir.')
