@@ -12,13 +12,13 @@ init = 800
 end = -1
 output_dir = os.path.join(GPL_TASKROOT, 'output')
 
-good = ['bnS231229bm', 'bnS231229c', 'bnS231227ba', 'bnS231227ay', 'bnS231227ao', 'bnS231227am', 'bnS231227b', 'bnS231226ce', 'bnS231226bm']
+good = ['bnS231229c', 'bnS231227ba', 'bnS231227ay', 'bnS231227ao', 'bnS231227am', 'bnS231227b', 'bnS231226ce', 'bnS231226bm']
 
 for evt in good:
     print('Processing %s' % evt)
-    fti_dirs = sorted(glob('%s/%s/*/FIXEDINTERVAL/' % (evt, output_dir)))
+    fti_dirs = sorted(glob('%s/%s/*/FIXEDINTERVAL/' % (output_dir, evt)))
     print('Found %d FTI folders.' % len(fti_dirs))
-    ati_dirs = sorted(glob('%s/%s/*/ADAPTIVEINTERVAL/' % (evt, output_dir)))
+    ati_dirs = sorted(glob('%s/%s/*/ADAPTIVEINTERVAL/' % (output_dir, evt)))
     print('Found %d ATI folders.' % len(ati_dirs))
 
     #print('Processing the first %d' % len(fti_dirs[init:end]))
