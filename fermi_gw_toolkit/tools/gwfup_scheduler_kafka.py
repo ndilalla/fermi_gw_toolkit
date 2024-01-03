@@ -91,8 +91,8 @@ def parse_notice(record, test=False):
             flat_skymap_path = os.path.join(input_dir, flat_skymap_name)
             version = 1
             while os.path.exists(flat_skymap_path):
-                flat_skymap_path.replace('_v%02d' % version,\
-                                         '_v%02d' % (version + 1))
+                flat_skymap_path = flat_skymap_path.replace('_v%02d' % version,\
+                                                    '_v%02d' % (version + 1))
                 version += 1
 
             print('Running ligo-skymap-flatten to get a flat skymap.')
