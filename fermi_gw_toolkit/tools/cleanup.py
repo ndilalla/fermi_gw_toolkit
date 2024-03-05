@@ -9,7 +9,7 @@ from fermi_gw_toolkit import GPL_TASKROOT
 #                                     formatter_class=formatter)
 # parser.add_argument("--init", help="Rescale the MAP to NSIDE", type=int,default=None)
 init = 800
-end = -10
+end = -15
 
 output_dir = os.path.join(GPL_TASKROOT, 'output')
 fti_dirs = sorted(glob('%s/*/*/FIXEDINTERVAL/' % (output_dir)))
@@ -17,9 +17,9 @@ print('Found %d FTI folders.' % len(fti_dirs))
 ati_dirs = sorted(glob('%s/*/*/ADAPTIVEINTERVAL/' % (output_dir)))
 print('Found %d ATI folders.' % len(ati_dirs))
 
-print('Processing the first %d' % len(fti_dirs[init:end]))
+print('Processing the first %d' % len(fti_dirs[init:]))#end]))
 
-for fti_dir, ati_dir in zip(fti_dirs[init:end], ati_dirs[init:end]):
+for fti_dir, ati_dir in zip(fti_dirs[init:end], ati_dirs[init:]):#end]):
     npz_files = glob('%s/*_bayesian_ul*.npz' % fti_dir)
     for npz_file in npz_files:
         os.remove(npz_file)
