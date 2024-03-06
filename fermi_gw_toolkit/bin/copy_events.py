@@ -7,16 +7,17 @@ import argparse
 import pickle
 from glob import glob
 from astropy.time import Time
-from fermi_gw_toolkit import GPL_TASKROOT#, DECORATOR_PATH
+from fermi_gw_toolkit import GPL_TASKROOT
 from fermi_gw_toolkit.utils.gcn_info import get_info
+from fermi_gw_toolkit.utils.slack import send_chat
 from fermi_gw_toolkit.lib.local_database import gw_local_database
 
 local_dir = os.path.join(GPL_TASKROOT, 'output')
-stanford_dir = '/var/www/html/FermiGRB/GWFUP-S3DF/'
+stanford_dir = '/var/www/html/FermiGRB/GWFUP/'
 try:
     _db_file = os.environ['GW_DB_FILE_PATH']
 except:
-    _db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4_events.pkl')
+    _db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4b_events.json')
 
 formatter = argparse.ArgumentDefaultsHelpFormatter
 parser = argparse.ArgumentParser(formatter_class=formatter)
@@ -65,6 +66,7 @@ def _copy(file_path, outfolder, outname=''):
 def make_copy(file_path, outfolder):
     _mkdir(outfolder + '/images')
     new_name = os.path.basename(file_path).replace('_fixed.html', '.html')
+    html_path = os.path.join(outfolder, new_name)
     _copy(file_path, outfolder, new_name)
     img_folder = os.path.join(os.path.dirname(file_path), 'images')
     _copy(img_folder, outfolder)
@@ -73,8 +75,9 @@ def make_copy(file_path, outfolder):
     fti =  os.path.join(os.path.dirname(file_path), 'FIXEDINTERVAL', '*map.png')
     _copy(fti, outfolder + '/images/')
     time.sleep(30)
+    return html_path
 
-def copy_event(name, db_dict, version=None, overwrite=False):
+def copy_event(name, db_dict, version=None, overwrite=False, send_alert=True):
     db_update = False
     grace_name = name.replace('bn', '')
     gw_info = get_info(grace_name)
@@ -121,7 +124,7 @@ def copy_event(name, db_dict, version=None, overwrite=False):
         print('Copying %s (%s) to Stanford...' % (name, version))
         remove = os.path.join(local_dir, name, version) + '/'
         new_path = fix_html(path, remove)
-        make_copy(new_path, outfolder)
+        html_path = make_copy(new_path, outfolder)
         db_dict.set_value(name, version, 'Copied', True)
     
         db_update = True
@@ -140,6 +143,18 @@ def copy_event(name, db_dict, version=None, overwrite=False):
                          'Significant', 'HasMassGap', 'HasNS', 'HasRemnant']
             _info = {_key:gw_info[_key] for _key in _keys}
             db_dict.update(name, version, _info)
+        
+        if send_alert:
+            ati_ts = db_dict.get_value(name, version, "Ati_ts")
+            fti_ts = db_dict.get_value(name, version, "Fti_ts")
+            if ati_ts >= 25 or fti_ts >= 25:
+                msg = "*Significant detection for %s (%s):*\n\n" %\
+                      (name, version)
+                msg += "Analysis report: %s\n\n" % html_path
+                msg += "Event details:\n %s" % db_dict.dump(name, version)
+                print(msg)
+                send_chat(msg)
+
     return db_update
 
 def copy_events(**kwargs):
@@ -166,10 +181,10 @@ def copy_events(**kwargs):
                 continue
             else:
                 name = str(directory).split('/')[-1]
-                db_update = copy_event(name, db_dict) or db_update
+                db_update = copy_event(name, db_dict, send_alert=False) or db_update
     else:
         version = kwargs['version']
-        db_update = copy_event(name, db_dict, version, overwrite=True)
+        db_update = copy_event(name, db_dict, version, True, False)
     
     #print(db_dict)
     if db_update is True:
