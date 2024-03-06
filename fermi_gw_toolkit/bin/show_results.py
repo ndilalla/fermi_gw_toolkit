@@ -13,7 +13,7 @@ from fermi_gw_toolkit.lib.html_lib import *
 formatter = argparse.ArgumentDefaultsHelpFormatter
 parser = argparse.ArgumentParser(formatter_class=formatter)
 
-_db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4_events.pkl')
+_db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4b_events.json')
 def fix_path(local_path):
     #return local_path.replace(GPL_TASKROOT, DECORATOR_PATH)
     return local_path
@@ -83,7 +83,7 @@ def max_ts(map_path, ts_cut, text='TS'):
     ts_map, header = hp.read_map(map_path, h=True)
     header = dict(header)
     nside = header['NSIDE']
-    radius = hp.nside2resol(nside, arcmin=True) / (60. * numpy.sqrt(2.)) #deg
+    radius = hp.nside2resol(nside, arcmin=True) / 60. #deg
     ts_max = str(round(numpy.nanmax(ts_map), 1))
     px_max = numpy.nanargmax(ts_map)
     ra_max, dec_max = pix_to_sky(px_max,nside)
@@ -238,13 +238,13 @@ def show_results(**kwargs):
     lle_ = ''
     lle_link = ''
     if lle_ts_map is not None: 
-        lle_ts_max, lle_ra_max, lle_dec_max, lle_ts_list, lle_nside, _radius =\
+        lle_ts_max, lle_ra_max, lle_dec_max, lle_ts_list, lle_nside, radius =\
                                 max_ts(kwargs['lle_ts_map'], sigma_cut, 'SIGMA')
         lle_src_names, lle_src_sep = check_catalog(lle_ra_max, lle_dec_max, radius)
         lle_n_src = len(lle_src_names)
         lle_max_src_list = insert_src_list(lle_src_names, lle_src_sep)
         lle_sun, lle_moon = check_sun_moon(lle_ra_max, lle_dec_max, _met,
-                                          radius)
+                                           radius)
         lle_ = lle_content.format(**locals())
         lle_link = lle_link_content
     
@@ -292,6 +292,5 @@ def show_results(**kwargs):
     #webbrowser.open(outfile)
 
 if __name__ == '__main__':
-
     args = parser.parse_args()
     outfile = show_results(**args.__dict__)
