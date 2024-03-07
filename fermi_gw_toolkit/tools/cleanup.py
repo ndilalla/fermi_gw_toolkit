@@ -31,7 +31,7 @@ args = parser.parse_args()
 
 init = args.init
 end = args.end
-output_dir = agrs.outfolder 
+output_dir = args.outfolder
 
 fti_dirs = sorted(glob('%s/*/*/FIXEDINTERVAL/' % (output_dir)))
 print('Found %d FTI folders.' % len(fti_dirs))
