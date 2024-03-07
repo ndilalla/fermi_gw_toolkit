@@ -123,6 +123,20 @@ sky_coverage = npzfile['cov']
 dt = npzfile['dt']
 plt.plot(dt, sky_coverage, alpha=alpha)
 
+cov_max.append(sky_coverage.max())
+id50 = numpy.searchsorted(sky_coverage, 0.5)
+if id50 == len(sky_coverage):
+    t50.append(10.)
+else:
+    t50.append(dt[id50])
+id90 = numpy.searchsorted(sky_coverage, 0.9)
+if id90 == len(sky_coverage):
+    t90.append(10.)
+else:
+    t90.append(dt[id90])
+cov_1800.append(sky_coverage[numpy.searchsorted(dt, 1.8)])
+cov_3600.append(sky_coverage[numpy.searchsorted(dt, 3.6)])
+
 plt.xlabel("Time since trigger (ks)")
 plt.ylabel("Cumulative\nprobability coverage")
 plt.ylim([-0.05,1.05])
