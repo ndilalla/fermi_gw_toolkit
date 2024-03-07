@@ -9,9 +9,9 @@ import matplotlib.patches as mpatches
 from fermi_gw_toolkit import GPL_TASKROOT
 from fermi_gw_toolkit.lib.local_database import gw_local_database
 
-db_file = os.path.join(GPL_TASKROOT,'databases', 'db_gw_O4_events.pkl')
+db_file = os.path.join(GPL_TASKROOT,'databases', 'db_gw_O4a_events.pkl')
 db_dict = gw_local_database.load(db_file)
-outfile = os.path.join(GPL_TASKROOT, 'databases', 'O4_summary.npz')
+outfile = os.path.join(GPL_TASKROOT, 'databases', 'O4_summary2.npz')
 # file_list = glob('output/*/*/*_results.html')
 output_dir = os.path.join(GPL_TASKROOT, 'output')
 events_list = sorted(glob('%s/*' % output_dir), reverse=False)
@@ -31,6 +31,11 @@ fti_ts = []
 fti_ul = []
 astro_sign = []
 bay_ul_sign = []
+t50 = []
+t90 = []
+cov_1800 = []
+cov_3600 = []
+cov_max = []
 
 plt.figure('Coverage', figsize=(16, 9))
 
@@ -78,6 +83,20 @@ for j, directory in enumerate(events_list):
         dt = npzfile['dt']
         plt.plot(dt, sky_coverage, alpha=alpha)
 
+        cov_max.append(sky_coverage.max())
+        id50 = numpy.searchsorted(sky_coverage, 0.5)
+        if id50 == len(sky_coverage):
+            t50.append(10.)
+        else:
+            t50.append(dt[id50])
+        id90 = numpy.searchsorted(sky_coverage, 0.9)
+        if id90 == len(sky_coverage):
+            t90.append(10.)
+        else:
+            t90.append(dt[id90])
+        cov_1800.append(sky_coverage[numpy.searchsorted(dt, 1.8)])
+        cov_3600.append(sky_coverage[numpy.searchsorted(dt, 3.6)])
+
         file_name_ts = 'FTI_ts_map.fits'
         file_ts = os.path.join(directory, version, file_name_ts)
         ts_map = healpy.read_map(file_ts)
@@ -112,12 +131,21 @@ plt.tight_layout()
 numpy.savez(outfile, bay_ul=numpy.array(bay_ul, dtype=object),
             ati_ts_max=numpy.array(ati_ts_max, dtype=object), 
             fti_ts_max=numpy.array(fti_ts_max, dtype=object), 
-            astro=numpy.array(astro, dtype=object), names=numpy.array(names, dtype=object),
-            ati_ts=numpy.array(ati_ts, dtype=object), ati_ul=numpy.array(ati_ul, dtype=object),
-            fti_ts=numpy.array(fti_ts, dtype=object), fti_ul=numpy.array(fti_ul, dtype=object), 
+            astro=numpy.array(astro, dtype=object), 
+            names=numpy.array(names, dtype=object),
+            ati_ts=numpy.array(ati_ts, dtype=object), 
+            ati_ul=numpy.array(ati_ul, dtype=object),
+            fti_ts=numpy.array(fti_ts, dtype=object), 
+            fti_ul=numpy.array(fti_ul, dtype=object), 
             astro_sign=numpy.array(astro_sign, dtype=object),
-            bay_ul_sign=numpy.array(bay_ul_sign, dtype=object))
+            bay_ul_sign=numpy.array(bay_ul_sign, dtype=object),
+            cov_max=numpy.array(cov_max, dtype=object),
+            t50=numpy.array(t50, dtype=object),
+            t90=numpy.array(t90, dtype=object),
+            cov_1800=numpy.array(cov_1800, dtype=object),
+            cov_3600=numpy.array(cov_3600, dtype=object))
 plt.show()
+input()
 
 npzfile = numpy.load(outfile, allow_pickle=True)
 bay_ul = npzfile['bay_ul']
