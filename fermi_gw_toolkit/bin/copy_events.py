@@ -145,8 +145,8 @@ def copy_event(name, db_dict, version=None, overwrite=False, send_alert=True):
             db_dict.update(name, version, _info)
         
         if send_alert:
-            ati_ts = int(db_dict.get_value(name, version, "Ati_ts"))
-            fti_ts = int(db_dict.get_value(name, version, "Fti_ts"))
+            ati_ts = float(db_dict.get_value(name, version, "Ati_ts"))
+            fti_ts = float(db_dict.get_value(name, version, "Fti_ts"))
             if ati_ts >= 25 or fti_ts >= 25:
                 msg = "*Significant detection for %s (%s):*\n\n" %\
                       (name, version)
