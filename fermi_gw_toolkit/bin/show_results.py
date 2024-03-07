@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os, glob, argparse
+import shutil
 import numpy
 import healpy as hp
 #import webbrowser
@@ -125,7 +126,7 @@ def min_max_ul(map_path):
     ul_min = round(numpy.nanmin(ul_map[numpy.nonzero(ul_map)]) / 1e-10, 2)
     return ul_min, ul_max
 
-def proc_ts_count_maps(file_list, met, radius=1):
+def proc_ts_count_maps(file_list, met, radius=1, cp_folder=None):
     if len(file_list) == 0:
         print('TS and count maps not found in file list %s' % file_list)
         return ''
@@ -144,6 +145,9 @@ def proc_ts_count_maps(file_list, met, radius=1):
         pgw_sun, pgw_moon = check_sun_moon(pgw_ra_max, pgw_dec_max, met, radius)
         pgw_ts_map = fix_path(file_coords.replace('_coords.txt', '_tsmap.png'))
         pgw_c_map = fix_path(pgw_ts_map.replace('_tsmap', '_cmap'))
+        if cp_folder is not None:
+            shutil.copy(pgw_ts_map, cp_folder)
+            shutil.copy(pgw_c_map, cp_folder)
         ts_count_map += ts_count_map_content.format(**locals())
     return ts_count_map
 
@@ -215,7 +219,7 @@ def show_results(**kwargs):
     
     #take the max/min UL from fti ul maps
     outdir = os.path.dirname(kwargs['fti_ts_map'])
-    fti_ = proc_ts_count_maps(glob.glob(outdir + '/FIXEDINTERVAL/%s_*_coords.txt' % kwargs['triggername']), _met)
+    fti_ = proc_ts_count_maps(glob.glob(outdir + '/FIXEDINTERVAL/%s_*_coords.txt' % kwargs['triggername']), _met, img_folder)
     
     # ATI
     #take the max ts and the ts_list from ati ts maps
@@ -250,7 +254,7 @@ def show_results(**kwargs):
     
     #PGWAVE
     pgwave_ = proc_ts_count_maps(glob.glob(outdir + '/PGWAVE/%s_*_coords.txt' %\
-                                   kwargs['triggername']), _met)
+                                   kwargs['triggername']), _met, img_folder)
 
     #process the coverage file to recover some useful info to display
     cov_file_path = os.path.join(outdir, 'bn%s_coverage.npz' % triggername)
