@@ -13,6 +13,7 @@ from fermi_gw_toolkit.utils.slack import send_chat
 from fermi_gw_toolkit.lib.local_database import gw_local_database
 
 local_dir = os.path.join(GPL_TASKROOT, 'output')
+web_dir = 'http://fermigrb.stanford.edu/GWFUP/'
 stanford_dir = '/var/www/html/FermiGRB/GWFUP/'
 try:
     _db_file = os.environ['GW_DB_FILE_PATH']
@@ -150,6 +151,7 @@ def copy_event(name, db_dict, version=None, overwrite=False, send_alert=True):
             if ati_ts >= 25 or fti_ts >= 25:
                 msg = "*Significant detection for %s (%s):*\n\n" %\
                       (name, version)
+                html_path = html_path.replace(stanford_dir, web_dir)
                 msg += "Analysis report: %s\n\n" % html_path
                 msg += "Event details:\n %s" % db_dict.dump(name, version)
                 print(msg)
