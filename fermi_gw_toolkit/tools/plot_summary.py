@@ -35,6 +35,7 @@ t50 = []
 t90 = []
 cov_1800 = []
 cov_3600 = []
+cov_5400 = []
 cov_max = []
 
 plt.figure('Coverage', figsize=(16, 9))
@@ -96,6 +97,7 @@ for j, directory in enumerate(events_list):
             t90.append(dt[id90])
         cov_1800.append(sky_coverage[numpy.searchsorted(dt, 1.8)])
         cov_3600.append(sky_coverage[numpy.searchsorted(dt, 3.6)])
+        cov_5400.append(sky_coverage[numpy.searchsorted(dt, 5.4)])
 
         file_name_ts = 'FTI_ts_map.fits'
         file_ts = os.path.join(directory, version, file_name_ts)
@@ -136,6 +138,7 @@ else:
     t90.append(dt[id90])
 cov_1800.append(sky_coverage[numpy.searchsorted(dt, 1.8)])
 cov_3600.append(sky_coverage[numpy.searchsorted(dt, 3.6)])
+cov_5400.append(sky_coverage[numpy.searchsorted(dt, 5.4)])
 
 plt.xlabel("Time since trigger (ks)")
 plt.ylabel("Cumulative\nprobability coverage")
@@ -157,7 +160,8 @@ numpy.savez(outfile, bay_ul=numpy.array(bay_ul, dtype=object),
             t50=numpy.array(t50, dtype=object),
             t90=numpy.array(t90, dtype=object),
             cov_1800=numpy.array(cov_1800, dtype=object),
-            cov_3600=numpy.array(cov_3600, dtype=object))
+            cov_3600=numpy.array(cov_3600, dtype=object),
+            cov_5400=numpy.array(cov_5400, dtype=object))
 plt.show()
 input()
 
