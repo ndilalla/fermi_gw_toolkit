@@ -219,7 +219,7 @@ def show_results(**kwargs):
     
     #take the max/min UL from fti ul maps
     outdir = os.path.dirname(kwargs['fti_ts_map'])
-    fti_ = proc_ts_count_maps(glob.glob(outdir + '/FIXEDINTERVAL/%s_*_coords.txt' % kwargs['triggername']), _met, img_folder)
+    fti_ = proc_ts_count_maps(glob.glob(outdir + '/FIXEDINTERVAL/%s_*_coords.txt' % kwargs['triggername']), _met, cp_folder=img_folder)
     
     # ATI
     #take the max ts and the ts_list from ati ts maps
@@ -254,7 +254,8 @@ def show_results(**kwargs):
     
     #PGWAVE
     pgwave_ = proc_ts_count_maps(glob.glob(outdir + '/PGWAVE/%s_*_coords.txt' %\
-                                   kwargs['triggername']), _met, img_folder)
+                                   kwargs['triggername']), _met, 
+                                   cp_folder=img_folder)
 
     #process the coverage file to recover some useful info to display
     cov_file_path = os.path.join(outdir, 'bn%s_coverage.npz' % triggername)
