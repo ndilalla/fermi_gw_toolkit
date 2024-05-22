@@ -140,6 +140,7 @@ if __name__=='__main__':
     # Connect as a consumer.
     config = {'group.id': 'GWFUP-S3DF',
               'auto.offset.reset': 'earliest',
+              'max.poll.interval.ms': 400000,
               'enable.auto.commit': False,
               'enable.partition.eof': True}
     consumer = Consumer(config=config, client_id=client_id,
