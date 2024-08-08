@@ -21,7 +21,7 @@ from fermi_gw_toolkit.tools.config import client_id, client_secret
 skipped_folder = os.path.join(GPL_TASKROOT, 'status', 'skipped')
 running_folder = os.path.join(GPL_TASKROOT, 'status', 'running')
 
-def parse_notice(record, test=False):
+def parse_notice(record, test=False, trigger=None):
     try:
         record = json.loads(record)
 
@@ -55,8 +55,8 @@ def parse_notice(record, test=False):
             terr = 0
             if record['event']['group'] == 'CBC':
                 terr = record['event']['classification']['Terrestrial'] * 100
-            if terr > 80:
-                print(f'{superevent_id} has a probability to be Terrestrial greater than 80%: {terr}%')
+            if terr > 90:
+                print(f'{superevent_id} has a probability to be Terrestrial greater than 90%: {terr}%')
                 print('Skipping the analysis of this event for the moment.')
                 os.system(f'touch {file_path}')
                 return True
@@ -68,6 +68,14 @@ def parse_notice(record, test=False):
             else:
                 print(f'This is the second {alert_type} notice. Starting the analysis now.')
                 os.system(f'rm {file_path}')
+        
+        if trigger is not None:
+            if trigger == superevent_id:
+                print("Trigger %s found. This will be the last message committed." % superevent_id)
+                return None
+            else:
+                print("Trigger %s is not %s. Keep committing..." % (superevent_id, trigger))
+                return True
 
         instruments = record['event']['instruments']
         nside = 64
@@ -129,7 +137,10 @@ if __name__=='__main__':
     formatter = argparse.ArgumentDefaultsHelpFormatter
     parser    = argparse.ArgumentParser(description=__description__,
                                         formatter_class=formatter)
-    parser.add_argument("--test", help="Run the script in testing mode", action='store_true')
+    parser.add_argument("--test", help="Run the script in testing mode", 
+        action='store_true')
+    parser.add_argument("--trigger", type=str, default=None, 
+        help="Commit all previous messages up to this trigger (included)")
     args = parser.parse_args()
 
     # Check if the GWFUP pipeline is too busy
@@ -158,7 +169,8 @@ if __name__=='__main__':
         elif not message.error():
             offset = message.offset()
             print(f"Message #{offset} received on ", datetime.now())
-            commit = parse_notice(message.value(), test=args.test)
+            commit = parse_notice(message.value(), test=args.test, 
+                                  trigger=args.trigger)
             if commit == False or args.test == True:
                 print(f'WARNING: Message #{offset} not committed.')
             else:
