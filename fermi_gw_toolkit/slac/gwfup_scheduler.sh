@@ -2,6 +2,7 @@
 
 export GPL_TASKROOT=/sdf/data/fermi/n/u26/GWFUP/
 source $GPL_TASKROOT/set_env/setup_ligo.sh
+date
 
 echo "Running on $(hostname) machine with pid $$"
 

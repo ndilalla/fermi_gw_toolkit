@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-import os, glob, argparse
-import shutil
+import os
+del os.environ['DISPLAY']
+import shutil, glob, argparse
 import numpy
 import healpy as hp
 #import webbrowser
