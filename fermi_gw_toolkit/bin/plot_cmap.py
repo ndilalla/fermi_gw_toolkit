@@ -25,7 +25,7 @@ from astropy.coordinates import SkyCoord
 
 class pgwave_list():
     def __init__(self,filename):
-        self.data=np.loadtxt(filename)
+        self.data=np.loadtxt(filename, ndmin=2)
         #print(self.data)
         pass
     def get_info(self):
