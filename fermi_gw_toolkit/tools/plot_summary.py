@@ -5,11 +5,25 @@ from glob import glob
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator, FixedLocator
 import matplotlib.patches as mpatches
+from matplotlib.lines import Line2D
 
 from fermi_gw_toolkit import GPL_TASKROOT
 from fermi_gw_toolkit.lib.local_database import gw_local_database
 
+"""
+Total / Followed up
+        --> Origin
+Significant / Non significant
+
+"""
+TOTAL = float(2295 + 124 + 41 + 6)
+
+def func(pct, allvals):
+    absolute = int(numpy.round(pct/100.*numpy.sum(allvals)))
+    return f"{pct:.1f}%\n({absolute:d})"
+
 outfile = os.path.join(GPL_TASKROOT, 'gw', 'databases', 'O4ab_summary.npz')
+outfigs = os.path.join(GPL_TASKROOT, 'gw', 'figures', 'symposium')
 output_dir = os.path.join(GPL_TASKROOT, 'output')
 events_list = sorted(glob('%s/*' % output_dir), reverse=False)
 
@@ -39,13 +53,15 @@ cov_max = npzfile['cov_max']
 labels=[]
 labels.append((mpatches.Patch(color=colors[0], alpha=alpha[0]), origin[0]))
 labels.append((mpatches.Patch(color=colors[2], alpha=alpha[0]), origin[2]))
+labels.append((mpatches.Patch(color=colors[3], alpha=alpha[0]), origin[3]))
 positions = numpy.arange(0, len(names))
 vpargs = dict(points=100, positions=positions, vert=True, widths=0.5, 
               showmeans=True, showextrema=True, showmedians=False)
 
 fig, axes = plt.subplots(num='TS FTI vs ATI', nrows=2, ncols=1, 
-                         figsize=(16, 9), sharex=True)
+                         figsize=(21, 9), sharex=True)
 vp = axes[0].violinplot(fti_ts, **vpargs)
+axes[0].set_xlim(-2, 124)
 axes[0].set_ylabel('FTI TS')
 axes[0].axhline(25., color='black', linestyle='--')
 axes[0].grid(axis='y')
@@ -72,15 +88,20 @@ for i, pc in enumerate(vp["bodies"]):
     pc.set_alpha(alpha[0])
 for partname in ('cbars','cmins','cmaxes','cmeans'):
     vp[partname].set_colors(c_)
+plt.savefig(outfigs + '/' + fig.get_label() + '.png')
 
 fig, axes = plt.subplots(num='UB FTI vs ATI', nrows=2, ncols=1, 
-                         figsize=(16, 9), sharex=True)
+                         figsize=(21, 9), sharex=True)
 
 vp = axes[0].violinplot(fti_ul, **vpargs)
+axes[0].set_xlim(-2, 124)
 axes[0].set_yscale('log')
 axes[0].set_ylabel('FTI Energy Flux UB (erg/cm^2/s)')
 axes[0].plot(positions, bay_ul_sign, 'vr')
-axes[0].legend(*zip(*(labels + [(mpatches.Patch(color='red'), 'Bayesian UB')])), loc=2)
+point = Line2D([0], [0], marker='v', markeredgecolor='r', markerfacecolor='r', 
+    linestyle='')
+axes[0].legend(*zip(*(labels + [(point, 'Bayesian UB')])), loc=2)
+#axes[0].legend(*zip(*(labels + [(mpatches.Patch(color='red'), 'Bayesian UB')])), loc=2)
 axes[0].grid(axis='y')
 
 for i, pc in enumerate(vp["bodies"]):
@@ -103,10 +124,11 @@ for i, pc in enumerate(vp["bodies"]):
     pc.set_alpha(alpha[0])
 for partname in ('cbars','cmins','cmaxes','cmeans'):
     vp[partname].set_colors(c_)
+plt.savefig(outfigs + '/' + fig.get_label() + '.png')
 
 astro = numpy.array(astro)
 
-plt.figure('UB')
+fig = plt.figure('UB')
 bins = numpy.logspace(-10, -7.5, 25)
 ul = [numpy.array(bay_ul)[astro == a] for a in origin]
 plt.hist(ul, bins=bins, label=origin, stacked=True, alpha=alpha[1], 
@@ -118,8 +140,9 @@ plt.yscale('log')
 plt.xscale('log')
 plt.grid()
 plt.tight_layout()
+plt.savefig(outfigs + '/' + fig.get_label() + '.png')
 
-plt.figure('FTI TS')
+fig = plt.figure('FTI TS')
 bins = numpy.linspace(0, 120, 25)
 fti = [numpy.array(fti_ts_max)[astro == a] for a in origin]
 plt.hist(fti, bins=bins, label=origin, stacked=True, alpha=alpha[1], 
@@ -130,8 +153,9 @@ plt.ylabel('Entries')
 plt.yscale('log')
 plt.grid()
 plt.tight_layout()
+plt.savefig(outfigs + '/' + fig.get_label() + '.png')
 
-plt.figure('FTI TS 2')
+fig = plt.figure('FTI TS 2')
 bins = numpy.logspace(0, 4, 30)
 fti = [numpy.array(fti_ts_max)[astro == a] for a in origin]
 plt.hist(fti, bins=bins, label=origin, stacked=True, alpha=alpha[1], 
@@ -144,8 +168,9 @@ plt.yscale('log')
 plt.xlim((3, None))
 plt.grid()
 plt.tight_layout()
+plt.savefig(outfigs + '/' + fig.get_label() + '.png')
 
-plt.figure('ATI TS')
+fig = plt.figure('ATI TS')
 bins = numpy.linspace(0, 100, 21)
 ati = [numpy.array(ati_ts_max)[astro == a] for a in origin]
 plt.hist(ati, bins=bins, label=origin, stacked=True, alpha=alpha[1], 
@@ -156,8 +181,9 @@ plt.ylabel('Entries')
 plt.yscale('log')
 plt.grid()
 plt.tight_layout()
+plt.savefig(outfigs + '/' + fig.get_label() + '.png')
 
-plt.figure('ATI TS 2')
+fig = plt.figure('ATI TS 2')
 bins = numpy.logspace(0, 4, 30)
 fti = [numpy.array(ati_ts_max)[astro == a] for a in origin]
 plt.hist(fti, bins=bins, label=origin, stacked=True, alpha=alpha[1], 
@@ -170,28 +196,19 @@ plt.yscale('log')
 plt.xlim((3, None))
 plt.grid()
 plt.tight_layout()
+plt.savefig(outfigs + '/' + fig.get_label() + '.png')
 
-"""
-Total / Followed up
-        --> Origin
-Significant / Non significant
-
-"""
-TOTAL = float(1610 + 46 + 6)
-FUP = len(bay_ul)
-SIGN = len(astro_sign)
-
-def func(pct, allvals):
-    absolute = int(numpy.round(pct/100.*numpy.sum(allvals)))
-    return f"{pct:.1f}%\n({absolute:d})"
+fup = len(bay_ul)
+sign = len(astro_sign)
 
 fig, ax = plt.subplots(num='Followed-up')
-data = [TOTAL - FUP, FUP]
+data = [TOTAL - fup, fup]
 labels = ['Skipped', 'Followed up']
 ax.pie(data, autopct=lambda pct: func(pct, data), labels=labels, 
        textprops=dict(fontsize=13), pctdistance=0.6,
        colors = ['#ff7f0e', '#1f77b4'])
 plt.tight_layout()
+plt.savefig(outfigs + '/' + fig.get_label() + '.png')
 
 fig, ax = plt.subplots(num='Origin')
 labels, data = numpy.unique(astro, return_counts=True)
@@ -199,46 +216,52 @@ labels, data = numpy.unique(astro, return_counts=True)
 ax.pie(data, autopct=lambda pct: func(pct, data), labels=labels, 
        textprops=dict(fontsize=13), pctdistance=0.7)
 plt.tight_layout()
+plt.savefig(outfigs + '/' + fig.get_label() + '.png')
 
 fig, ax = plt.subplots(num='Significant')
-data = [FUP - SIGN, SIGN]
+data = [fup - sign, sign]
 labels = ['Not significant', 'Significant']
 ax.pie(data, autopct=lambda pct: func(pct, data), labels=labels, 
        textprops=dict(fontsize=13), pctdistance=0.6, 
        colors=['#2ca02c', '#d62728'])
 plt.tight_layout()
+plt.savefig(outfigs + '/' + fig.get_label() + '.png')
 
 fig, ax = plt.subplots(num='Significant origin')
 labels, data = numpy.unique(astro_sign, return_counts=True)
 ax.pie(data, autopct=lambda pct: func(pct, data), labels=labels, 
        textprops=dict(fontsize=13), pctdistance=0.6)
 plt.tight_layout()
+plt.savefig(outfigs + '/' + fig.get_label() + '.png')
 
-plt.figure('T 50')
+fig = plt.figure('T 50')
 bins = numpy.linspace(0, 10, 21)
 plt.hist(t50, bins=bins)
 plt.xlabel('Time 50% Coverage')
 plt.ylabel('Entries')
 plt.grid()
 plt.tight_layout()
+plt.savefig(outfigs + '/' + fig.get_label() + '.png')
 
-plt.figure('T 90')
+fig = plt.figure('T 90')
 bins = numpy.linspace(0, 10, 21)
 plt.hist(t90, bins=bins)
 plt.xlabel('Time 90% Coverage')
 plt.ylabel('Entries')
 plt.grid()
 plt.tight_layout()
+plt.savefig(outfigs + '/' + fig.get_label() + '.png')
 
-plt.figure('Cov Max')
+fig = plt.figure('Cov Max')
 bins = numpy.linspace(0, 1, 21)
 plt.hist(cov_max, bins=bins)
 plt.xlabel('Maximum Coverage')
 plt.ylabel('Entries')
 plt.grid()
 plt.tight_layout()
+plt.savefig(outfigs + '/' + fig.get_label() + '.png')
 
-plt.figure('Cov 1800')
+fig = plt.figure('Cov 1800')
 bins = numpy.linspace(0, 100, 21)
 plt.hist(cov_1800 * 100, bins=bins)
 plt.xlabel('Coverage after 1.8 ks [%]', size=15)
@@ -247,8 +270,9 @@ plt.grid()
 plt.tight_layout()
 plt.xticks(fontsize=12)
 plt.yticks(fontsize=12)
+plt.savefig(outfigs + '/' + fig.get_label() + '.png')
 
-plt.figure('Cov 3600')
+fig = plt.figure('Cov 3600')
 bins = numpy.linspace(0, 100, 21)
 plt.hist(cov_3600 * 100, bins=bins)
 plt.xlabel('Coverage after 3.6 ks [%]', size=15)
@@ -257,8 +281,9 @@ plt.grid()
 plt.tight_layout()
 plt.xticks(fontsize=12)
 plt.yticks(fontsize=12)
+plt.savefig(outfigs + '/' + fig.get_label() + '.png')
 
-plt.figure('Cov 5400')
+fig = plt.figure('Cov 5400')
 bins = numpy.linspace(0, 100, 21)
 plt.hist(cov_5400 * 100, bins=bins)
 plt.xlabel('Coverage after 5.4 ks [%]', size=15)
@@ -267,5 +292,6 @@ plt.grid()
 plt.tight_layout()
 plt.xticks(fontsize=12)
 plt.yticks(fontsize=12)
+plt.savefig(outfigs + '/' + fig.get_label() + '.png')
 
-plt.show()
+#plt.show()
