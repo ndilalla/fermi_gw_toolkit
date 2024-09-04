@@ -23,7 +23,7 @@ outfile = os.path.join(GPL_TASKROOT, 'databases', 'O4ab_summary.npz')
 
 origin = ['BBH', 'BNS', 'NSBH', 'Terrestrial', 'Burst']
 colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd']
-alpha = (0.5, 0.7)
+alpha = 0.7
 
 bay_ul = []
 ati_ts_max = []
@@ -36,8 +36,15 @@ fti_ts = []
 fti_ul = []
 astro_sign = []
 bay_ul_sign = []
+t50 = []
+t90 = []
+cov_1800 = []
+cov_3600 = []
+cov_5400 = []
+cov_max = []
 
 plt.figure('Coverage', figsize=(16, 9))
+plt.rc('font', size=16)
 
 for j, directory in enumerate(events_list):
     if j % 50 == 0:
@@ -84,7 +91,22 @@ for j, directory in enumerate(events_list):
         npzfile = numpy.load(cov_file)
         sky_coverage = npzfile['cov']
         dt = npzfile['dt']
-        plt.plot(dt, sky_coverage, alpha=alpha[1])
+        plt.plot(dt, sky_coverage, alpha=alpha)
+
+        cov_max.append(sky_coverage.max())
+        id50 = numpy.searchsorted(sky_coverage, 0.5)
+        if id50 == len(sky_coverage):
+            t50.append(10.)
+        else:
+            t50.append(dt[id50])
+        id90 = numpy.searchsorted(sky_coverage, 0.9)
+        if id90 == len(sky_coverage):
+            t90.append(10.)
+        else:
+            t90.append(dt[id90])
+        cov_1800.append(sky_coverage[numpy.searchsorted(dt, 1.8)])
+        cov_3600.append(sky_coverage[numpy.searchsorted(dt, 3.6)])
+        cov_5400.append(sky_coverage[numpy.searchsorted(dt, 5.4)])
 
         file_name_ts = 'FTI_ts_map.fits'
         file_ts = os.path.join(directory, version, file_name_ts)
@@ -114,10 +136,20 @@ outfig = outfile.replace('summary.npz', 'coverage.png')
 plt.savefig(outfig)
 
 numpy.savez(outfile, bay_ul=numpy.array(bay_ul, dtype=object),
-            ati_ts_max=numpy.array(ati_ts_max, dtype=object), 
-            fti_ts_max=numpy.array(fti_ts_max, dtype=object), 
-            astro=numpy.array(astro, dtype=object), names=numpy.array(names, dtype=object),
-            ati_ts=numpy.array(ati_ts, dtype=object), ati_ul=numpy.array(ati_ul, dtype=object),
-            fti_ts=numpy.array(fti_ts, dtype=object), fti_ul=numpy.array(fti_ul, dtype=object), 
+            ati_ts_max=numpy.array(ati_ts_max, dtype=object),
+            fti_ts_max=numpy.array(fti_ts_max, dtype=object),
+            astro=numpy.array(astro, dtype=object),
+            names=numpy.array(names, dtype=object),
+            ati_ts=numpy.array(ati_ts, dtype=object),
+            ati_ul=numpy.array(ati_ul, dtype=object),
+            fti_ts=numpy.array(fti_ts, dtype=object),
+            fti_ul=numpy.array(fti_ul, dtype=object),
             astro_sign=numpy.array(astro_sign, dtype=object),
-            bay_ul_sign=numpy.array(bay_ul_sign, dtype=object))
+            bay_ul_sign=numpy.array(bay_ul_sign, dtype=object),
+            cov_max=numpy.array(cov_max, dtype=object),
+            t50=numpy.array(t50, dtype=object),
+            t90=numpy.array(t90, dtype=object),
+            cov_1800=numpy.array(cov_1800, dtype=object),
+            cov_3600=numpy.array(cov_3600, dtype=object),
+            cov_5400=numpy.array(cov_5400, dtype=object))
+
