@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
-del os.environ['DISPLAY']
+if 'DISPLAY' in os.environ:
+    del os.environ['DISPLAY']
 import shutil, glob, argparse
 import numpy
 import healpy as hp
