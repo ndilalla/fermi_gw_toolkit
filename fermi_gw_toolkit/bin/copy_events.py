@@ -175,7 +175,7 @@ def copy_events(**kwargs):
         for file_path in files:
             file_name = os.path.basename(file_path).replace('.txt', '')
             name, version = file_name.split('_')
-            db_update = copy_event(name, db_dict, version, send_alert) or db_update
+            db_update = copy_event(name, db_dict, version, send_alert=send_alert) or db_update
             cmd = 'mv %s %s../copied/' % (file_path, done_dir)
             print(cmd)
             os.system(cmd)
