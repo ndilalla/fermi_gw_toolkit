@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import ast
 import urllib
 import time
 import subprocess
@@ -30,6 +31,8 @@ parser.add_argument("--directory", help="Path to the 'done' folder",
                     required=False, default=None, type=str)
 parser.add_argument("--db_file", help="File used for database", type=str,
                     required=False, default=_db_file)
+parser.add_argument("--send_alert", type=ast.literal_eval, default=True,
+                    choices=[True, False], help="Flag to send or not alert for significant detections.")
 #parser.add_argument("--overwrite", )
 
 def fix_html(html, remove=None):
@@ -163,6 +166,7 @@ def copy_events(**kwargs):
     name = kwargs['triggername']
     done_dir = kwargs['directory']
     db_file = kwargs['db_file']
+    send_alert = kwargs['send_alert']
     db_dict = gw_local_database.load(db_file)
     db_update = False
     if done_dir is not None:
@@ -171,7 +175,7 @@ def copy_events(**kwargs):
         for file_path in files:
             file_name = os.path.basename(file_path).replace('.txt', '')
             name, version = file_name.split('_')
-            db_update = copy_event(name, db_dict, version, True) or db_update
+            db_update = copy_event(name, db_dict, version, send_alert) or db_update
             cmd = 'mv %s %s../copied/' % (file_path, done_dir)
             print(cmd)
             os.system(cmd)
