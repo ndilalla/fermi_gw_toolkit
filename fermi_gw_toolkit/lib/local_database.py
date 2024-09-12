@@ -2,6 +2,8 @@ import pickle
 import json
 import os
 
+from filelock import Timeout, FileLock
+
 from fermi_gw_toolkit import GPL_TASKROOT
 
 class gw_local_database(dict):
@@ -23,7 +25,11 @@ class gw_local_database(dict):
 
     @staticmethod
     def check_extension(file_path):
-        if not (file_path.endswith('.pkl') or file_path.endswith('.json')):
+        if file_path.endswith('.pkl'):
+            return '.pkl'
+        elif file_path.endswith('.json'):
+            return '.json'
+        else:
             raise RuntimeError("Database must have '.pkl' or '.json' extension.")
     
     @staticmethod
@@ -36,9 +42,12 @@ class gw_local_database(dict):
             print(f"{file_path} already exists!")
 
     @classmethod
-    def load(cls, file_path):
+    def load(cls, file_path, locking=True, **kwargs):
         print("Loading the local database %s..." % file_path)
-        cls.check_extension(file_path)
+        ext = cls.check_extension(file_path)
+        if locking:
+            lock_path = file_path.replace(ext, '.lock')
+            cls.acquire_lock(cls, lock_path, **kwargs)
         if file_path.endswith('.pkl'):
             with open(file_path, 'rb') as f:
                 _dict = pickle.load(f)
@@ -59,6 +68,22 @@ class gw_local_database(dict):
             json_object = json.dumps(self, indent=2, sort_keys=True)
             with open(file_path, 'w') as outfile:
                 outfile.write(json_object)
+        self.release_lock()
+    
+    def acquire_lock(self, lock_path, **kwargs):
+        args = (kwargs.get('timeout', -1), kwargs.get('poll_interval', 5))
+        self.lock = FileLock(lock_path)
+        try:
+            self.lock.acquire(*args, blocking=True)
+            print('Lock acquired.')
+        except Timeout:
+            raise RuntimeError("Could not acquire the lock to open the database.")
+
+    def release_lock(self, force=False):
+        if hasattr(self, 'lock'):
+            if self.lock.is_locked:
+                self.lock.release(force)
+                print('Lock released.')
     
     def get_key(self, name, version):
         return '%s/%s' % (name, version)
@@ -98,14 +123,15 @@ class gw_local_database(dict):
     
 if __name__ == '__main__':
     from fermi_gw_toolkit.utils.slack import send_chat
-    db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4a_events.json')
-    # gw_local_database.create_empty(db_file)
-    db = gw_local_database.load(db_file)
-    db.show()
-    print(db.obs_run)
-    name = 'bnS240116z'
-    version = 'v01'
-    msg = "Event details:\n %s" % db.dump(name, version)
-    print(msg)
+    #db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4a_events.json')
+    db_file = os.path.join(GPL_TASKROOT, 'gw', 'databases', 'test_O4a.json')
+    gw_local_database.create_empty(db_file)
+    db = gw_local_database.load(db_file, locking=False, timeout=10)
+    db.release_lock()
+    # print(db.obs_run)
+    #name = 'bnS240116z'
+    #version = 'v01'
+    #msg = "Event details:\n %s" % db.dump(name, version)
+    #print(msg)
     # send_chat(msg, channel='bot-testing')
     # db.save(os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4b_events.json'))

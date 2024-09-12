@@ -197,6 +197,8 @@ def copy_events(**kwargs):
         print('Saving the database to %s...' % db_file)
         db_dict.save(db_file)
         _copy(db_file, stanford_dir + db_dict.obs_run + '/')
+    else:
+        db_dict.release_lock()
     print('Done!')
 
 if __name__ == "__main__":

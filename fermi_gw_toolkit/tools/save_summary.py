@@ -9,12 +9,12 @@ from fermi_gw_toolkit import GPL_TASKROOT
 from fermi_gw_toolkit.lib.local_database import gw_local_database
 
 o4a_db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4a_events.pkl')
-o4a_db_dict = gw_local_database.load(o4a_db_file)
+o4a_db_dict = gw_local_database.load(o4a_db_file, locking=False)
 o4a_output_dir = os.path.join(GPL_TASKROOT, 'output', 'rhel6')
 o4a_events_list = sorted(glob('%s/*' % o4a_output_dir), reverse=False)
 
 o4b_db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4b_events.json')
-o4b_db_dict = gw_local_database.load(o4b_db_file)
+o4b_db_dict = gw_local_database.load(o4b_db_file, locking=False)
 o4b_output_dir = os.path.join(GPL_TASKROOT, 'output')
 o4b_events_list = sorted(glob('%s/*' % o4b_output_dir), reverse=False)
 
