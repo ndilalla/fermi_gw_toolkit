@@ -1,4 +1,4 @@
-#!/bin/tcsh -f
+#!/bin/tcsh -fe
 
 # If we do not need to run the Bayesian UL, make this fail
 if ($BAYESIAN_UL == 0) then
