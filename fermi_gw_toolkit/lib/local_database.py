@@ -58,7 +58,7 @@ class gw_local_database(dict):
         c.obs_run = c.get_obs_run(file_path)
         return c
 
-    def save(self, file_path, protocol=2):
+    def save(self, file_path, protocol=2, chmod=False):
         self.check_extension(file_path)
         print("Saving the database to %s..." % file_path)
         if file_path.endswith('.pkl'):
@@ -68,7 +68,7 @@ class gw_local_database(dict):
             json_object = json.dumps(self, indent=2, sort_keys=True)
             with open(file_path, 'w') as outfile:
                 outfile.write(json_object)
-        self.release_lock()
+        self.release_lock(chmod=chmod)
     
     def acquire_lock(self, lock_path, **kwargs):
         args = (kwargs.get('timeout', -1), kwargs.get('poll_interval', 5))
@@ -79,12 +79,12 @@ class gw_local_database(dict):
         except Timeout:
             raise RuntimeError("Could not acquire the lock to open the database.")
 
-    def release_lock(self, force=False):
-        if hasattr(self, 'lock'):
-            if self.lock.is_locked:
-                self.lock.release(force)
-                print('Lock released.')
-                #os.chmod(self.lock.lock_file, 0o0777)
+    def release_lock(self, force=False, chmod=False):
+        if hasattr(self, 'lock') and self.lock.is_locked:
+            self.lock.release(force)
+            print('Lock released.')
+            if chmod:
+                os.chmod(self.lock.lock_file, 0o0777)
 
     
     def get_key(self, name, version):
