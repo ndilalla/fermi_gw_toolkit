@@ -84,6 +84,8 @@ class gw_local_database(dict):
             if self.lock.is_locked:
                 self.lock.release(force)
                 print('Lock released.')
+                os.chmod(self.lock.lock_file, 0o0777)
+
     
     def get_key(self, name, version):
         return '%s/%s' % (name, version)
