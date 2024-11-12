@@ -175,7 +175,7 @@ def show_results(**kwargs):
     styles = kwargs['styles']
     
     #define all the variables to be used in the template
-    triggername = kwargs['triggername'].replace('bn','')
+    triggername = kwargs['triggername'].replace('bn', '', 1)
     triggertime = round(kwargs['triggertime'], 2)
     date, time = get_date(kwargs['ligo_map'])
     emin = kwargs['emin']
