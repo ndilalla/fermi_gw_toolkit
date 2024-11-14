@@ -83,7 +83,7 @@ def make_copy(file_path, outfolder):
 
 def copy_event(name, db_dict, version=None, overwrite=False, send_alert=True):
     db_update = False
-    grace_name = name.replace('bn', '')
+    grace_name = name.replace('bn', '', 1)
     gw_info = get_info(grace_name)
     if gw_info is None:
         # NOT a grace superevent
