@@ -113,7 +113,8 @@ def parse_notice(record, test=False, trigger=None):
             cmd = 'ligo-skymap-flatten %s %s' % \
                 (mo_skymap_path, flat_skymap_path)
             print('About to run: ', cmd)
-            os.system(cmd)
+            if not test:
+                os.system(cmd)
 
             triggername = 'bn%s' % superevent_id
             cmd = f'{FERMI_GW_ROOT}/slac/submit_gwfup_job.sh {flat_skymap_path} {nside} {triggername} >> {GPL_TASKROOT}/logs/submit.log 2>&1 &'
