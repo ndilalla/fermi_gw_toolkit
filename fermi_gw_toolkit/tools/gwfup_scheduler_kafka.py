@@ -84,6 +84,12 @@ def parse_notice(record, test=False, trigger=None):
 
         # Parse sky map
         skymap_str = record.get('event', {}).pop('skymap')
+
+        if record['external_coinc'] is not None:
+            print('Found external coincidence with %s!' % (record['external_coinc']['observatory']))
+            print('Using the combined skymap to run the analysis.')
+            skymap_str = record.get('external_coinc', {}).pop('combined_skymap')
+
         print('Notice content:')
         pprint(record)
         if skymap_str:
