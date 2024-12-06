@@ -17,11 +17,18 @@ from fermi_gw_toolkit.utils.date_to_met import met_to_utc
 def getfromfile(filename):
     cmd='chmod a+r %s' % filename
     os.system(cmd) 
-    f=fits.open(filename)
-    date_obs=f[1].header['DATE-OBS'].replace('T',' ')
-    met=float(date2met(date_obs))
     name=filename.split('/')[-1].split('.')[0]
     trigger_name='bn%s' % name
+    f=fits.open(filename)
+    try:
+        date_obs=f[1].header['DATE-OBS'].replace('T',' ')
+    except KeyError:
+        print('DATE-OBS keyword not available in the header of file %s' % filename)
+        print('Skipping this event: %s' % trigger_name)
+        skip_file = '%sstatus/skipped/%s.txt' % (GPL_TASKROOT, trigger_name)
+        os.system(f'touch {skip_file}')
+        sys.exit(1)
+    met=float(date2met(date_obs))
     print(trigger_name, date_obs, met)
     return trigger_name, filename, met
     
