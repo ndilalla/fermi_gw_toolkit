@@ -5,9 +5,9 @@ def run_at_slac():
     """
     hostname = socket.getfqdn()
     print("Running on host: ", hostname)
-    run_at_slac = True
-    if hostname.find("slac.stanford.edu") == -1:
-        run_at_slac = False
+    run_at_slac = False
+    if hostname.startswith("sdfmilan") or hostname.endswith("slac.stanford.edu"):
+        run_at_slac = True
     return run_at_slac
 
 if __name__=="__main__":
