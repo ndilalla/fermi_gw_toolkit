@@ -41,7 +41,8 @@ def run_shell_command(command):
         result = subprocess.run(command,
                                 capture_output=True,
                                 text=True,
-                                check=True)
+                                check=True,
+                                shell=True)
         return result.stdout
     except subprocess.CalledProcessError as e:
         print(f"Command failed: {e}", file=sys.stderr)
