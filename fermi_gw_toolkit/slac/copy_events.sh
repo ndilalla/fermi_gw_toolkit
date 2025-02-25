@@ -3,6 +3,7 @@
 export GPL_TASKROOT=/sdf/data/fermi/n/u26/GWFUP/
 export DONE_DIR=$GPL_TASKROOT/status/done/
 date
+set -e
 
 if [ "$(ls -A $DONE_DIR)" ]; then
     echo "New events found in $DONE_DIR"

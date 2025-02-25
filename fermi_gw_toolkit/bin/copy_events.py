@@ -2,6 +2,7 @@
 import os
 import ast
 import urllib
+import sys
 import time
 import subprocess
 import argparse
@@ -35,6 +36,18 @@ parser.add_argument("--send_alert", type=ast.literal_eval, default=True,
                     choices=[True, False], help="Flag to send or not alert for significant detections.")
 #parser.add_argument("--overwrite", )
 
+def run_shell_command(command):
+    try:
+        result = subprocess.run(command,
+                                capture_output=True,
+                                text=True,
+                                check=True)
+        return result.stdout
+    except subprocess.CalledProcessError as e:
+        print(f"Command failed: {e}", file=sys.stderr)
+        print(f"Error output: {e.stderr}", file=sys.stderr)
+        raise e
+
 def fix_html(html, remove=None):
     if not html.endswith('.html'):
         return ''
@@ -53,19 +66,19 @@ def fix_html(html, remove=None):
 def _rmdir(folder):
     command = 'ssh ndilalla@galprop.stanford.edu "rm -rf %s"' % folder
     print('Executing %s...' % command)
-    os.system(command)
-    raw_input()
+    run_shell_command(command)
+    #raw_input()
 
 def _mkdir(folder):
     command = 'ssh ndilalla@galprop.stanford.edu "mkdir -p %s"' % folder
     print('Executing %s...' % command)
-    os.system(command)
+    run_shell_command(command)
 
 def _copy(file_path, outfolder, outname=''):
     command = 'scp -r %s ndilalla@galprop.stanford.edu:%s/%s' %\
         (file_path, outfolder, outname)
     print('Executing %s...' % command)
-    os.system(command)
+    run_shell_command(command)
 
 def make_copy(file_path, outfolder):
     _mkdir(outfolder + '/images')
