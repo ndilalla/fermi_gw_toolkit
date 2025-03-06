@@ -20,7 +20,7 @@ stanford_dir = '/var/www/html/FermiGRB/GWFUP/'
 try:
     _db_file = os.environ['GW_DB_FILE_PATH']
 except:
-    _db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4b_events.json')
+    _db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4c_events.json')
 
 formatter = argparse.ArgumentDefaultsHelpFormatter
 parser = argparse.ArgumentParser(formatter_class=formatter)

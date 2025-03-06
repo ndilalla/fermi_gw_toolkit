@@ -16,7 +16,7 @@ from fermi_gw_toolkit.lib.html_lib import *
 formatter = argparse.ArgumentDefaultsHelpFormatter
 parser = argparse.ArgumentParser(formatter_class=formatter)
 
-_db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4b_events.json')
+_db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4c_events.json')
 def fix_path(local_path):
     #return local_path.replace(GPL_TASKROOT, DECORATOR_PATH)
     return local_path

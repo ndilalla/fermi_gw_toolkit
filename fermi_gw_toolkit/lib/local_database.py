@@ -19,6 +19,8 @@ class gw_local_database(dict):
             return 'O4a'
         elif 'O4b' in os.path.basename(file_path):
             return 'O4b'
+        elif 'O4c' in os.path.basename(file_path):
+            return 'O4c'
         else:
             raise RuntimeError("Unknown observing run in db file %s" %\
                                os.path.basename(file_path))
@@ -126,7 +128,7 @@ class gw_local_database(dict):
 if __name__ == '__main__':
     from fermi_gw_toolkit.utils.slack import send_chat
     #db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4a_events.json')
-    db_file = os.path.join(GPL_TASKROOT, 'gw', 'databases', 'test_O4a.json')
+    db_file = os.path.join(GPL_TASKROOT, 'gw', 'databases', 'db_gw_O4c_events.json')
     gw_local_database.create_empty(db_file)
     db = gw_local_database.load(db_file, locking=False, timeout=10)
     db.release_lock()
