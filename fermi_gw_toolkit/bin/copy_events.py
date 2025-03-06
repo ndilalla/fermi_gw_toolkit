@@ -7,6 +7,7 @@ import time
 import subprocess
 import argparse
 import pickle
+import shlex
 from glob import glob
 from astropy.time import Time
 from fermi_gw_toolkit import GPL_TASKROOT
@@ -38,11 +39,10 @@ parser.add_argument("--send_alert", type=ast.literal_eval, default=True,
 
 def run_shell_command(command):
     try:
-        result = subprocess.run(command,
+        result = subprocess.run(shlex.split(command),
                                 capture_output=True,
                                 text=True,
-                                check=True,
-                                shell=True)
+                                check=True)
         return result.stdout
     except subprocess.CalledProcessError as e:
         print(f"Command failed: {e}", file=sys.stderr)
