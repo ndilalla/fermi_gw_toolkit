@@ -15,11 +15,15 @@ o4a_events_list = sorted(glob('%s/*' % o4a_output_dir), reverse=False)
 
 o4b_db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4b_events.json')
 o4b_db_dict = gw_local_database.load(o4b_db_file, locking=False)
-o4b_output_dir = os.path.join(GPL_TASKROOT, 'output')
-o4b_events_list = sorted(glob('%s/*' % o4b_output_dir), reverse=False)
 
-events_list = o4a_events_list + o4b_events_list
-outfile = os.path.join(GPL_TASKROOT, 'databases', 'O4ab_summary.npz')
+o4c_db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4c_events.json')
+o4c_db_dict = gw_local_database.load(o4c_db_file, locking=False)
+
+o4bc_output_dir = os.path.join(GPL_TASKROOT, 'output')
+o4bc_events_list = sorted(glob('%s/*' % o4bc_output_dir), reverse=False)
+
+events_list = o4a_events_list + o4bc_events_list
+outfile = os.path.join(GPL_TASKROOT, 'databases', 'O4abc_summary.npz')
 
 origin = ['BBH', 'BNS', 'NSBH', 'Terrestrial', 'Burst']
 colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd']
@@ -60,7 +64,10 @@ for j, directory in enumerate(events_list):
         else:
             evt = o4b_db_dict['%s/%s' % (name, version)]
     except KeyError:
-        continue
+        try:
+            evt = o4c_db_dict['%s/%s' % (name, version)]
+        except KeyError:
+            continue
     try:
         copied = evt['Copied']
         if not copied:
@@ -152,4 +159,3 @@ numpy.savez(outfile, bay_ul=numpy.array(bay_ul, dtype=object),
             cov_1800=numpy.array(cov_1800, dtype=object),
             cov_3600=numpy.array(cov_3600, dtype=object),
             cov_5400=numpy.array(cov_5400, dtype=object))
-
