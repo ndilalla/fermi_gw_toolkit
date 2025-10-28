@@ -182,7 +182,7 @@ if __name__=='__main__':
             break
         utc_now = Time(datetime.utcnow(), scale='utc')
         utc_diff = (utc_now - utc_t0).to_value('hr')
-        if t > 15 or utc_diff > 15:
+        if t > 18 or utc_diff > 18:
             print('WARNING: submitter is likely stuck! Forcing the submission.')
             break
             # print('Skipping %s for the moment...' % TRIGGERNAME)

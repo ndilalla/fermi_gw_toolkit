@@ -19,7 +19,7 @@ local_dir = os.path.join(GPL_TASKROOT, 'output')
 web_dir = 'http://fermigrb.stanford.edu/GWFUP/'
 stanford_dir = '/var/www/html/FermiGRB/GWFUP/'
 try:
-    _db_file = os.environ['GW_DB_FILE_PATH']
+    _db_file = os.environ['GW_DB_FILE_PATH'].json
 except:
     _db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4c_events.json')
 

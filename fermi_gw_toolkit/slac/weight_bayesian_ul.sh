@@ -13,7 +13,7 @@ source $GPL_TASKROOT/set_env/setup_gwfup.csh
 set echo
 
 echo 'About to run weight_bayesian_ul.py..'
-python ${FERMI_GWTOOLS}/bin/weight_bayesian_ul.py --map ${HEALPIX_PATH_MAP} --ul_directory ${OUTPUT_FILE_PATH}/FIXEDINTERVAL/ --outroot ${OUT_BAYUL} --db_file ${GW_DB_FILE_PATH}
+python ${FERMI_GWTOOLS}/bin/weight_bayesian_ul.py --map ${HEALPIX_PATH_MAP} --ul_directory ${OUTPUT_FILE_PATH}/FIXEDINTERVAL/ --outroot ${OUT_BAYUL} --db_file ${GW_DB_FILE_PATH}.json
 
 chmod a+w "${OUT_BAYUL}_ph.png"
 chmod a+w "${OUT_BAYUL}_ene.png"

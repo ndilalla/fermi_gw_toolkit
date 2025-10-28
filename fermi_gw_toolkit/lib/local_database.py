@@ -127,9 +127,9 @@ class gw_local_database(dict):
     
 if __name__ == '__main__':
     from fermi_gw_toolkit.utils.slack import send_chat
-    #db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4a_events.json')
-    db_file = os.path.join(GPL_TASKROOT, 'gw', 'databases', 'db_gw_O4c_events.json')
-    gw_local_database.create_empty(db_file)
+    db_file = os.path.join(GPL_TASKROOT, 'databases', 'db_gw_O4c_events.json')
+    #db_file = os.path.join(GPL_TASKROOT, 'gw', 'databases', 'db_gw_O4c_events.json')
+    #gw_local_database.create_empty(db_file)
     db = gw_local_database.load(db_file, locking=False, timeout=10)
     db.release_lock()
     # print(db.obs_run)

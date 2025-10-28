@@ -49,6 +49,9 @@ lle_dirs = lle_dirs[init:end]
 print('Processing %d events' % len(fti_dirs))
 
 for fti_dir, ati_dir, lle_dir in zip(fti_dirs, ati_dirs, lle_dirs):
+    if "bnS250103cj" in fti_dir:
+        print("Skipping bnS250103cj")
+        continue
     npz_files = glob('%s/*_bayesian_ul*.npz' % fti_dir)
     for npz_file in npz_files:
         os.remove(npz_file)

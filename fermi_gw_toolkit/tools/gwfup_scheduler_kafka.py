@@ -81,6 +81,8 @@ def parse_notice(record, test=False, trigger=None):
         nside = 64
         if len(instruments) < 2:
             nside = 32
+        if record['event']['significant'] is False and record['event']['group'] == 'Burst':
+            nside = 32
 
         # Parse sky map
         skymap_str = record.get('event', {}).pop('skymap')
